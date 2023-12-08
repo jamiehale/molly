@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "author": "Jamie Hale <jamiesonhale@gmail.com>",
-  "license": "MIT",
+  "license": "AGPL-3",
   "dependencies": {
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
