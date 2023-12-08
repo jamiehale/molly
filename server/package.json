@@ -1,0 +1,28 @@
+{
+  "name": "molly-server",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Jamie Hale <jamiesonhale@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "knex": "^3.0.1",
+    "pg": "^8.11.3"
+  },
+  "scripts": {
+    "start": "babel-node src/index.js",
+    "watch": "nodemon --exec babel-node ./src/index.js",
+    "db:migrate": "knex --esm migrate:latest",
+    "db:migrate:rollback": "knex --esm migrate:rollback",
+    "db:migrate:make": "knex --esm migrate:make",
+    "db:data:prune:yes:really": "rm -rf db/data/*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.5",
+    "@babel/node": "^7.22.19",
+    "@babel/preset-env": "^7.23.5",
+    "nodemon": "^3.0.2"
+  }
+}
