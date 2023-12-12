@@ -2,10 +2,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Knex from 'knex';
 import { config } from 'dotenv';
+import { api } from './api';
+import { HttpError, isHttpError } from './error';
 
 config();
 
-const knex = Knex({
+const db = Knex({
   client: 'pg',
   connection: {
     host: process.env.DB_HOST,
@@ -19,22 +21,28 @@ const knex = Knex({
 const app = express();
 const port = process.env.PORT;
 
-let artifacts = [];
-
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send('I have a ham radio');
-  console.log(artifacts);
 });
 
-app.get('/artifacts', (req, res) => {
-  res.json(JSON.stringify(artifacts));
+app.use('/api', api(db));
+
+app.use((req, res, next) => {
+  next(new HttpError('Not Found', 404));
 });
 
-app.post('/artifacts', (req, res) => {
-  artifacts = [...artifacts, req.body];
-  res.json(JSON.stringify(req.body));
+app.use((err, req, res, next) => {
+  let status = 500;
+  if (isHttpError(err)) {
+    status = err.status;
+  } else {
+    console.error('Error:', err);
+  }
+  res.status(status).json({
+    message: status === 500 ? 'Internal error' : err.message,
+  });
 });
 
 app.listen(port, () => {

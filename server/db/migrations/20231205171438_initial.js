@@ -8,24 +8,23 @@ const artifactType = (id, title) => ({ id, title });
 const artifactSource = (id, title) => ({ id, title });
 const artifactLocationType = (id, title) => ({ id, title });
 const artifactDateType = (id, title) => ({ id, title });
-const assetCollection = (id, title, baseUrl) => ({ id, title, baseUrl });
+const assetCollection = (id, title, baseUrl) => ({ id, title, base_url: baseUrl });
 
 export const up = (knex) =>
   knex.schema
     // Users
     //
-    .createTable('accounts', (table) => {
+    .createTable('users', (table) => {
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     })
     .createTable('api_keys', (table) => {
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
-      table.uuid('account_id').notNullable();
+      table.uuid('user_id').notNullable();
       table.string('secret').notNullable();
 
-      table.foreign('account_id').references('accounts.id');
-    })
-    .createTable('users', (table) => {
-      table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
+      table.foreign('user_id').references('users.id');
+
+      table.unique('secret');
     })
 
     // Look-ups
@@ -134,8 +133,11 @@ export const up = (knex) =>
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
       table.string('title').notNullable();
       table.string('type_id').notNullable();
+      table.string('date_value').nullable();
+      table.uuid('location_id').nullable();
 
       table.foreign('type_id').references('event_types.id');
+      table.foreign('location_id').references('locations.id');
     })
 
     // Artifacts
@@ -143,7 +145,7 @@ export const up = (knex) =>
     .createTable('artifacts', (table) => {
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
       table.string('title').notNullable();
-      table.text('description').notNullable();
+      table.text('description');
       table.text('type_id').notNullable();
       table.text('source_id').notNullable();
       table.uuid('creator_id').notNullable();
@@ -206,17 +208,6 @@ export const up = (knex) =>
 
       table.foreign('person_id').references('people.id');
       table.foreign('type_id').references('people_date_types.id');
-      table.foreign('creator_id').references('users.id');
-    })
-    .createTable('event_dates', (table) => {
-      table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
-      table.uuid('event_id').notNullable();
-      table.string('type_id').notNullable();
-      table.string('value').notNullable();
-      table.uuid('creator_id').notNullable();
-
-      table.foreign('event_id').references('events.id');
-      table.foreign('type_id').references('event_date_types.id');
       table.foreign('creator_id').references('users.id');
     })
     .createTable('artifact_dates', (table) => {
@@ -301,12 +292,19 @@ export const up = (knex) =>
         parentRole('other', 'Other'),
       ]),
     )
-    .then(() => knex('asset_collections').insert([assetCollection('main', 'Main', 'http://localhost/api/assets')]));
+    .then(() => knex('asset_collections').insert([assetCollection('main', 'Main', 'http://localhost/api/assets')]))
+    .then(() =>
+      knex('users')
+        .insert({})
+        .returning('id')
+        .then((records) => records[0])
+        .then((record) => record.id)
+        .then((userId) => knex('api_keys').insert({ user_id: userId, secret: '12345' })),
+    );
 
 export const down = (knex) =>
   knex.schema
     .dropTableIfExists('artifact_dates')
-    .dropTableIfExists('event_dates')
     .dropTableIfExists('people_dates')
     .dropTableIfExists('assets')
     .dropTableIfExists('artifact_events')
@@ -331,6 +329,5 @@ export const down = (knex) =>
     .dropTableIfExists('partnership_types')
     .dropTableIfExists('partner_roles')
     .dropTableIfExists('genders')
-    .dropTableIfExists('users')
     .dropTableIfExists('api_keys')
-    .dropTableIfExists('accounts');
+    .dropTableIfExists('users');
