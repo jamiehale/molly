@@ -1,9 +1,8 @@
 import express from 'express';
-import { get, withAuthentication } from '../resource-helpers';
+import { get, withUserId } from '../resource-helpers';
 import { readAllArtifactTypes } from '../data/artifact-types';
 
-const getArtifactTypes = (db) =>
-  withAuthentication(() => readAllArtifactTypes(db));
+const getArtifactTypes = (db) => withUserId(() => readAllArtifactTypes(db));
 
 export const artifactTypeRoutes = (db) => {
   const router = express.Router();

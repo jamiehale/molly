@@ -2,7 +2,7 @@ import { HttpError } from './error';
 import { throwIfNil } from './util';
 import { validate } from './validation';
 
-export const withAuthentication = (fn) => async (context) => {
+export const withUserId = (fn) => async (context) => {
   if (!context.res.locals.userId) {
     throw new Error('Not authenticated');
   }
@@ -35,6 +35,9 @@ const withErrorHandling = (fn) => (context) => {
   fn(context).catch(context.next);
 };
 
+export const optionalField = (name, payload, fieldName = name) =>
+  payload[name] === undefined ? {} : { [fieldName]: payload[name] };
+
 export const get = (router, path, fn, ...middleware) => {
   router.get(
     path,
@@ -45,6 +48,14 @@ export const get = (router, path, fn, ...middleware) => {
 
 export const post = (router, path, fn, ...middleware) => {
   router.post(
+    path,
+    ...middleware,
+    withInitialContext(withErrorHandling(withJsonResponse(fn))),
+  );
+};
+
+export const patch = (router, path, fn, ...middleware) => {
+  router.patch(
     path,
     ...middleware,
     withInitialContext(withErrorHandling(withJsonResponse(fn))),

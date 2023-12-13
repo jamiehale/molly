@@ -2,22 +2,28 @@ import express from 'express';
 import {
   get,
   post,
-  withAuthentication,
+  patch,
+  withUserId,
   withPayload,
   withParams,
+  optionalField,
 } from '../resource-helpers';
-import { readAllArtifacts, createArtifact } from '../data/artifacts';
+import {
+  readAllArtifacts,
+  readArtifact,
+  createArtifact,
+  updateArtifact,
+} from '../data/artifacts';
 import { createAsset, readAllAssetsByArtifactId } from '../data/assets';
 import {
   required,
+  optional,
   validArtifactType,
   validArtifactSource,
   validArtifactId,
 } from '../validation';
 
-const getArtifacts = (db) => withAuthentication(() => readAllArtifacts(db));
-
-const newArtifactDescriptor = (db) => ({
+const postArtifactPayload = (db) => ({
   title: required(),
   typeId: required(validArtifactType(db)),
   sourceId: required(validArtifactSource(db)),
@@ -31,14 +37,7 @@ const artifactFromPayload = (userId, payload) => ({
   creatorId: userId,
 });
 
-const postArtifact = (db) =>
-  withAuthentication(
-    withPayload(newArtifactDescriptor(db), (context) =>
-      createArtifact(db, artifactFromPayload(context.userId, context.payload)),
-    ),
-  );
-
-const newArtifactAssetDescriptor = () => ({
+const postArtifactAssetPayload = () => ({
   filename: required(),
   mimetype: required(),
 });
@@ -55,41 +54,90 @@ const assetFromPayload = (userId, artifactId, payload) => ({
   creatorId: userId,
 });
 
-const withDebug = (message, fn) => async (context) => {
-  console.log(`Context (${message}):`, context);
-  const result = await fn(context);
-  console.log(`Context after (${message})`, context);
-  return result;
-};
+const patchArtifactPayload = (db) => ({
+  title: optional(),
+  description: optional(),
+  typeId: optional(validArtifactType(db)),
+  sourceId: optional(validArtifactSource(db)),
+});
 
-const getArtifactAssets = (db) =>
-  withAuthentication(
+const artifactFieldsFromPayload = (payload) => ({
+  ...optionalField('title', payload),
+  ...optionalField('description', payload),
+  ...optionalField('typeId', payload, 'type_id'),
+  ...optionalField('sourceId', payload, 'source_id'),
+});
+
+export const artifactRoutes = (db) => {
+  const router = express.Router();
+
+  // artifacts
+  get(router, '/artifacts', () => readAllArtifacts(db));
+
+  get(
+    router,
+    '/artifacts/:id',
     withParams(artifactParams(db), (context) =>
-      readAllAssetsByArtifactId(db, context.params.id),
+      readArtifact(db, context.params.id),
     ),
   );
 
-const postArtifactAsset = (db) =>
-  withAuthentication(
-    withParams(
-      artifactParams(db),
-      withPayload(newArtifactAssetDescriptor(), (context) =>
-        createAsset(
+  post(
+    router,
+    '/artifacts',
+    withUserId(
+      withPayload(postArtifactPayload(db), (context) =>
+        createArtifact(
           db,
-          assetFromPayload(context.userId, context.params.id, context.payload),
+          artifactFromPayload(context.userId, context.payload),
         ),
       ),
     ),
   );
 
-export const artifactRoutes = (db) => {
-  const router = express.Router();
+  patch(
+    router,
+    '/artifacts/:id',
+    withParams(
+      artifactParams(db),
+      withPayload(patchArtifactPayload(db), (context) =>
+        updateArtifact(
+          db,
+          context.params.id,
+          artifactFieldsFromPayload(context.payload),
+        ),
+      ),
+    ),
+  );
 
-  get(router, '/artifacts', getArtifacts(db));
-  post(router, '/artifacts', postArtifact(db));
+  // assets
+  get(
+    router,
+    '/artifacts/:id/assets',
+    withParams(artifactParams(db), (context) =>
+      readAllAssetsByArtifactId(db, context.params.id),
+    ),
+  );
 
-  get(router, '/artifacts/:id/assets', getArtifactAssets(db));
-  post(router, '/artifacts/:id/assets', postArtifactAsset(db));
+  post(
+    router,
+    '/artifacts/:id/assets',
+    withParams(
+      artifactParams(db),
+      withUserId(
+        withPayload(postArtifactAssetPayload(), (context) =>
+          createAsset(
+            db,
+            assetFromPayload(
+              context.userId,
+              context.params.id,
+              context.payload,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 
   return router;
 };

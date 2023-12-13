@@ -1,4 +1,5 @@
-import { firstRecord } from '../util';
+import { NotFoundError } from '../error';
+import { firstRecord, throwIfNil } from '../util';
 
 const newRecordFromArtifact = (artifact) => ({
   title: artifact.title,
@@ -28,3 +29,18 @@ export const createArtifact = (db, artifact) =>
 
 export const readAllArtifacts = (db) =>
   db('artifacts').select('*').then(artifactsFromRecords);
+
+export const readArtifact = (db, id) =>
+  db('artifacts')
+    .where({ id })
+    .first()
+    .then(throwIfNil(() => NotFoundError(`Artifact id ${id}`)))
+    .then(artifactFromRecord);
+
+export const updateArtifact = (db, id, fields) =>
+  db('artifacts')
+    .where({ id })
+    .update(fields)
+    .returning('*')
+    .then(firstRecord)
+    .then(artifactFromRecord);

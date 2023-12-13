@@ -1,5 +1,5 @@
 import express from 'express';
-import { get, withAuthentication, withParams } from '../resource-helpers';
+import { get, withUserId, withParams } from '../resource-helpers';
 import { readAsset } from '../data/assets';
 import { required } from '../validation';
 
@@ -8,7 +8,7 @@ const assetParams = () => ({
 });
 
 const getAsset = (db) =>
-  withAuthentication(
+  withUserId(
     withParams(assetParams(), (context) => readAsset(db, context.params.id)),
   );
 
