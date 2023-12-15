@@ -17,12 +17,14 @@
     "db:migrate": "knex --esm migrate:latest",
     "db:migrate:rollback": "knex --esm migrate:rollback",
     "db:migrate:make": "knex --esm migrate:make",
-    "db:data:prune:yes:really": "rm -rf db/data/*"
+    "db:data:prune:yes:really": "rm -rf db/data/*",
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.23.5",
     "@babel/node": "^7.22.19",
     "@babel/preset-env": "^7.23.5",
+    "jest": "^29.7.0",
     "nodemon": "^3.0.2"
   }
 }

@@ -74,3 +74,7 @@ export const trace = (o) => {
 };
 
 export const toInt = (s) => parseInt(s, 10);
+
+export const capitalize = (s) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`;
+
+export const plural = (s) => `${s}s`;

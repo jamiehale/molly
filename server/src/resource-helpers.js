@@ -1,6 +1,7 @@
+import express from 'express';
 import { HttpError } from './error';
-import { throwIfNil } from './util';
-import { validate } from './validation';
+import { curry, throwIfNil } from './util';
+import { validResource, validate } from './validation';
 
 export const withUserId = (fn) => async (context) => {
   if (!context.res.locals.userId) {
@@ -33,7 +34,9 @@ export const withJsonResponse = (responseFn) => (context) =>
     });
 
 export const withErrorHandling = (fn) => (context) => {
-  fn(context).catch(context.next);
+  fn(context).catch((err) => {
+    return context.next(err);
+  });
 };
 
 export const optionalField = (name, payload, fieldName = name) =>
@@ -62,3 +65,66 @@ export const patch = (router, path, fn, ...middleware) => {
     withInitialContext(withErrorHandling(withJsonResponse(fn))),
   );
 };
+
+export const resourceParams = (validateResourceIdFn) => ({
+  id: validResource(validateResourceIdFn),
+});
+
+export const getAllResources = curry((path, actionFn, router) =>
+  router.get(
+    path,
+    withInitialContext(withErrorHandling(withJsonResponse(actionFn))),
+  ),
+);
+
+export const getSingleResource = curry(
+  (path, validateResourceIdFn, actionFn, router) =>
+    router.get(
+      `${path}/:id`,
+      withInitialContext(
+        withErrorHandling(
+          withJsonResponse(
+            withParams(resourceParams(validateResourceIdFn), (context) =>
+              actionFn(context.params.id),
+            ),
+          ),
+        ),
+      ),
+    ),
+);
+
+export const postResource = curry((path, payload, actionFn, router) =>
+  router.post(
+    path,
+    withInitialContext(
+      withErrorHandling(
+        withJsonResponse(withUserId(withPayload(payload, () => actionFn()))),
+      ),
+    ),
+  ),
+);
+
+export const patchResource = curry(
+  (path, validateResourceIdFn, payload, actionFn, router) =>
+    router.patch(
+      `${path}/:id`,
+      withInitialContext(
+        withErrorHandling(
+          withJsonResponse(
+            withParams(
+              resourceParams(validateResourceIdFn),
+              withPayload(payload, (context) =>
+                actionFn(context.params.id, context.payload),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+);
+
+export const routes = (a) =>
+  a.reduce((router, r) => {
+    r(router);
+    return router;
+  }, express.Router());

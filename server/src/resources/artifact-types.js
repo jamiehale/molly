@@ -1,6 +1,6 @@
 import express from 'express';
 import { get, withUserId } from '../resource-helpers';
-import { readAllArtifactTypes } from '../data/artifact-types';
+import { readAllArtifactTypes } from '../data/stores/artifact-types';
 
 const getArtifactTypes = (db) => withUserId(() => readAllArtifactTypes(db));
 

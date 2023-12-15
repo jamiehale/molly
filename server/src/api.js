@@ -6,14 +6,14 @@ import { artifactTypeRoutes } from './resources/artifact-types';
 import { assetRoutes } from './resources/assets';
 import { eventRoutes } from './resources/events';
 
-export const api = (db) => {
+export const api = (repos) => {
   const router = express.Router();
 
-  router.use(authenticated(db), userRoutes(db));
-  router.use(authenticated(db), artifactRoutes(db));
-  router.use(authenticated(db), artifactTypeRoutes(db));
-  router.use(authenticated(db), assetRoutes(db));
-  router.use(authenticated(db), eventRoutes(db));
+  // router.use(authenticated(repos), userRoutes(repos));
+  // router.use(authenticated(repos), artifactRoutes(repos));
+  // router.use(authenticated(repos), artifactTypeRoutes(repos));
+  // router.use(authenticated(repos), assetRoutes(repos));
+  router.use(authenticated(repos), eventRoutes(repos));
 
   return router;
 };

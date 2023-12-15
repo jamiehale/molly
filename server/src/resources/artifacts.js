@@ -7,26 +7,26 @@ import {
   withPayload,
   withParams,
   optionalField,
+  getAllResources,
+  getSingleResource,
+  postResource,
+  patchResource,
 } from '../resource-helpers';
 import {
   readAllArtifacts,
   readArtifact,
   createArtifact,
   updateArtifact,
-} from '../data/artifacts';
-import { createAsset, readAllAssetsByArtifactId } from '../data/assets';
-import {
-  required,
-  optional,
-  validArtifactType,
-  validArtifactSource,
-  validArtifactId,
-} from '../validation';
+  artifactExists,
+} from '../data/stores/artifacts';
+import { createAsset, readAllAssetsByArtifactId } from '../data/stores/assets';
+import { required, optional, validResource } from '../validation';
+import { composeP, curry } from '../util';
 
-const postArtifactPayload = (db) => ({
+const postArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
   title: required(),
-  typeId: required(validArtifactType(db)),
-  sourceId: required(validArtifactSource(db)),
+  typeId: composeP(required(), validResource(artifactTypeRepo)),
+  sourceId: composeP(required(), validResource(artifactSourceRepo)),
 });
 
 const artifactFromPayload = (userId, payload) => ({
@@ -42,8 +42,8 @@ const postArtifactAssetPayload = () => ({
   mimetype: required(),
 });
 
-const artifactParams = (db) => ({
-  id: required(validArtifactId(db)),
+const artifactParams = (repo) => ({
+  id: composeP(required(), validResource(repo)),
 });
 
 const assetFromPayload = (userId, artifactId, payload) => ({
@@ -54,11 +54,11 @@ const assetFromPayload = (userId, artifactId, payload) => ({
   creatorId: userId,
 });
 
-const patchArtifactPayload = (db) => ({
-  title: optional(),
-  description: optional(),
-  typeId: optional(validArtifactType(db)),
-  sourceId: optional(validArtifactSource(db)),
+const patchArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
+  title: optional,
+  description: optional,
+  typeId: validResource(artifactTypeRepo),
+  sourceId: validResource(artifactSourceRepo),
 });
 
 const artifactFieldsFromPayload = (payload) => ({
@@ -68,48 +68,41 @@ const artifactFieldsFromPayload = (payload) => ({
   ...optionalField('sourceId', payload, 'source_id'),
 });
 
-export const artifactRoutes = (db) => {
-  const router = express.Router();
-
-  // artifacts
-  get(router, '/artifacts', () => readAllArtifacts(db));
-
-  get(
-    router,
-    '/artifacts/:id',
-    withParams(artifactParams(db), (context) =>
-      readArtifact(db, context.params.id),
+// const getAllChildResources = curry((path, repo, ))
+export const artifactRoutes = ({
+  artifactRepo,
+  artifactTypeRepo,
+  artifactSourceRepo,
+}) =>
+  routes([
+    getAllResources('/artifacts', artifactRepo),
+    getSingleResource('/artifacts', artifactRepo),
+    postResource(
+      '/artifacts',
+      artifactRepo,
+      postArtifactPayload(artifactTypeRepo, artifactSourceRepo),
     ),
-  );
-
-  post(
-    router,
-    '/artifacts',
-    withUserId(
-      withPayload(postArtifactPayload(db), (context) =>
-        createArtifact(
-          db,
-          artifactFromPayload(context.userId, context.payload),
-        ),
-      ),
+    patchResource(
+      '/artifacts',
+      artifactRepo,
+      patchArtifactPayload(artifactTypeRepo, artifactSourceRepo),
     ),
-  );
+    // (router) =>
+    //   router.get(
+    //     '/artifacts/:id/assets',
+    //     withInitialContext(
+    //       withErrorHandling(
+    //         withJsonResponse(
+    //           withParams(artifactParams(artifactRepo), (context) =>
+    //             readAllAssetsByArtifactId(db, context.params.id),
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+  ]);
 
-  patch(
-    router,
-    '/artifacts/:id',
-    withParams(
-      artifactParams(db),
-      withPayload(patchArtifactPayload(db), (context) =>
-        updateArtifact(
-          db,
-          context.params.id,
-          artifactFieldsFromPayload(context.payload),
-        ),
-      ),
-    ),
-  );
-
+/*
   // assets
   get(
     router,
@@ -141,3 +134,4 @@ export const artifactRoutes = (db) => {
 
   return router;
 };
+*/

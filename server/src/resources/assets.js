@@ -1,6 +1,6 @@
 import express from 'express';
 import { get, withUserId, withParams } from '../resource-helpers';
-import { readAsset } from '../data/assets';
+import { readAsset } from '../data/stores/assets';
 import { required } from '../validation';
 
 const assetParams = () => ({

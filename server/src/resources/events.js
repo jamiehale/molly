@@ -1,27 +1,16 @@
-import express from 'express';
 import {
-  get,
-  post,
-  patch,
-  withUserId,
-  withPayload,
-  withParams,
   optionalField,
   withInitialContext,
   withErrorHandling,
   withJsonResponse,
+  withParams,
+  routes,
+  resourceParams,
+  withUserId,
+  withPayload,
 } from '../resource-helpers';
-import {
-  readAllEvents,
-  readEvent,
-  createEvent,
-  updateEvent,
-  eventExists,
-} from '../data/events';
 import { required, optional, validResource } from '../validation';
-import { eventTypeExists } from '../data/event-types';
-import { locationExists } from '../data/locations';
-import { composeP, curry } from '../util';
+import { composeP } from '../util';
 
 const postEventPayload = (eventTypeRepo, locationRepo) => ({
   title: required(),
@@ -52,115 +41,85 @@ const eventFieldsFromPayload = (payload) => ({
   ...optionalField('locationId', payload, 'location_id'),
 });
 
-const resourceParams = (repo) => ({
-  id: validResource(repo),
-});
-
-const routes = (a) =>
-  a.reduce((router, r) => {
-    r(router);
-    return router;
-  }, express.Router());
-
-export const eventRoutes = (db) => {
-  const repo = {
-    create: createEvent(db),
-    readAll: readAllEvents(db),
-    readSingle: readEvent(db),
-    exists: eventExists(db),
-    update: updateEvent(db),
-    // del: deleteEvent,
-  };
-
-  const eventTypeRepo = {
-    exists: eventTypeExists(db),
-  };
-
-  const locationRepo = {
-    exists: locationExists(db),
-  };
-
-  console.log(repo);
-
-  const getAllResources = curry((path, repo, router) =>
-    router.get(
-      path,
-      withInitialContext(
-        withErrorHandling(withJsonResponse((context) => repo.readAll())),
-      ),
-    ),
-  );
-
-  const getSingleResource = curry((path, repo, router) =>
-    router.get(
-      `${path}/:id`,
-      withInitialContext(
-        withErrorHandling(
-          withJsonResponse(
-            withParams(resourceParams(repo), (context) =>
-              repo.readSingle(context.params.id),
+export const eventRoutes = ({
+  artifactRepo,
+  eventRepo,
+  eventTypeRepo,
+  locationRepo,
+}) =>
+  routes([
+    (router) =>
+      router.get(
+        '/events/:id',
+        withInitialContext(
+          withErrorHandling(
+            withJsonResponse(
+              withParams(
+                resourceParams((id) => eventRepo.eventExists(id)),
+                ({ params }) => eventRepo.readEvent(params.id),
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
-  const postResource = curry(
-    (path, repo, payload, resourceFromPayload, router) =>
+    (router) =>
+      router.get(
+        '/events',
+        withInitialContext(
+          withErrorHandling(withJsonResponse(() => eventRepo.readAllEvents())),
+        ),
+      ),
+    (router) =>
       router.post(
-        path,
+        '/events',
         withInitialContext(
           withErrorHandling(
             withJsonResponse(
               withUserId(
-                withPayload(payload, (context) =>
-                  repo.create(
-                    resourceFromPayload(context.userId, context.payload),
-                  ),
+                withPayload(
+                  postEventPayload(eventTypeRepo, locationRepo),
+                  ({ userId, payload }) =>
+                    eventRepo.createEvent(resourceFromPayload(userId, payload)),
                 ),
               ),
             ),
           ),
         ),
       ),
-  );
-  const patchResource = curry(
-    (path, repo, payload, fieldsFromPayload, router) =>
+    (router) =>
       router.patch(
-        `${path}/:id`,
+        '/events/:id',
         withInitialContext(
           withErrorHandling(
             withJsonResponse(
               withParams(
-                resourceParams(repo),
-                withPayload(payload, (context) => {
-                  console.log(context);
-                  return repo.update(
-                    context.params.id,
-                    fieldsFromPayload(context.payload),
-                  );
-                }),
+                resourceParams((id) => eventRepo.eventExists(id)),
+                withPayload(
+                  patchEventPayload(eventTypeRepo, locationRepo),
+                  ({ params, payload }) =>
+                    eventRepo.updateEvent(
+                      params.id,
+                      eventFieldsFromPayload(payload),
+                    ),
+                ),
               ),
             ),
           ),
         ),
       ),
-  );
-
-  return routes([
-    getAllResources('/events', repo),
-    getSingleResource('/events', repo),
-    postResource(
-      '/events',
-      repo,
-      postEventPayload(eventTypeRepo, locationRepo),
-      eventFromPayload,
-    ),
-    patchResource(
-      '/events',
-      repo,
-      patchEventPayload(eventTypeRepo, locationRepo),
-      eventFieldsFromPayload,
-    ),
+    (router) =>
+      router.get(
+        '/events/:id/artifacts',
+        withInitialContext(
+          withErrorHandling(
+            withJsonResponse(
+              withParams(
+                resourceParams((id) => eventRepo.exists(id)),
+                ({ params }) =>
+                  artifactRepo.readAllArtifacts({ eventId: params.id }),
+              ),
+            ),
+          ),
+        ),
+      ),
   ]);
-};
