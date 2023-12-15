@@ -1,5 +1,16 @@
 import { HttpError, NotFoundError, isHttpError } from './error';
-import { ifElse, isUndefined, throwIfEmpty, throwIfNil } from './util';
+import {
+  always,
+  identity,
+  identityP,
+  ifElse,
+  isUndefined,
+  prop,
+  throwIfEmpty,
+  throwIfFalse,
+  throwIfNil,
+} from './util';
+import { readEventType } from './data/event-types';
 
 export const validate = (descriptor, body) =>
   Object.keys(descriptor)
@@ -7,7 +18,7 @@ export const validate = (descriptor, body) =>
       (pAcc, field) =>
         pAcc.then((acc) =>
           descriptor[field]({ field, value: body[field], body }).then(
-            (value) => ({ ...acc, [field]: value }),
+            ({ value }) => ({ ...acc, [field]: value }),
           ),
         ),
       Promise.resolve({}),
@@ -21,20 +32,19 @@ export const validate = (descriptor, body) =>
 
 const endOfChain = ({ value }) => Promise.resolve(value);
 
+const defaultRequiredErrorFn = ({ field }) =>
+  new Error(`Missing required value ${field}`);
+
 export const required =
-  (next = endOfChain) =>
+  (errorFn = defaultRequiredErrorFn) =>
   async (o) => {
-    const { field, value, body } = o;
-    if (value === undefined) {
-      throw new Error(`Missing required value '${field}'`);
+    if (o.value === undefined) {
+      throw errorFn(o);
     }
-    return next(o);
+    return o;
   };
 
-export const optional =
-  (next = endOfChain) =>
-  async (o) =>
-    next(o);
+export const optional = async (o) => o;
 
 export const validArtifactType = (db, next = endOfChain) =>
   ifElse(
@@ -73,7 +83,7 @@ export const validArtifactId = (db, next = endOfChain) =>
         .then(() => next(o)),
   );
 
-export const validEventId = (db, next = endOfChain) =>
+export const validEvent = (db, next = endOfChain) =>
   ifElse(
     (o) => isUndefined(o.value),
     next,
@@ -89,9 +99,8 @@ export const validEventType = (db, next = endOfChain) =>
     (o) => isUndefined(o.value),
     next,
     (o) =>
-      db('event_types')
-        .where({ id: o.value })
-        .then(throwIfEmpty(() => new NotFoundError(`Event type '${o.value}'`)))
+      readEventType(db, o.value)
+        .then(throwIfNil(() => new NotFoundError(`Event type '${o.value}'`)))
         .then(() => next(o)),
   );
 
@@ -104,4 +113,18 @@ export const validLocation = (db, next = endOfChain) =>
         .where({ id: o.value })
         .then(throwIfEmpty(() => new NotFoundError(`Event type '${o.value}'`)))
         .then(() => next(o)),
+  );
+
+const defaultValidResourceErrorFn = ({ field, value }) =>
+  new Error(`Invalid resource id '${value}' (${field})`);
+
+export const validResource = (repo, errorFn = defaultValidResourceErrorFn) =>
+  ifElse(
+    (o) => isUndefined(o.value),
+    identityP,
+    (o) =>
+      repo
+        .exists(o.value)
+        .then(throwIfFalse(() => errorFn(o)))
+        .then(always(o)),
   );

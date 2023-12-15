@@ -22,16 +22,17 @@ export const withPayload = (descriptor, fn) => (context) =>
     return fn(context);
   });
 
-const withInitialContext = (fn) => (req, res, next) => fn({ req, res, next });
+export const withInitialContext = (fn) => (req, res, next) =>
+  fn({ req, res, next });
 
-const withJsonResponse = (responseFn) => (context) =>
+export const withJsonResponse = (responseFn) => (context) =>
   responseFn(context)
     .then(throwIfNil(() => new HttpError('Invalid response')))
     .then((responseValue) => {
       context.res.json(responseValue);
     });
 
-const withErrorHandling = (fn) => (context) => {
+export const withErrorHandling = (fn) => (context) => {
   fn(context).catch(context.next);
 };
 

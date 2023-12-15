@@ -1,5 +1,13 @@
 import { NotFoundError } from '../error';
-import { firstRecord, throwIfNil } from '../util';
+import {
+  curry,
+  eq,
+  firstRecord,
+  prop,
+  throwIfNil,
+  thunk,
+  toInt,
+} from '../util';
 
 const newRecordFromEvent = (event) => ({
   title: event.title,
@@ -18,27 +26,41 @@ const eventFromRecord = (record) => ({
 
 const eventsFromRecords = (records) => records.map(eventFromRecord);
 
-export const createEvent = (db, event) =>
+export const createEvent = curry((db, event) =>
   db('events')
     .insert(newRecordFromEvent(event))
     .returning('*')
     .then(firstRecord)
-    .then(eventFromRecord);
+    .then(eventFromRecord),
+);
 
-export const readAllEvents = (db) =>
-  db('events').select('*').then(eventsFromRecords);
+export const readAllEvents = thunk((db) =>
+  db('events').select('*').then(eventsFromRecords),
+);
 
-export const readevent = (db, id) =>
+export const readEvent = curry((db, id) =>
   db('events')
     .where({ id })
     .first()
     .then(throwIfNil(() => NotFoundError(`Event id ${id}`)))
-    .then(eventFromRecord);
+    .then(eventFromRecord),
+);
 
-export const updateEvent = (db, id, fields) =>
+export const eventExists = curry((db, id) =>
+  db('events')
+    .where({ id })
+    .count()
+    .then(firstRecord)
+    .then(prop('count'))
+    .then(toInt)
+    .then(eq(1)),
+);
+
+export const updateEvent = curry((db, id, fields) =>
   db('events')
     .where({ id })
     .update(fields)
     .returning('*')
     .then(firstRecord)
-    .then(eventFromRecord);
+    .then(eventFromRecord),
+);
