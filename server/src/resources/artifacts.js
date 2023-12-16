@@ -1,27 +1,11 @@
-import express from 'express';
 import {
-  get,
-  post,
-  patch,
-  withUserId,
-  withPayload,
-  withParams,
   optionalField,
-  getAllResources,
-  getSingleResource,
-  postResource,
-  patchResource,
+  routes,
+  baseResourceRoutes,
+  withUserId,
 } from '../resource-helpers';
-import {
-  readAllArtifacts,
-  readArtifact,
-  createArtifact,
-  updateArtifact,
-  artifactExists,
-} from '../data/stores/artifacts';
-import { createAsset, readAllAssetsByArtifactId } from '../data/stores/assets';
 import { required, optional, validResource } from '../validation';
-import { composeP, curry } from '../util';
+import { composeP } from '../util';
 
 const postArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
   title: required(),
@@ -42,10 +26,6 @@ const postArtifactAssetPayload = () => ({
   mimetype: required(),
 });
 
-const artifactParams = (repo) => ({
-  id: composeP(required(), validResource(repo)),
-});
-
 const assetFromPayload = (userId, artifactId, payload) => ({
   filename: payload.filename,
   mimetype: payload.mimetype,
@@ -55,8 +35,8 @@ const assetFromPayload = (userId, artifactId, payload) => ({
 });
 
 const patchArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
-  title: optional,
-  description: optional,
+  title: optional(),
+  description: optional(),
   typeId: validResource(artifactTypeRepo),
   sourceId: validResource(artifactSourceRepo),
 });
@@ -68,38 +48,28 @@ const artifactFieldsFromPayload = (payload) => ({
   ...optionalField('sourceId', payload, 'source_id'),
 });
 
-// const getAllChildResources = curry((path, repo, ))
 export const artifactRoutes = ({
   artifactRepo,
   artifactTypeRepo,
   artifactSourceRepo,
 }) =>
   routes([
-    getAllResources('/artifacts', artifactRepo),
-    getSingleResource('/artifacts', artifactRepo),
-    postResource(
-      '/artifacts',
-      artifactRepo,
+    ...baseResourceRoutes(
+      'artifact',
+      (id) => artifactRepo.artifactExists(id),
+      ({ params }) => artifactRepo.readArtifact(params.id),
+      () => artifactRepo.readAllArtifacts(),
       postArtifactPayload(artifactTypeRepo, artifactSourceRepo),
-    ),
-    patchResource(
-      '/artifacts',
-      artifactRepo,
+      ({ userId, payload }) =>
+        artifactRepo.createArtifact(artifactFromPayload(userId, payload)),
       patchArtifactPayload(artifactTypeRepo, artifactSourceRepo),
+      ({ params, payload }) =>
+        artifactRepo.updateArtifact(
+          params.id,
+          artifactFieldsFromPayload(payload),
+        ),
+      withUserId,
     ),
-    // (router) =>
-    //   router.get(
-    //     '/artifacts/:id/assets',
-    //     withInitialContext(
-    //       withErrorHandling(
-    //         withJsonResponse(
-    //           withParams(artifactParams(artifactRepo), (context) =>
-    //             readAllAssetsByArtifactId(db, context.params.id),
-    //           ),
-    //         ),
-    //       ),
-    //     ),
-    //   ),
   ]);
 
 /*

@@ -1,11 +1,19 @@
 import express from 'express';
-import { HttpError } from './error';
-import { curry, throwIfNil } from './util';
+import {
+  HttpError,
+  InternalError,
+  UnauthorizedError,
+  isInternalError,
+  isMollyError,
+  isParameterError,
+  isUnauthorizedError,
+} from './error';
+import { plural, throwIfNil } from './util';
 import { validResource, validate } from './validation';
 
 export const withUserId = (fn) => async (context) => {
   if (!context.res.locals.userId) {
-    throw new Error('Not authenticated');
+    throw new UnauthorizedError('Not authenticated');
   }
   context.userId = context.res.locals.userId;
   return fn(context);
@@ -26,105 +34,134 @@ export const withPayload = (descriptor, fn) => (context) =>
 export const withInitialContext = (fn) => (req, res, next) =>
   fn({ req, res, next });
 
-export const withJsonResponse = (responseFn) => (context) =>
-  responseFn(context)
-    .then(throwIfNil(() => new HttpError('Invalid response')))
+export const withJsonResponse = (fn) => (context) =>
+  fn(context)
+    .then(throwIfNil(() => new InternalError('Invalid response')))
     .then((responseValue) => {
       context.res.json(responseValue);
     });
 
+const httpErrorFromMollyError = (mollyError) => {
+  if (isUnauthorizedError(mollyError)) {
+    return new HttpError(mollyError.message, 401);
+  }
+  if (isInternalError(mollyError)) {
+    console.error(mollyError);
+    return new HttpError('Internal error', 500);
+  }
+  if (isParameterError(mollyError)) {
+    return new HttpError(mollyError.message, 400);
+  }
+  return new HttpError(mollyError.message, 500);
+};
+
 export const withErrorHandling = (fn) => (context) => {
   fn(context).catch((err) => {
-    return context.next(err);
+    return context.next(httpErrorFromMollyError(err));
   });
 };
 
 export const optionalField = (name, payload, fieldName = name) =>
   payload[name] === undefined ? {} : { [fieldName]: payload[name] };
 
-export const get = (router, path, fn, ...middleware) => {
-  router.get(
-    path,
-    ...middleware,
-    withInitialContext(withErrorHandling(withJsonResponse(fn))),
-  );
-};
-
-export const post = (router, path, fn, ...middleware) => {
-  router.post(
-    path,
-    ...middleware,
-    withInitialContext(withErrorHandling(withJsonResponse(fn))),
-  );
-};
-
-export const patch = (router, path, fn, ...middleware) => {
-  router.patch(
-    path,
-    ...middleware,
-    withInitialContext(withErrorHandling(withJsonResponse(fn))),
-  );
-};
-
 export const resourceParams = (validateResourceIdFn) => ({
   id: validResource(validateResourceIdFn),
 });
 
-export const getAllResources = curry((path, actionFn, router) =>
-  router.get(
-    path,
-    withInitialContext(withErrorHandling(withJsonResponse(actionFn))),
-  ),
-);
+export const routes = (handlers) =>
+  handlers.reduce((router, handler) => {
+    handler(router);
+    return router;
+  }, express.Router());
 
-export const getSingleResource = curry(
-  (path, validateResourceIdFn, actionFn, router) =>
+const passThrough = (fn) => (context) => fn(context);
+
+const getSingleResource =
+  (name, validateResourceFn, readResourceFn, extraFn = passThrough) =>
+  (router) =>
     router.get(
-      `${path}/:id`,
+      `/${plural(name)}/:id`,
       withInitialContext(
         withErrorHandling(
-          withJsonResponse(
-            withParams(resourceParams(validateResourceIdFn), (context) =>
-              actionFn(context.params.id),
+          extraFn(
+            withJsonResponse(
+              withParams(resourceParams(validateResourceFn), readResourceFn),
             ),
           ),
         ),
       ),
-    ),
-);
+    );
 
-export const postResource = curry((path, payload, actionFn, router) =>
-  router.post(
-    path,
-    withInitialContext(
-      withErrorHandling(
-        withJsonResponse(withUserId(withPayload(payload, () => actionFn()))),
+const getAllResources =
+  (name, readAllResourcesFn, extraFn = passThrough) =>
+  (router) =>
+    router.get(
+      `/${plural(name)}`,
+      withInitialContext(
+        withErrorHandling(extraFn(withJsonResponse(readAllResourcesFn))),
       ),
-    ),
-  ),
-);
+    );
 
-export const patchResource = curry(
-  (path, validateResourceIdFn, payload, actionFn, router) =>
-    router.patch(
-      `${path}/:id`,
+const postResource =
+  (name, descriptor, createResourceFn, extraFn = passThrough) =>
+  (router) =>
+    router.post(
+      `/${plural(name)}`,
       withInitialContext(
         withErrorHandling(
-          withJsonResponse(
-            withParams(
-              resourceParams(validateResourceIdFn),
-              withPayload(payload, (context) =>
-                actionFn(context.params.id, context.payload),
+          extraFn(
+            withJsonResponse(
+              withUserId(withPayload(descriptor, createResourceFn)),
+            ),
+          ),
+        ),
+      ),
+    );
+
+const patchResource =
+  (
+    name,
+    validateResourceFn,
+    descriptor,
+    updateResourceFn,
+    extraFn = passThrough,
+  ) =>
+  (router) =>
+    router.patch(
+      `/${plural(name)}/:id`,
+      withInitialContext(
+        withErrorHandling(
+          extraFn(
+            withJsonResponse(
+              withParams(
+                resourceParams(validateResourceFn),
+                withPayload(descriptor, updateResourceFn),
               ),
             ),
           ),
         ),
       ),
-    ),
-);
+    );
 
-export const routes = (a) =>
-  a.reduce((router, r) => {
-    r(router);
-    return router;
-  }, express.Router());
+export const baseResourceRoutes = (
+  name,
+  validateResourceFn,
+  readResourceFn,
+  readAllResourcesFn,
+  postDescriptor,
+  createResourceFn,
+  patchDescriptor,
+  updateResourceFn,
+  extraFn = passThrough,
+) => [
+  getSingleResource(name, validateResourceFn, readResourceFn, extraFn),
+  getAllResources(name, readAllResourcesFn, extraFn),
+  postResource(name, postDescriptor, createResourceFn, extraFn),
+  patchResource(
+    name,
+    validateResourceFn,
+    patchDescriptor,
+    updateResourceFn,
+    extraFn,
+  ),
+];
