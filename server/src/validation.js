@@ -1,5 +1,6 @@
 import { ParameterError } from './error';
 import { always, identityP, ifElse, isUndefined, throwIfFalse } from './util';
+import * as U from './util';
 
 const removeEmptyValues = (o) =>
   Object.keys(o).reduce(
@@ -7,21 +8,55 @@ const removeEmptyValues = (o) =>
     {},
   );
 
-export const validate = (descriptor, body) =>
-  Object.keys(descriptor)
-    .reduce(
-      (pAcc, field) =>
+export const any = () => async (o) => o;
+
+export const and =
+  (v1, ...vs) =>
+  (o) =>
+    vs.reduce(
+      (pAcc, v) => pAcc.then((acc) => v({ scope: o.scope, value: acc })),
+      v1(o),
+    );
+
+// export const check = (validateFn, checkFn) => (o) =>
+export const object =
+  (descriptor) =>
+  ({ scope, value }) => {
+    if (U.type(value) !== 'Object') {
+      throw new ParameterError(
+        `${scope}: expecting object but got ${U.type(value)}`,
+      );
+    }
+    return Object.keys(descriptor).reduce(
+      (pAcc, key) =>
         pAcc.then((acc) =>
-          descriptor[field]({ field, value: body[field], body }).then(
-            ({ value }) => ({ ...acc, [field]: value }),
-          ),
+          descriptor[key]({
+            scope: key,
+            value: value[key],
+          }).then((result) => ({
+            ...acc,
+            ...(U.isUndefined(result) ? {} : { [key]: result }),
+          })),
         ),
       Promise.resolve({}),
-    )
-    .then(removeEmptyValues);
+    );
+  };
 
-const defaultRequiredErrorFn = ({ field }) =>
-  new ParameterError(`Missing required value ${field}`);
+// export const validate = (descriptor, body) =>
+//   Object.keys(descriptor)
+//     .reduce(
+//       (pAcc, field) =>
+//         pAcc.then((acc) =>
+//           descriptor[field]({ field, value: body[field], body }).then(
+//             ({ value }) => ({ ...acc, [field]: value }),
+//           ),
+//         ),
+//       Promise.resolve({}),
+//     )
+//     .then(removeEmptyValues);
+
+const defaultRequiredErrorFn = ({ scope }) =>
+  new ParameterError(`${scope}: required`);
 
 export const required =
   (errorFn = defaultRequiredErrorFn) =>
@@ -29,13 +64,13 @@ export const required =
     if (o.value === undefined) {
       throw errorFn(o);
     }
-    return o;
+    return o.value;
   };
 
 const defaultMatchesErrorFn =
   (regex) =>
-  ({ value, field }) =>
-    new ParameterError(`${value} (${field}) does not match ${regex}`);
+  ({ value, scope }) =>
+    new ParameterError(`${scope}: '${value}' does not match pattern ${regex}`);
 
 export const matches =
   (regex, errorFn = defaultMatchesErrorFn(regex)) =>
@@ -43,7 +78,7 @@ export const matches =
     if (!regex.test(o.value)) {
       throw errorFn(o);
     }
-    return o;
+    return o.value;
   };
 
 const UUID_REGEX =
@@ -54,16 +89,16 @@ export const isUuid = (errorFn = defaultMatchesErrorFn(UUID_REGEX)) =>
 
 export const optional = (ifPresentFn) => async (o) => {
   if (o.value === undefined) {
-    return o;
+    return o.value;
   }
   if (ifPresentFn) {
     return ifPresentFn(o);
   }
-  return o;
+  return o.value;
 };
 
-const defaultIsNullErrorFn = (o) =>
-  new ParameterError(`${o.field} expected to be null`);
+const defaultIsNullErrorFn = ({ scope }) =>
+  new ParameterError(`${scope}: expected null`);
 
 export const isNull =
   (errorFn = defaultIsNullErrorFn) =>
@@ -71,12 +106,24 @@ export const isNull =
     if (o.value !== null) {
       throw errorFn(o);
     }
-    return o;
+    return o.value;
   };
 
-const defaultEitherErrorFn = (eitherErr, orErr) =>
+const defaultIsNotNullErrorFn = ({ scope }) =>
+  new ParameterError(`${scope}: expected not null`);
+
+export const isNotNull =
+  (errorFn = defaultIsNotNullErrorFn) =>
+  async (o) => {
+    if (o.value === null) {
+      throw errorFn(o);
+    }
+    return o.value;
+  };
+
+const defaultEitherErrorFn = (eitherErr, orErr, { scope }) =>
   new ParameterError(
-    `${o.field} doesn't match either expected condition (${eitherErr.message}, ${orErr.message})`,
+    `${scope}: doesn't match either expected condition (${eitherErr.message}, ${orErr.message})`,
   );
 
 export const either =
@@ -92,13 +139,13 @@ export const either =
         await orFn(orO);
         return orO;
       } catch (orErr) {
-        throw errorFn(eitherErr, orErr);
+        throw errorFn(eitherErr, orErr, o);
       }
     }
   };
 
-const defaultValidResourceErrorFn = ({ field, value }) =>
-  new ParameterError(`Invalid resource id '${value}' (${field})`);
+const defaultValidResourceErrorFn = ({ scope, value }) =>
+  new ParameterError(`${scope}: invalid resource id '${value}'`);
 
 export const validResource = (
   validateResourceIdFn,
@@ -110,5 +157,23 @@ export const validResource = (
     (o) =>
       validateResourceIdFn(o.value)
         .then(throwIfFalse(() => errorFn(o)))
-        .then(always(o)),
+        .then(always(o.value)),
   );
+
+const defaultValidDateValueErrorFn = ({ scope, value }) =>
+  new ParameterError(`${scope}: invalid date ${value}`);
+
+export const validDateValue =
+  (errorFn = defaultValidDateValueErrorFn) =>
+  async (o) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(o.value)) {
+      if (isNaN(Date.parse(o.value))) {
+        throw errorFn(o);
+      }
+      return o.value;
+    }
+    if (/^(abt )?\d{4}$/.test(o.value.toLowerCase())) {
+      return o.value;
+    }
+    throw errorFn(o);
+  };

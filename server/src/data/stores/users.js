@@ -1,3 +1,4 @@
+import { renameKeys } from '../../util';
 import { createResourceStore } from '../resource-store';
 
 const userFromRecord = (record) => ({
@@ -5,5 +6,10 @@ const userFromRecord = (record) => ({
   accountId: record.account_id,
 });
 
+const userKeyMap = {
+  id: 'id',
+  accountId: 'account_id',
+};
+
 export const createUsersStore = (db) =>
-  createResourceStore(db, 'users', userFromRecord, {});
+  createResourceStore(db, 'users', userFromRecord, renameKeys(userKeyMap));

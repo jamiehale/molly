@@ -1,12 +1,15 @@
+import { renameKeys } from '../../util';
 import { createResourceStore } from '../resource-store';
 
-const newRecordFromArtifact = (artifact) => ({
-  title: artifact.title,
-  description: artifact.description,
-  type_id: artifact.typeId,
-  source_id: artifact.sourceId,
-  creator_id: artifact.creatorId,
-});
+const artifactKeyMap = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  typeId: 'type_id',
+  sourceId: 'source_id',
+  collectionId: 'collection_id',
+  creatorId: 'creator_id',
+};
 
 const artifactFromRecord = (record) => ({
   id: record.id,
@@ -14,6 +17,7 @@ const artifactFromRecord = (record) => ({
   description: record.description,
   typeId: record.type_id,
   sourceId: record.source_id,
+  collectionId: record.collection_id,
   creatorId: record.creator_id,
 });
 
@@ -22,5 +26,5 @@ export const createArtifactStore = (db) =>
     db,
     'artifacts',
     artifactFromRecord,
-    newRecordFromArtifact,
+    renameKeys(artifactKeyMap),
   );

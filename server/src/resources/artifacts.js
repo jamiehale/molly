@@ -3,14 +3,27 @@ import {
   routes,
   baseResourceRoutes,
   withUserId,
+  withInitialContext,
+  withErrorHandling,
+  withJsonResponse,
+  withParams,
+  resourceParams,
 } from '../resource-helpers';
-import { required, optional, validResource } from '../validation';
+import { required, optional, validResource, isNotNull } from '../validation';
 import { composeP } from '../util';
 
 const postArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
-  title: required(),
-  typeId: composeP(required(), validResource(artifactTypeRepo)),
-  sourceId: composeP(required(), validResource(artifactSourceRepo)),
+  title: composeP(isNotNull(), required()),
+  typeId: composeP(
+    validResource((id) => artifactTypeRepo.artifactTypeExists(id)),
+    isNotNull(),
+    required(),
+  ),
+  sourceId: composeP(
+    validResource((id) => artifactSourceRepo.artifactSourceExists(id)),
+    isNotNull(),
+    required(),
+  ),
 });
 
 const artifactFromPayload = (userId, payload) => ({
@@ -35,23 +48,34 @@ const assetFromPayload = (userId, artifactId, payload) => ({
 });
 
 const patchArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
-  title: optional(),
+  title: optional(isNotNull()),
   description: optional(),
-  typeId: validResource(artifactTypeRepo),
-  sourceId: validResource(artifactSourceRepo),
+  typeId: optional(
+    composeP(
+      validResource((id) => artifactTypeRepo.artifactTypeExists(id)),
+      isNotNull(),
+    ),
+  ),
+  sourceId: optional(
+    composeP(
+      validResource((id) => artifactSourceRepo.artifactSourceExists(id)),
+      isNotNull(),
+    ),
+  ),
 });
 
 const artifactFieldsFromPayload = (payload) => ({
   ...optionalField('title', payload),
   ...optionalField('description', payload),
-  ...optionalField('typeId', payload, 'type_id'),
-  ...optionalField('sourceId', payload, 'source_id'),
+  ...optionalField('typeId', payload),
+  ...optionalField('sourceId', payload),
 });
 
 export const artifactRoutes = ({
   artifactRepo,
   artifactTypeRepo,
   artifactSourceRepo,
+  assetRepo,
 }) =>
   routes([
     ...baseResourceRoutes(
@@ -70,6 +94,23 @@ export const artifactRoutes = ({
         ),
       withUserId,
     ),
+    (router) =>
+      router.get(
+        '/artifacts/:id/assets',
+        withInitialContext(
+          withErrorHandling(
+            withUserId(
+              withJsonResponse(
+                withParams(
+                  resourceParams((id) => artifactRepo.artifactExists(id)),
+                  ({ params }) =>
+                    assetRepo.readAllAssets({ artifactId: params.id }),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
   ]);
 
 /*

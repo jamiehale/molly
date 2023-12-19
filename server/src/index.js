@@ -20,6 +20,10 @@ import { createUsersStore } from './data/stores/users';
 import { createApiKeyRepo } from './data/repos/api-keys';
 import { createAssetRepo } from './data/repos/assets';
 import { createUserRepo } from './data/repos/users';
+import { createArtifactSourceRepo } from './data/repos/artifact-sources';
+import { createArtifactSourceStore } from './data/stores/artifact-sources';
+import { createArtifactCollectionRepo } from './data/repos/artifact-collections';
+import { createArtifactCollectionStore } from './data/stores/artifact-collections';
 
 config();
 
@@ -36,6 +40,8 @@ const db = Knex({
 
 const stores = {
   apiKeyStore: createApiKeyStore(db),
+  artifactCollectionStore: createArtifactCollectionStore(db),
+  artifactSourceStore: createArtifactSourceStore(db),
   artifactTypeStore: createArtifactTypeStore(db),
   artifactStore: createArtifactStore(db),
   assetStore: createAssetStore(db),
@@ -47,6 +53,8 @@ const stores = {
 
 const repos = {
   apiKeyRepo: createApiKeyRepo(stores),
+  artifactCollectionRepo: createArtifactCollectionRepo(stores),
+  artifactSourceRepo: createArtifactSourceRepo(stores),
   artifactTypeRepo: createArtifactTypeRepo(stores),
   artifactRepo: createArtifactRepo(stores),
   assetRepo: createAssetRepo(stores),

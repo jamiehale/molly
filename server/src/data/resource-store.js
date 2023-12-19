@@ -13,24 +13,25 @@ const create = curry((db, table, objectFromRecord, recordFromObject, fields) =>
     .then(objectFromRecord),
 );
 
-const readSingle = curry((db, table, objectFromRecord, specifier) =>
-  db(table)
-    .where(specifier)
-    .first()
-    .then(throwIfNil(() => NotFoundError(`Event id ${id}`)))
-    .then(objectFromRecord),
+const readSingle = curry(
+  (db, table, objectFromRecord, recordFromObject, specifier) =>
+    db(table)
+      .where(recordFromObject(specifier))
+      .first()
+      .then(throwIfNil(() => NotFoundError(`Event id ${id}`)))
+      .then(objectFromRecord),
 );
 
-const readAll = curry((db, table, objectFromRecord, filter) =>
+const readAll = curry((db, table, objectFromRecord, recordFromObject, filter) =>
   db(table)
-    .where(filter)
+    .where(recordFromObject(filter))
     .select('*')
     .then(objectsFromRecords(objectFromRecord)),
 );
 
-const exists = curry((db, table, specifier) =>
+const exists = curry((db, table, recordFromObject, specifier) =>
   db(table)
-    .where(specifier)
+    .where(recordFromObject(specifier))
     .count()
     .then(firstRecord)
     .then(prop('count'))
@@ -41,7 +42,7 @@ const exists = curry((db, table, specifier) =>
 const updateSingle = curry(
   (db, table, objectFromRecord, recordFromObject, specifier, fields) =>
     db(table)
-      .where(specifier)
+      .where(recordFromObject(specifier))
       .update(recordFromObject(fields))
       .returning('*')
       .then(firstRecord)
@@ -65,9 +66,9 @@ export const createResourceStore = (
   recordFromObject,
 ) => ({
   create: create(db, table, objectFromRecord, recordFromObject),
-  readSingle: readSingle(db, table, objectFromRecord),
-  readAll: readAll(db, table, objectFromRecord),
-  exists: exists(db, table),
+  readSingle: readSingle(db, table, objectFromRecord, recordFromObject),
+  readAll: readAll(db, table, objectFromRecord, recordFromObject),
+  exists: exists(db, table, recordFromObject),
   updateSingle: updateSingle(db, table, objectFromRecord, recordFromObject),
   updateAll: updateAll(db, table, objectFromRecord, recordFromObject),
   // del: del(db, table),

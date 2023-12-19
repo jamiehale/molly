@@ -78,3 +78,23 @@ export const toInt = (s) => parseInt(s, 10);
 export const capitalize = (s) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`;
 
 export const plural = (s) => `${s}s`;
+
+export const renameKeys = curry((keyMap, o) =>
+  Object.keys(o).reduce((acc, key) => ({ ...acc, [keyMap[key]]: o[key] }), {}),
+);
+
+export const type = (val) =>
+  val === null
+    ? 'Null'
+    : val === undefined
+    ? 'Undefined'
+    : Object.prototype.toString.call(val).slice(8, -1);
+
+export const transform = curry((descriptor, o) =>
+  Object.keys(descriptor).reduce(
+    (acc, key) => ({ ...acc, [key]: descriptor[key](o) }),
+    {},
+  ),
+);
+
+export const map = curry((f, a) => a.map(f));

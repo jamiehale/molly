@@ -1,11 +1,13 @@
+import { renameKeys } from '../../util';
 import { createResourceStore } from '../resource-store';
 
-const recordFromEvent = (newEvent) => ({
-  title: newEvent.title,
-  type_id: newEvent.typeId,
-  date_value: newEvent.dateValue,
-  location_id: newEvent.locationId,
-});
+const eventKeyMap = {
+  id: 'id',
+  title: 'title',
+  typeId: 'type_id',
+  dateValue: 'date_value',
+  locationId: 'location_id',
+};
 
 const eventFromRecord = (record) => ({
   id: record.id,
@@ -16,4 +18,4 @@ const eventFromRecord = (record) => ({
 });
 
 export const createEventStore = (db) =>
-  createResourceStore(db, 'events', eventFromRecord, recordFromEvent);
+  createResourceStore(db, 'events', eventFromRecord, renameKeys(eventKeyMap));

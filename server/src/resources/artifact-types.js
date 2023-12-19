@@ -1,13 +1,45 @@
-import express from 'express';
-import { get, withUserId } from '../resource-helpers';
-import { readAllArtifactTypes } from '../data/stores/artifact-types';
+import {
+  optionalField,
+  routes,
+  baseResourceRoutes,
+  withUserId,
+} from '../resource-helpers';
+import { required, optional } from '../validation';
 
-const getArtifactTypes = (db) => withUserId(() => readAllArtifactTypes(db));
+const postArtifactTypePayload = () => ({
+  title: required(),
+});
 
-export const artifactTypeRoutes = (db) => {
-  const router = express.Router();
+const artifactTypeFromPayload = (userId, payload) => ({
+  title: payload.title,
+});
 
-  get(router, '/artifact-types', getArtifactTypes(db));
+const patchArtifactTypePayload = () => ({
+  title: optional(),
+});
 
-  return router;
-};
+const artifactTypeFieldsFromPayload = (payload) => ({
+  ...optionalField('title', payload),
+});
+
+export const artifactTypeRoutes = ({ artifactTypeRepo }) =>
+  routes([
+    ...baseResourceRoutes(
+      'artifact-type',
+      (id) => artifactTypeRepo.artifactTypeExists(id),
+      ({ params }) => artifactTypeRepo.readArtifactType(params.id),
+      () => artifactTypeRepo.readAllArtifactTypes(),
+      postArtifactTypePayload(),
+      ({ userId, payload }) =>
+        artifactTypeRepo.createArtifactType(
+          artifactTypeFromPayload(userId, payload),
+        ),
+      patchArtifactTypePayload(),
+      ({ params, payload }) =>
+        artifactTypeRepo.updateArtifactType(
+          params.id,
+          artifactTypeFieldsFromPayload(payload),
+        ),
+      withUserId,
+    ),
+  ]);

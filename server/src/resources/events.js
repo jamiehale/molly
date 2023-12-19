@@ -18,6 +18,8 @@ import {
   isUuid,
   either,
   isNull,
+  validDateValue,
+  isNotNull,
 } from '../validation';
 import { composeP } from '../util';
 import { ParameterError } from '../error';
@@ -48,14 +50,14 @@ const eventFromPayload = (userId, payload) => ({
 });
 
 const patchEventPayload = (eventTypeRepo, locationRepo) => ({
-  title: optional(),
+  title: optional(isNotNull()),
   typeId: optional(
     validResource(
       (id) => eventTypeRepo.eventTypeExists(id),
       ({ value }) => new ParameterError(`Invalid typeId '${value}'`),
     ),
   ),
-  dateValue: optional(),
+  dateValue: optional(validDateValue()),
   locationId: optional(
     either(
       isNull(),
@@ -90,13 +92,8 @@ export const eventRoutes = ({
       ({ userId, payload }) =>
         eventRepo.createEvent(eventFromPayload(userId, payload)),
       patchEventPayload(eventTypeRepo, locationRepo),
-      ({ params, payload }) => {
-        console.log('wat', payload);
-        return eventRepo.updateEvent(
-          params.id,
-          eventFieldsFromPayload(payload),
-        );
-      },
+      ({ params, payload }) =>
+        eventRepo.updateEvent(params.id, eventFieldsFromPayload(payload)),
       withUserId,
     ),
     (router) =>

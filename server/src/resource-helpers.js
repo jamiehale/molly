@@ -2,6 +2,7 @@ import express from 'express';
 import {
   HttpError,
   InternalError,
+  ParameterError,
   UnauthorizedError,
   isInternalError,
   isMollyError,
@@ -10,31 +11,44 @@ import {
 } from './error';
 import { plural, throwIfNil } from './util';
 import { validResource, validate } from './validation';
+import * as U from './util';
 
-export const withUserId = (fn) => async (context) => {
+export const withUserId = async (context) => {
   if (!context.res.locals.userId) {
     throw new UnauthorizedError('Not authenticated');
   }
   context.userId = context.res.locals.userId;
-  return fn(context);
+  return context;
 };
 
-export const withParams = (descriptor, fn) => (context) =>
-  validate(descriptor, context.req.params).then((params) => {
+export const withQuery = (validateFn) => (context) =>
+  validateFn({ scope: 'query', value: context.req.query }).then((query) => {
+    context.query = query;
+    return context;
+  });
+
+export const withParams = (validateFn) => (context) =>
+  validateFn({ scope: 'params', value: context.req.params }).then((params) => {
     context.params = params;
-    return fn(context);
+    return context;
   });
 
-export const withPayload = (descriptor, fn) => (context) =>
-  validate(descriptor, context.req.body).then((payload) => {
-    context.payload = payload;
-    return fn(context);
+export const withBody = (validateFn) => (context) =>
+  validateFn({ scope: 'body', value: context.req.body }).then((body) => {
+    context.body = body;
+    return context;
   });
 
-export const withInitialContext = (fn) => (req, res, next) =>
-  fn({ req, res, next });
+export const withContext = (fn) => async (req, res, next) =>
+  fn({ req, res, next })
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((err) => {
+      return next(httpErrorFromMollyError(err));
+    });
 
-export const withJsonResponse = (fn) => (context) =>
+export const withJsonResponse = (context) =>
   fn(context)
     .then(throwIfNil(() => new InternalError('Invalid response')))
     .then((responseValue) => {
@@ -52,6 +66,7 @@ const httpErrorFromMollyError = (mollyError) => {
   if (isParameterError(mollyError)) {
     return new HttpError(mollyError.message, 400);
   }
+  console.error(mollyError);
   return new HttpError(mollyError.message, 500);
 };
 
@@ -64,8 +79,8 @@ export const withErrorHandling = (fn) => (context) => {
 export const optionalField = (name, payload, fieldName = name) =>
   payload[name] === undefined ? {} : { [fieldName]: payload[name] };
 
-export const resourceParams = (validateResourceIdFn) => ({
-  id: validResource(validateResourceIdFn),
+export const resourceParams = (validateResourceIdFn, errorFn = undefined) => ({
+  id: validResource(validateResourceIdFn, errorFn),
 });
 
 export const routes = (handlers) =>
@@ -76,92 +91,71 @@ export const routes = (handlers) =>
 
 const passThrough = (fn) => (context) => fn(context);
 
-const getSingleResource =
-  (name, validateResourceFn, readResourceFn, extraFn = passThrough) =>
-  (router) =>
+const invalidResourceErrorFn =
+  (name) =>
+  ({ field, value }) =>
+    new ParameterError(`Invalid ${name} id '${value}' (${field})`);
+
+export const getSingleResource =
+  (path, validateParamsFn, readResourceFn) => (router) =>
     router.get(
-      `/${plural(name)}/:id`,
-      withInitialContext(
-        withErrorHandling(
-          extraFn(
-            withJsonResponse(
-              withParams(resourceParams(validateResourceFn), readResourceFn),
-            ),
-          ),
-        ),
+      path,
+      withContext(
+        U.composeP(readResourceFn, withParams(validateParamsFn), withUserId),
       ),
     );
 
-const getAllResources =
-  (name, readAllResourcesFn, extraFn = passThrough) =>
-  (router) =>
+export const getAllResources =
+  (path, validateQueryFn, readAllResourcesFn) => (router) =>
     router.get(
-      `/${plural(name)}`,
-      withInitialContext(
-        withErrorHandling(extraFn(withJsonResponse(readAllResourcesFn))),
+      path,
+      withContext(
+        U.composeP(readAllResourcesFn, withQuery(validateQueryFn), withUserId),
       ),
     );
 
-const postResource =
-  (name, descriptor, createResourceFn, extraFn = passThrough) =>
-  (router) =>
+export const postResource =
+  (path, validateBodyFn, createResourceFn) => (router) =>
     router.post(
-      `/${plural(name)}`,
-      withInitialContext(
-        withErrorHandling(
-          extraFn(
-            withJsonResponse(
-              withUserId(withPayload(descriptor, createResourceFn)),
-            ),
-          ),
-        ),
+      path,
+      withContext(
+        U.composeP(createResourceFn, withBody(validateBodyFn), withUserId),
       ),
     );
 
-const patchResource =
-  (
-    name,
-    validateResourceFn,
-    descriptor,
-    updateResourceFn,
-    extraFn = passThrough,
-  ) =>
-  (router) =>
+export const patchResource =
+  (path, validateParamsFn, validateBodyFn, updateResourceFn) => (router) =>
     router.patch(
-      `/${plural(name)}/:id`,
-      withInitialContext(
-        withErrorHandling(
-          extraFn(
-            withJsonResponse(
-              withParams(
-                resourceParams(validateResourceFn),
-                withPayload(descriptor, updateResourceFn),
-              ),
-            ),
-          ),
+      path,
+      withContext(
+        U.composeP(
+          updateResourceFn,
+          withBody(validateBodyFn),
+          withParams(validateParamsFn),
+          withUserId,
         ),
       ),
     );
 
-export const baseResourceRoutes = (
-  name,
-  validateResourceFn,
-  readResourceFn,
-  readAllResourcesFn,
-  postDescriptor,
-  createResourceFn,
-  patchDescriptor,
-  updateResourceFn,
-  extraFn = passThrough,
-) => [
-  getSingleResource(name, validateResourceFn, readResourceFn, extraFn),
-  getAllResources(name, readAllResourcesFn, extraFn),
-  postResource(name, postDescriptor, createResourceFn, extraFn),
-  patchResource(
-    name,
-    validateResourceFn,
-    patchDescriptor,
-    updateResourceFn,
-    extraFn,
-  ),
-];
+// export const baseResourceRoutes = (
+//   name,
+//   validateResourceFn,
+//   readResourceFn,
+//   readAllResourcesFn,
+//   postDescriptor,
+//   createResourceFn,
+//   patchDescriptor,
+//   updateResourceFn,
+//   extraFn = passThrough,
+// ) => [
+//   getSingleResource(name, validateResourceFn, readResourceFn, extraFn),
+//   getAllResources(name, readAllResourcesFn, extraFn),
+//   postResource(name, postDescriptor, createResourceFn, extraFn),
+//   patchResource(
+//     name,
+//     validateResourceFn,
+//     patchDescriptor,
+//     updateResourceFn,
+//     extraFn,
+//   ),
+// ];

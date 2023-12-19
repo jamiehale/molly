@@ -1,21 +1,43 @@
-import express from 'express';
-import { get, withUserId, withParams } from '../resource-helpers';
-import { readAsset } from '../data/stores/assets';
-import { required } from '../validation';
+import {
+  optionalField,
+  routes,
+  baseResourceRoutes,
+  withUserId,
+} from '../resource-helpers';
+import { required, optional } from '../validation';
 
-const assetParams = () => ({
-  id: required(),
+const postArtifactTypePayload = () => ({
+  title: required(),
 });
 
-const getAsset = (db) =>
-  withUserId(
-    withParams(assetParams(), (context) => readAsset(db, context.params.id)),
-  );
+const artifactTypeFromPayload = (userId, payload) => ({
+  title: payload.title,
+});
 
-export const assetRoutes = (db) => {
-  const router = express.Router();
+const patchArtifactTypePayload = () => ({
+  title: optional(),
+});
 
-  get(router, '/assets/:id', getAsset(db));
+const artifactTypeFieldsFromPayload = (payload) => ({
+  ...optionalField('title', payload),
+});
 
-  return router;
-};
+export const assetRoutes = ({ assetRepo }) =>
+  routes([
+    ...baseResourceRoutes(
+      'asset',
+      (id) => assetRepo.assetExists(id),
+      ({ params }) => assetRepo.readAsset(params.id),
+      () => assetRepo.readAllAssets(),
+      postArtifactTypePayload(),
+      ({ userId, payload }) =>
+        assetRepo.createArtifactType(artifactTypeFromPayload(userId, payload)),
+      patchArtifactTypePayload(),
+      ({ params, payload }) =>
+        assetRepo.updateArtifactType(
+          params.id,
+          artifactTypeFieldsFromPayload(payload),
+        ),
+      withUserId,
+    ),
+  ]);

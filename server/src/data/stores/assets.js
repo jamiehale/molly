@@ -1,12 +1,14 @@
+import { renameKeys } from '../../util';
 import { createResourceStore } from '../resource-store';
 
-const newRecordFromAsset = (asset) => ({
-  filename: asset.filename,
-  mimetype: asset.mimetype,
-  collection_id: asset.collectionId,
-  artifact_id: asset.artifactId,
-  creator_id: asset.creatorId,
-});
+const assetKeyMap = {
+  id: 'id',
+  filename: 'filename',
+  mimetype: 'mimetype',
+  collectionId: 'collection_id',
+  artifactId: 'artifact_id',
+  creatorId: 'creator_id',
+};
 
 const assetFromRecord = (record) => ({
   id: record.id,
@@ -18,4 +20,4 @@ const assetFromRecord = (record) => ({
 });
 
 export const createAssetStore = (db) =>
-  createResourceStore(db, 'assets', assetFromRecord, newRecordFromAsset);
+  createResourceStore(db, 'assets', assetFromRecord, renameKeys(assetKeyMap));
