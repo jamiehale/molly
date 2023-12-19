@@ -5,12 +5,11 @@ import {
   ParameterError,
   UnauthorizedError,
   isInternalError,
-  isMollyError,
   isParameterError,
   isUnauthorizedError,
 } from './error';
-import { plural, throwIfNil } from './util';
-import { validResource, validate } from './validation';
+import { throwIfNil } from './util';
+import { validResource } from './validation';
 import * as U from './util';
 
 export const withUserId = async (context) => {
@@ -137,25 +136,29 @@ export const patchResource =
       ),
     );
 
-// export const baseResourceRoutes = (
-//   name,
-//   validateResourceFn,
-//   readResourceFn,
-//   readAllResourcesFn,
-//   postDescriptor,
-//   createResourceFn,
-//   patchDescriptor,
-//   updateResourceFn,
-//   extraFn = passThrough,
-// ) => [
-//   getSingleResource(name, validateResourceFn, readResourceFn, extraFn),
-//   getAllResources(name, readAllResourcesFn, extraFn),
-//   postResource(name, postDescriptor, createResourceFn, extraFn),
-//   patchResource(
-//     name,
-//     validateResourceFn,
-//     patchDescriptor,
-//     updateResourceFn,
-//     extraFn,
-//   ),
-// ];
+export const getAllChildResources =
+  (path, validateParamsFn, readAllResourcesFn) => (router) =>
+    router.get(
+      path,
+      withContext(
+        U.composeP(
+          readAllResourcesFn,
+          withParams(validateParamsFn),
+          withUserId,
+        ),
+      ),
+    );
+
+export const postChildResource =
+  (path, validateParamsFn, validateBodyFn, createResourceFn) => (router) =>
+    router.post(
+      path,
+      withContext(
+        U.composeP(
+          createResourceFn,
+          withBody(validateBodyFn),
+          withParams(validateParamsFn),
+          withUserId,
+        ),
+      ),
+    );

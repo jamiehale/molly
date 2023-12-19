@@ -8,6 +8,8 @@ import {
   postResource,
   patchResource,
   withContext,
+  getAllChildResources,
+  postChildResource,
 } from '../resource-helpers';
 import * as V from '../validation';
 import * as U from '../util';
@@ -20,7 +22,23 @@ const postBody = () =>
     description: V.optional(),
   });
 
-const artifactCollection = (userId, payload) => ({
+const postArtifactBody = (validArtifactTypeFn, validArtifactSourceFn) =>
+  V.object({
+    title: V.and(V.required(), V.isNotNull()),
+    description: V.optional(),
+    typeId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactTypeFn),
+    ),
+    sourceId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactSourceFn),
+    ),
+  });
+
+const newArtifactCollection = (userId, payload) => ({
   title: payload.title,
   shortName: payload.shortName,
   description: payload.description,
@@ -57,112 +75,95 @@ const params = (validArtifactCollectionFn) =>
     ),
   });
 
-const toResult = {
-  id: U.prop('id'),
-  title: U.prop('title'),
-  shortName: U.prop('shortName'),
-  description: U.prop('description'),
-  creatorId: U.prop('creatorId'),
-};
+const toResult = U.pick([
+  'id',
+  'title',
+  'shortName',
+  'description',
+  'creatorId',
+]);
 
-const toArtifactResult = {
-  id: U.prop('id'),
-};
+const toArtifactResult = U.pick([
+  'id',
+  'title',
+  'description',
+  'typeId',
+  'sourceId',
+  'collectionId',
+  'creatorId',
+]);
 
 export const artifactCollectionRoutes = ({
   artifactCollectionRepo,
   artifactRepo,
+  artifactTypeRepo,
+  artifactSourceRepo,
 }) =>
   routes([
     getSingleResource(
       '/artifact-collection/:id',
-      params((id) => artifactCollectionRepo.artifactCollectionExists(id)),
+      params(artifactCollectionRepo.artifactCollectionExists),
       ({ params }) =>
-        artifactCollectionRepo
-          .readArtifactCollection(params.id)
-          .then(U.transform(toResult)),
+        artifactCollectionRepo.readArtifactCollection(params.id).then(toResult),
     ),
     getAllResources('/artifact-collections', V.any(), () =>
-      artifactCollectionRepo
-        .readAllArtifactCollections()
-        .then(U.map(U.transform(toResult))),
+      artifactCollectionRepo.readAllArtifactCollections().then(U.map(toResult)),
     ),
-    postResource(
-      '/artifact-collections',
-      postBody(
-        (id) => artifactTypeRepo.artifactTypeExists(id),
-        (id) => artifactSourceRepo.artifactSourceExists(id),
-      ),
-      ({ userId, body }) =>
-        artifactCollectionRepo
-          .createArtifactCollection(artifactCollection(userId, body))
-          .then(U.transform(toResult)),
+    postResource('/artifact-collections', postBody(), ({ userId, body }) =>
+      artifactCollectionRepo
+        .createArtifactCollection(
+          U.compose(
+            U.assoc('creatorId', userId),
+            U.pick(['title', 'shortName', 'description', 'creatorId']),
+          )(body),
+        )
+        .then(toResult),
     ),
     patchResource(
       '/artifact-collections/:id',
-      params((id) => artifactCollectionRepo.artifactCollectionExists(id)),
-      patchBody(
-        (id) => artifactTypeRepo.artifactTypeExists(id),
-        (id) => artifactSourceRepo.artifactSourceExists(id),
-      ),
+      params(artifactCollectionRepo.artifactCollectionExists),
+      patchBody(),
       ({ params, body }) =>
         artifactCollectionRepo
           .updateArtifactCollection(
             params.id,
-            artifactCollectionFieldsFromPayload(body),
+            U.compose(
+              U.filterEmptyProps,
+              U.pick(['title', 'shortName', 'description']),
+            )(body),
           )
-          .then(U.transform(toResult)),
+          .then(toResult),
     ),
-    (router) =>
-      router.get(
-        '/artifact-collections/:id/artifacts',
-        withContext(
-          U.composeP(
-            ({ params }) =>
-              artifactRepo
-                .readAllArtifacts({ collectionId: params.id })
-                .then(U.map(U.transform(toArtifactResult))),
-            withParams(
-              params((id) =>
-                artifactCollectionRepo.artifactCollectionExists(id),
-              ),
-            ),
-            withUserId,
-          ),
-        ),
+    getAllChildResources(
+      '/artifact-collections/:id/artifacts',
+      params(artifactCollectionRepo.artifactCollectionExists),
+      ({ params }) =>
+        artifactRepo
+          .readAllArtifacts({ collectionId: params.id })
+          .then(U.map(toArtifactResult)),
+    ),
+    postChildResource(
+      '/artifact-collections/:id/artifacts',
+      params((id) => artifactCollectionRepo.artifactCollectionExists(id)),
+      postArtifactBody(
+        artifactTypeRepo.artifactTypeExists,
+        artifactSourceRepo.artifactSourceExists,
       ),
+      ({ userId, params, body }) =>
+        artifactRepo
+          .createArtifact(
+            U.compose(
+              U.assoc('collectionId', params.id),
+              U.assoc('creatorId', userId),
+              U.pick([
+                'title',
+                'description',
+                'typeId',
+                'sourceId',
+                'collectionId',
+              ]),
+            )(body),
+          )
+          .then(toArtifactResult),
+    ),
   ]);
-
-/*
-  // assets
-  get(
-    router,
-    '/artifacts/:id/assets',
-    withParams(artifactParams(db), (context) =>
-      readAllAssetsByArtifactId(db, context.params.id),
-    ),
-  );
-
-  post(
-    router,
-    '/artifacts/:id/assets',
-    withParams(
-      artifactParams(db),
-      withUserId(
-        withPayload(postArtifactAssetPayload(), (context) =>
-          createAsset(
-            db,
-            assetFromPayload(
-              context.userId,
-              context.params.id,
-              context.payload,
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  return router;
-};
-*/

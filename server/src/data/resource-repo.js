@@ -1,39 +1,37 @@
-import { ParameterError, toInternalError } from '../error';
-import { capitalize, plural } from '../util';
+import { toInternalError } from '../error';
+import * as U from '../util';
 
-const createResource = (store) => (newResource) =>
-  store.create(newResource).catch(toInternalError);
+export const createResource =
+  (store, fromModelFn, toModelFn) => (newResource) =>
+    store
+      .create(fromModelFn(newResource))
+      .then(toModelFn)
+      .catch(toInternalError);
 
-const readResource = (store) => (id) =>
-  store.readSingle({ id }).catch(toInternalError);
+export const readResource = (store, toModelFn) => (id) =>
+  store.readSingle({ id }).then(toModelFn).catch(toInternalError);
 
-const readAllResources =
-  (store) =>
+export const readAllResources =
+  (store, fromModelFn, toModelFn) =>
   (filters = {}) =>
-    store.readAll(filters).catch(toInternalError);
+    store
+      .readAll(fromModelFn(filters))
+      .then(U.map(toModelFn))
+      .catch(toInternalError);
 
-const resourceExists = (store) => (id) =>
+export const resourceExists = (store) => (id) =>
   store.exists({ id }).catch(toInternalError);
 
-const updateResource = (store) => async (id, fields) => {
-  if (Object.keys(fields).length === 0) {
-    throw new ParameterError('No fields to update');
-  }
-  return store.updateSingle({ id }, fields).catch(toInternalError);
-};
+export const updateResource =
+  (store, fromModelFn, toModelFn) => async (id, fields) =>
+    store
+      .updateSingle({ id }, fromModelFn(fields))
+      .then(toModelFn)
+      .catch(toInternalError);
 
-const updateAllResources = (store) => async (filters, fields) => {
-  if (Object.keys(fields).length === 0) {
-    throw new ParameterError('No fields to update');
-  }
-  return store.updateAll(filters, fields).catch(toInternalError);
-};
-
-export const baseResourceRepo = (name, store) => ({
-  [`create${capitalize(name)}`]: createResource(store),
-  [`read${capitalize(name)}`]: readResource(store),
-  [`readAll${capitalize(plural(name))}`]: readAllResources(store),
-  [`${name}Exists`]: resourceExists(store),
-  [`update${capitalize(name)}`]: updateResource(store),
-  [`updateAll${capitalize(plural(name))}`]: updateAllResources(store),
-});
+export const updateAllResources =
+  (store, fromModelFn, toModelFn) => async (filters, fields) =>
+    store
+      .updateAll(fromModelFn(filters), fromModelFn(fields))
+      .then(U.map(toModelFn))
+      .catch(toInternalError);

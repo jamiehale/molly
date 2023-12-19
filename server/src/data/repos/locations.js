@@ -1,6 +1,29 @@
-import { baseResourceRepo } from '../resource-repo';
+import {
+  createResource,
+  readAllResources,
+  readResource,
+  resourceExists,
+  updateAllResources,
+  updateResource,
+} from '../resource-repo';
+import * as U from '../../util';
+
+const fromModel = U.transform({
+  id: U.prop('id'),
+  value: U.prop('value'),
+});
+
+const toModel = U.transform({
+  id: U.prop('id'),
+  value: U.prop('value'),
+});
 
 export const createLocationRepo = ({ locationStore }) => ({
-  ...baseResourceRepo('location', locationStore),
+  createLocation: createResource(locationStore, fromModel, toModel),
+  readLocation: readResource(locationStore, toModel),
+  readAllLocations: readAllResources(locationStore, fromModel, toModel),
+  locationExists: resourceExists(locationStore),
+  updateLocation: updateResource(locationStore, fromModel, toModel),
+  updateAllLocations: updateAllResources(locationStore, fromModel, toModel),
   // del: del(db, table),
 });

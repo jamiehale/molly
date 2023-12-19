@@ -98,3 +98,24 @@ export const transform = curry((descriptor, o) =>
 );
 
 export const map = curry((f, a) => a.map(f));
+
+export const filterEmptyProps = (o) =>
+  Object.keys(o).reduce(
+    (acc, key) => ({
+      ...acc,
+      ...(isUndefined(o[key]) ? {} : { [key]: o[key] }),
+    }),
+    {},
+  );
+
+export const pick = curry((keys, o) =>
+  keys.reduce(
+    (acc, key) => ({
+      ...acc,
+      ...(isUndefined(o[key]) ? {} : { [key]: o[key] }),
+    }),
+    {},
+  ),
+);
+
+export const assoc = curry((key, value, o) => ({ ...o, [key]: value }));
