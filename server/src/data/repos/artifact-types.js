@@ -21,7 +21,11 @@ const toModel = U.transform({
 export const createArtifactTypeRepo = ({ artifactTypeStore }) => ({
   createArtifactType: createResource(artifactTypeStore, fromModel, toModel),
   readArtifactType: readResource(artifactTypeStore, toModel),
-  readAllArtifactTypes: readAllResources(artifactTypeStore, fromModel, toModel),
+  readAllArtifactTypes: readAllResources(
+    artifactTypeStore,
+    U.compose(U.filterEmptyProps, fromModel),
+    toModel,
+  ),
   artifactTypeExists: resourceExists(artifactTypeStore),
   updateArtifactType: updateResource(artifactTypeStore, fromModel, toModel),
   updateAllArtifactTypes: updateAllResources(

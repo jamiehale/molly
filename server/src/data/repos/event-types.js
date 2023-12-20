@@ -21,7 +21,11 @@ const toModel = U.transform({
 export const createEventTypeRepo = ({ eventTypeStore }) => ({
   createEventType: createResource(eventTypeStore, fromModel, toModel),
   readEventType: readResource(eventTypeStore, toModel),
-  readAllEventTypes: readAllResources(eventTypeStore, fromModel, toModel),
+  readAllEventTypes: readAllResources(
+    eventTypeStore,
+    U.compose(U.filterEmptyProps, fromModel),
+    toModel,
+  ),
   eventTypeExists: resourceExists(eventTypeStore),
   updateEventType: updateResource(eventTypeStore, fromModel, toModel),
   updateAllEventTypes: updateAllResources(eventTypeStore, fromModel, toModel),

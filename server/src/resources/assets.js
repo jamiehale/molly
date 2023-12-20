@@ -1,43 +1,54 @@
+import { ParameterError } from '../error';
 import {
-  optionalField,
   routes,
-  baseResourceRoutes,
-  withUserId,
+  getSingleResource,
+  getAllResources,
+  patchResource,
 } from '../resource-helpers';
-import { required, optional } from '../validation';
+import * as U from '../util';
+import * as V from '../validation';
 
-const postArtifactTypePayload = () => ({
-  title: required(),
-});
+const patchBody = (validVaultFn) =>
+  V.and(
+    V.object({
+      filename: V.optional(V.isNotNull()),
+      mimetype: V.optional(V.isNotNull()),
+      vaultId: V.optional(V.and(V.isNotNull(), V.validResource(validVaultFn))),
+    }),
+    V.isNotEmpty(() => new ParameterError('No fields to update!')),
+  );
 
-const artifactTypeFromPayload = (userId, payload) => ({
-  title: payload.title,
-});
+const toResult = U.pick([
+  'id',
+  'filename',
+  'mimetype',
+  'vaultId',
+  'artifactId',
+  'creatorId',
+]);
 
-const patchArtifactTypePayload = () => ({
-  title: optional(),
-});
-
-const artifactTypeFieldsFromPayload = (payload) => ({
-  ...optionalField('title', payload),
-});
-
-export const assetRoutes = ({ assetRepo }) =>
+export const assetRoutes = ({ assetRepo, vaultRepo }) =>
   routes([
-    ...baseResourceRoutes(
-      'asset',
-      (id) => assetRepo.assetExists(id),
-      ({ params }) => assetRepo.readAsset(params.id),
-      () => assetRepo.readAllAssets(),
-      postArtifactTypePayload(),
-      ({ userId, payload }) =>
-        assetRepo.createArtifactType(artifactTypeFromPayload(userId, payload)),
-      patchArtifactTypePayload(),
-      ({ params, payload }) =>
-        assetRepo.updateArtifactType(
-          params.id,
-          artifactTypeFieldsFromPayload(payload),
-        ),
-      withUserId,
+    getSingleResource('/assets/:id', assetRepo.assetExists, ({ params }) =>
+      assetRepo.readAsset(params.id).then(toResult),
+    ),
+    getAllResources('/assets', V.any(), () =>
+      assetRepo.readAllAssets().then(U.map(toResult)),
+    ),
+    // no post
+    patchResource(
+      '/assets/:id',
+      assetRepo.assetExists,
+      patchBody(vaultRepo.vaultExists),
+      ({ params, body }) =>
+        assetRepo
+          .updateAsset(
+            params.id,
+            U.compose(
+              U.filterEmptyProps,
+              U.pick(['filename', 'mimetype', 'vaultId']),
+            )(body),
+          )
+          .then(toResult),
     ),
   ]);

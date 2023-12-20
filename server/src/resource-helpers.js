@@ -2,17 +2,16 @@ import express from 'express';
 import {
   HttpError,
   InternalError,
-  ParameterError,
   UnauthorizedError,
   isInternalError,
   isParameterError,
   isUnauthorizedError,
 } from './error';
 import { throwIfNil } from './util';
-import { validResource } from './validation';
 import * as U from './util';
+import * as V from './validation';
 
-export const withUserId = async (context) => {
+const withUserId = async (context) => {
   if (!context.res.locals.userId) {
     throw new UnauthorizedError('Not authenticated');
   }
@@ -20,25 +19,25 @@ export const withUserId = async (context) => {
   return context;
 };
 
-export const withQuery = (validateFn) => (context) =>
+const withQuery = (validateFn) => (context) =>
   validateFn({ scope: 'query', value: context.req.query }).then((query) => {
     context.query = query;
     return context;
   });
 
-export const withParams = (validateFn) => (context) =>
+const withParams = (validateFn) => (context) =>
   validateFn({ scope: 'params', value: context.req.params }).then((params) => {
     context.params = params;
     return context;
   });
 
-export const withBody = (validateFn) => (context) =>
+const withBody = (validateFn) => (context) =>
   validateFn({ scope: 'body', value: context.req.body }).then((body) => {
     context.body = body;
     return context;
   });
 
-export const withContext = (fn) => async (req, res, next) =>
+const withContext = (fn) => async (req, res, next) =>
   fn({ req, res, next })
     .then((result) => {
       res.json(result);
@@ -47,7 +46,7 @@ export const withContext = (fn) => async (req, res, next) =>
       return next(httpErrorFromMollyError(err));
     });
 
-export const withJsonResponse = (context) =>
+const withJsonResponse = (context) =>
   fn(context)
     .then(throwIfNil(() => new InternalError('Invalid response')))
     .then((responseValue) => {
@@ -69,18 +68,11 @@ const httpErrorFromMollyError = (mollyError) => {
   return new HttpError(mollyError.message, 500);
 };
 
-export const withErrorHandling = (fn) => (context) => {
+const withErrorHandling = (fn) => (context) => {
   fn(context).catch((err) => {
     return context.next(httpErrorFromMollyError(err));
   });
 };
-
-export const optionalField = (name, payload, fieldName = name) =>
-  payload[name] === undefined ? {} : { [fieldName]: payload[name] };
-
-export const resourceParams = (validateResourceIdFn, errorFn = undefined) => ({
-  id: validResource(validateResourceIdFn, errorFn),
-});
 
 export const routes = (handlers) =>
   handlers.reduce((router, handler) => {
@@ -88,19 +80,25 @@ export const routes = (handlers) =>
     return router;
   }, express.Router());
 
-const passThrough = (fn) => (context) => fn(context);
-
-const invalidResourceErrorFn =
-  (name) =>
-  ({ field, value }) =>
-    new ParameterError(`Invalid ${name} id '${value}' (${field})`);
+const resourceParams = (validArtifactCollectionFn) =>
+  V.object({
+    id: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactCollectionFn),
+    ),
+  });
 
 export const getSingleResource =
-  (path, validateParamsFn, readResourceFn) => (router) =>
+  (path, validateResourceIdFn, readResourceFn) => (router) =>
     router.get(
       path,
       withContext(
-        U.composeP(readResourceFn, withParams(validateParamsFn), withUserId),
+        U.composeP(
+          readResourceFn,
+          withParams(resourceParams(validateResourceIdFn)),
+          withUserId,
+        ),
       ),
     );
 
@@ -123,41 +121,41 @@ export const postResource =
     );
 
 export const patchResource =
-  (path, validateParamsFn, validateBodyFn, updateResourceFn) => (router) =>
+  (path, validateResourceIdFn, validateBodyFn, updateResourceFn) => (router) =>
     router.patch(
       path,
       withContext(
         U.composeP(
           updateResourceFn,
           withBody(validateBodyFn),
-          withParams(validateParamsFn),
+          withParams(resourceParams(validateResourceIdFn)),
           withUserId,
         ),
       ),
     );
 
 export const getAllChildResources =
-  (path, validateParamsFn, readAllResourcesFn) => (router) =>
+  (path, validateResourceFn, readAllResourcesFn) => (router) =>
     router.get(
       path,
       withContext(
         U.composeP(
           readAllResourcesFn,
-          withParams(validateParamsFn),
+          withParams(resourceParams(validateResourceFn)),
           withUserId,
         ),
       ),
     );
 
 export const postChildResource =
-  (path, validateParamsFn, validateBodyFn, createResourceFn) => (router) =>
+  (path, validateResourceFn, validateBodyFn, createResourceFn) => (router) =>
     router.post(
       path,
       withContext(
         U.composeP(
           createResourceFn,
           withBody(validateBodyFn),
-          withParams(validateParamsFn),
+          withParams(resourceParams(validateResourceFn)),
           withUserId,
         ),
       ),

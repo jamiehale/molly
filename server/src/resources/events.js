@@ -1,116 +1,77 @@
 import {
-  optionalField,
-  withInitialContext,
-  withErrorHandling,
-  withJsonResponse,
-  withParams,
   routes,
-  resourceParams,
-  withUserId,
-  withPayload,
-  baseResourceRoutes,
+  getSingleResource,
+  getAllResources,
+  postResource,
+  patchResource,
 } from '../resource-helpers';
-import {
-  required,
-  optional,
-  validResource,
-  matches,
-  isUuid,
-  either,
-  isNull,
-  validDateValue,
-  isNotNull,
-} from '../validation';
-import { composeP } from '../util';
+import * as V from '../validation';
+import * as U from '../util';
 import { ParameterError } from '../error';
 
-const postEventPayload = (eventTypeRepo, locationRepo) => ({
-  title: required(),
-  typeId: composeP(
-    validResource((id) => eventTypeRepo.eventTypeExists(id)),
-    required(),
-  ),
-  dateValue: optional(),
-  locationId: optional(
-    composeP(
-      validResource((id) => locationRepo.locationExists(id)),
-      isUuid(),
+const postBody = (validEventTypeFn, validLocationFn) =>
+  V.object({
+    title: V.and(V.required(), V.isNotNull()),
+    typeId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validEventTypeFn),
     ),
-  ),
-});
-
-const eventFromPayload = (userId, payload) => ({
-  title: payload.title,
-  description: payload.description,
-  typeId: payload.typeId,
-  dateValue: payload.dateValue,
-  locationId: payload.locationId,
-  sourceId: payload.sourceId,
-  creatorId: userId,
-});
-
-const patchEventPayload = (eventTypeRepo, locationRepo) => ({
-  title: optional(isNotNull()),
-  typeId: optional(
-    validResource(
-      (id) => eventTypeRepo.eventTypeExists(id),
-      ({ value }) => new ParameterError(`Invalid typeId '${value}'`),
+    dateValue: V.optional(V.and(V.isNotNull(), V.validDateValue())),
+    locationId: V.optional(
+      V.and(V.isNotNull(), V.validResource(validLocationFn)),
     ),
-  ),
-  dateValue: optional(validDateValue()),
-  locationId: optional(
-    either(
-      isNull(),
-      composeP(
-        validResource((id) => locationRepo.locationExists(id)),
-        isUuid(),
+  });
+
+const patchBody = (validEventTypeFn, validLocationFn) =>
+  V.and(
+    V.object({
+      title: V.optional(V.isNotNull()),
+      typeId: V.optional(V.isNotNull(), V.validResource(validEventTypeFn)),
+      dateValue: V.optional(V.isNotNull(), V.validDateValue()),
+      locationId: V.optional(
+        V.and(V.isNotNull(), V.validResource(validLocationFn)),
       ),
-    ),
-  ),
-});
+    }),
+    V.isNotEmpty(() => new ParameterError('No fields to update!')),
+  );
 
-const eventFieldsFromPayload = (payload) => ({
-  ...optionalField('title', payload),
-  ...optionalField('typeId', payload),
-  ...optionalField('dateValue', payload),
-  ...optionalField('locationId', payload),
-});
+const toResult = U.pick(['id', 'title', 'typeId', 'dateValue', 'locationId']);
 
-export const eventRoutes = ({
-  artifactRepo,
-  eventRepo,
-  eventTypeRepo,
-  locationRepo,
-}) =>
+export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
   routes([
-    ...baseResourceRoutes(
-      'event',
-      (id) => eventRepo.eventExists(id),
-      ({ params }) => eventRepo.readEvent(params.id),
-      () => eventRepo.readAllEvents(),
-      postEventPayload(eventTypeRepo, locationRepo),
-      ({ userId, payload }) =>
-        eventRepo.createEvent(eventFromPayload(userId, payload)),
-      patchEventPayload(eventTypeRepo, locationRepo),
-      ({ params, payload }) =>
-        eventRepo.updateEvent(params.id, eventFieldsFromPayload(payload)),
-      withUserId,
+    getSingleResource('/events/:id', eventRepo.eventExists, ({ params }) =>
+      eventRepo.readEvent(params.id).then(toResult),
     ),
-    (router) =>
-      router.get(
-        '/events/:id/artifacts',
-        withInitialContext(
-          withErrorHandling(
-            withUserId(
-              withJsonResponse(
-                withParams(
-                  resourceParams((id) => eventRepo.exists(id)),
-                  ({ params }) =>
-                    artifactRepo.readAllArtifacts({ eventId: params.id }),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+    getAllResources('/events', V.any(), () =>
+      eventRepo.readAllEvents().then(U.map(toResult)),
+    ),
+    postResource(
+      '/events',
+      postBody(eventTypeRepo.eventTypeExists, locationRepo.locationExists),
+      ({ userId, body }) =>
+        eventRepo
+          .createEvent(
+            U.compose(
+              U.assoc('creatorId', userId),
+              U.pick(['title', 'typeId', 'dateValue', 'locationId']),
+            )(body),
+          )
+          .then(toResult),
+    ),
+    patchResource(
+      '/events/:id',
+      eventRepo.eventExists,
+      patchBody(eventTypeRepo.eventTypeExists, locationRepo.locationExists),
+      ({ params, body }) =>
+        eventRepo
+          .updateEvent(
+            params.id,
+            U.compose(
+              U.filterEmptyProps,
+              U.pick(['title', 'typeId', 'dateValue', 'locationId']),
+            )(body),
+          )
+          .then(toResult),
+    ),
   ]);

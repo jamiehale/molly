@@ -1,148 +1,111 @@
 import {
-  optionalField,
   routes,
-  baseResourceRoutes,
-  withUserId,
-  withInitialContext,
-  withErrorHandling,
-  withJsonResponse,
-  withParams,
-  resourceParams,
+  getSingleResource,
+  getAllResources,
+  patchResource,
+  getAllChildResources,
+  postChildResource,
 } from '../resource-helpers';
-import { required, optional, validResource, isNotNull } from '../validation';
-import { composeP } from '../util';
+import * as U from '../util';
+import * as V from '../validation';
 
-const postArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
-  title: composeP(isNotNull(), required()),
-  typeId: composeP(
-    validResource((id) => artifactTypeRepo.artifactTypeExists(id)),
-    isNotNull(),
-    required(),
-  ),
-  sourceId: composeP(
-    validResource((id) => artifactSourceRepo.artifactSourceExists(id)),
-    isNotNull(),
-    required(),
-  ),
-});
+const postAssetBody = (validVaultFn) =>
+  V.object({
+    filename: V.and(V.required(), V.isNotNull()),
+    mimetype: V.and(V.required(), V.isNotNull()),
+    vaultId: V.and(V.required(), V.isNotNull(), V.validResource(validVaultFn)),
+  });
 
-const artifactFromPayload = (userId, payload) => ({
-  title: payload.title,
-  description: payload.description,
-  typeId: payload.typeId,
-  sourceId: payload.sourceId,
-  creatorId: userId,
-});
+const patchBody = (validArtifactTypeFn, validArtifactSourceFn) =>
+  V.and(
+    V.object({
+      title: V.optional(V.isNotNull()),
+      description: V.optional(),
+      typeId: V.optional(
+        V.and(V.isNotNull(), V.validResource(validArtifactTypeFn)),
+      ),
+      sourceId: V.optional(
+        V.and(V.isNotNull(), V.validResource(validArtifactSourceFn)),
+      ),
+    }),
+    V.isNotEmpty(() => new ParameterError('No fields to update!')),
+  );
 
-const postArtifactAssetPayload = () => ({
-  filename: required(),
-  mimetype: required(),
-});
+const toResult = U.pick([
+  'id',
+  'title',
+  'description',
+  'typeId',
+  'sourceId',
+  'collectionId',
+  'creatorId',
+]);
 
-const assetFromPayload = (userId, artifactId, payload) => ({
-  filename: payload.filename,
-  mimetype: payload.mimetype,
-  collectionId: 'main',
-  artifactId: artifactId,
-  creatorId: userId,
-});
-
-const patchArtifactPayload = (artifactTypeRepo, artifactSourceRepo) => ({
-  title: optional(isNotNull()),
-  description: optional(),
-  typeId: optional(
-    composeP(
-      validResource((id) => artifactTypeRepo.artifactTypeExists(id)),
-      isNotNull(),
-    ),
-  ),
-  sourceId: optional(
-    composeP(
-      validResource((id) => artifactSourceRepo.artifactSourceExists(id)),
-      isNotNull(),
-    ),
-  ),
-});
-
-const artifactFieldsFromPayload = (payload) => ({
-  ...optionalField('title', payload),
-  ...optionalField('description', payload),
-  ...optionalField('typeId', payload),
-  ...optionalField('sourceId', payload),
-});
+const toAssetResult = U.pick([
+  'id',
+  'filename',
+  'mimetype',
+  'vaultId',
+  'artifactId',
+  'creatorId',
+]);
 
 export const artifactRoutes = ({
   artifactRepo,
   artifactTypeRepo,
   artifactSourceRepo,
   assetRepo,
+  vaultRepo,
 }) =>
   routes([
-    ...baseResourceRoutes(
-      'artifact',
-      (id) => artifactRepo.artifactExists(id),
-      ({ params }) => artifactRepo.readArtifact(params.id),
-      () => artifactRepo.readAllArtifacts(),
-      postArtifactPayload(artifactTypeRepo, artifactSourceRepo),
-      ({ userId, payload }) =>
-        artifactRepo.createArtifact(artifactFromPayload(userId, payload)),
-      patchArtifactPayload(artifactTypeRepo, artifactSourceRepo),
-      ({ params, payload }) =>
-        artifactRepo.updateArtifact(
-          params.id,
-          artifactFieldsFromPayload(payload),
-        ),
-      withUserId,
+    getSingleResource(
+      '/artifacts/:id',
+      artifactRepo.artifactExists,
+      ({ params }) => artifactRepo.readArtifact(params.id).then(toResult),
     ),
-    (router) =>
-      router.get(
-        '/artifacts/:id/assets',
-        withInitialContext(
-          withErrorHandling(
-            withUserId(
-              withJsonResponse(
-                withParams(
-                  resourceParams((id) => artifactRepo.artifactExists(id)),
-                  ({ params }) =>
-                    assetRepo.readAllAssets({ artifactId: params.id }),
-                ),
-              ),
-            ),
-          ),
-        ),
+    getAllResources('/artifacts', V.any(), () =>
+      artifactRepo.readAllArtifacts().then(U.map(toResult)),
+    ),
+    // no post
+    patchResource(
+      '/artifacts/:id',
+      artifactRepo.artifactExists,
+      patchBody(
+        artifactTypeRepo.artifactTypeExists,
+        artifactSourceRepo.artifactSourceExists,
       ),
+      ({ params, body }) =>
+        artifactRepo
+          .updateArtifact(
+            params.id,
+            U.compose(
+              U.filterEmptyProps,
+              U.pick(['title', 'description', 'typeId', 'sourceId']),
+            )(body),
+          )
+          .then(toResult),
+    ),
+    getAllChildResources(
+      '/artifacts/:id/assets',
+      artifactRepo.artifactExists,
+      ({ params }) =>
+        assetRepo
+          .readAllAssets({ artifactId: params.id })
+          .then(U.map(toAssetResult)),
+    ),
+    postChildResource(
+      '/artifacts/:id/assets',
+      artifactRepo.artifactExists,
+      postAssetBody(vaultRepo.vaultExists),
+      ({ userId, params, body }) =>
+        assetRepo
+          .createAsset(
+            U.compose(
+              U.assoc('artifactId', params.id),
+              U.assoc('creatorId', userId),
+              U.pick(['filename', 'mimetype', 'vaultId']),
+            )(body),
+          )
+          .then(toAssetResult),
+    ),
   ]);
-
-/*
-  // assets
-  get(
-    router,
-    '/artifacts/:id/assets',
-    withParams(artifactParams(db), (context) =>
-      readAllAssetsByArtifactId(db, context.params.id),
-    ),
-  );
-
-  post(
-    router,
-    '/artifacts/:id/assets',
-    withParams(
-      artifactParams(db),
-      withUserId(
-        withPayload(postArtifactAssetPayload(), (context) =>
-          createAsset(
-            db,
-            assetFromPayload(
-              context.userId,
-              context.params.id,
-              context.payload,
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  return router;
-};
-*/

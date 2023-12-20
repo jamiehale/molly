@@ -119,3 +119,5 @@ export const pick = curry((keys, o) =>
 );
 
 export const assoc = curry((key, value, o) => ({ ...o, [key]: value }));
+
+export const not = (v) => !v;

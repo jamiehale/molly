@@ -23,7 +23,7 @@ export const createArtifactSourceRepo = ({ artifactSourceStore }) => ({
   readArtifactSource: readResource(artifactSourceStore, toModel),
   readAllArtifactSources: readAllResources(
     artifactSourceStore,
-    fromModel,
+    U.compose(U.filterEmptyProps, fromModel),
     toModel,
   ),
   artifactSourceExists: resourceExists(artifactSourceStore),

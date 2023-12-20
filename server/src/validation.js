@@ -159,6 +159,15 @@ export const validResource = (
         .then(throwIfFalse(() => errorFn(o)))
         .then(always(o.value)),
   );
+const defaultAvailableKeyErrorFn = ({ scope, value }) =>
+  new ParameterError(`${scope}: key in use '${value}'`);
+
+export const availableKey =
+  (keyAvailableFn, errorFn = defaultAvailableKeyErrorFn) =>
+  (o) =>
+    keyAvailableFn(o.value)
+      .then(throwIfFalse(() => errorFn(o)))
+      .then(U.always(o.value));
 
 const defaultValidDateValueErrorFn = ({ scope, value }) =>
   new ParameterError(`${scope}: invalid date ${value}`);
@@ -176,4 +185,22 @@ export const validDateValue =
       return o.value;
     }
     throw errorFn(o);
+  };
+
+const defaultIsNotEmptyErrorFn = ({ scope }) =>
+  new ParameterError(`${scope}: value is empty`);
+
+export const isNotEmpty =
+  (errorFn = defaultIsNotEmptyErrorFn) =>
+  async (o) => {
+    if (U.type(o.value) === 'Object') {
+      if (Object.keys(o.value).length === 0) {
+        throw errorFn(o);
+      }
+    } else if (U.type(o.value) === 'Array') {
+      if (o.value.length === 0) {
+        throw errorFn(o);
+      }
+    }
+    return o.value;
   };

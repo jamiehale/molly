@@ -29,7 +29,11 @@ const toModel = U.transform({
 export const createAssetRepo = ({ assetStore }) => ({
   createAsset: createResource(assetStore, fromModel, toModel),
   readAsset: readResource(assetStore, toModel),
-  readAllAssets: readAllResources(assetStore, fromModel, toModel),
+  readAllAssets: readAllResources(
+    assetStore,
+    U.compose(U.filterEmptyProps, fromModel),
+    toModel,
+  ),
   assetExists: resourceExists(assetStore),
   updateAsset: updateResource(assetStore, fromModel, toModel),
   updateAllAssets: updateAllResources(assetStore, fromModel, toModel),

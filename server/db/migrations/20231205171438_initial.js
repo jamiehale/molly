@@ -194,7 +194,7 @@ export const up = (knex) =>
 
     // Assets
     //
-    .createTable('asset_vaults', (table) => {
+    .createTable('vaults', (table) => {
       table.string('id').primary().notNullable();
       table.string('title').notNullable();
       table.text('description');
@@ -208,7 +208,7 @@ export const up = (knex) =>
       table.uuid('artifact_id').notNullable();
       table.uuid('creator_id').notNullable();
 
-      table.foreign('vault_id').references('asset_vaults.id');
+      table.foreign('vault_id').references('vaults.id');
       table.foreign('artifact_id').references('artifacts.id');
       table.foreign('creator_id').references('users.id');
     })
@@ -319,7 +319,7 @@ export const up = (knex) =>
       ]),
     )
     .then(() =>
-      knex('asset_vaults').insert([
+      knex('vaults').insert([
         assetCollection('main', 'Main', 'http://localhost/api/assets'),
       ]),
     )
@@ -339,6 +339,7 @@ export const down = (knex) =>
     .dropTableIfExists('artifact_dates')
     .dropTableIfExists('people_dates')
     .dropTableIfExists('assets')
+    .dropTableIfExists('asset_vaults')
     .dropTableIfExists('artifact_events')
     .dropTableIfExists('artifact_locations')
     .dropTableIfExists('artifact_people')

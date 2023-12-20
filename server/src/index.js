@@ -24,6 +24,8 @@ import { createArtifactSourceRepo } from './data/repos/artifact-sources';
 import { createArtifactSourceStore } from './data/stores/artifact-sources';
 import { createArtifactCollectionRepo } from './data/repos/artifact-collections';
 import { createArtifactCollectionStore } from './data/stores/artifact-collections';
+import { createVaultStore } from './data/stores/vaults';
+import { createVaultRepo } from './data/repos/vaults';
 
 config();
 
@@ -49,6 +51,7 @@ const stores = {
   eventStore: createEventStore(db),
   locationStore: createLocationStore(db),
   userStore: createUsersStore(db),
+  vaultStore: createVaultStore(db),
 };
 
 const repos = {
@@ -62,6 +65,7 @@ const repos = {
   eventRepo: createEventRepo(stores),
   locationRepo: createLocationRepo(stores),
   userRepo: createUserRepo(stores),
+  vaultRepo: createVaultRepo(stores),
 };
 
 const app = express();

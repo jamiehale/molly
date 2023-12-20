@@ -9,13 +9,9 @@ import {
 import * as U from '../util';
 import * as V from '../validation';
 
-const postBody = (validArtifactSourceFn) =>
+const postBody = (validEventTypeFn) =>
   V.object({
-    id: V.and(
-      V.required(),
-      V.isNotNull(),
-      V.availableKey(validArtifactSourceFn),
-    ),
+    id: V.and(V.required(), V.isNotNull(), V.availableKey(validEventTypeFn)),
     title: V.and(V.required(), V.isNotNull()),
   });
 
@@ -29,23 +25,22 @@ const patchBody = () =>
 
 const toResult = U.pick(['id', 'title']);
 
-export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
+export const eventTypeRoutes = ({ eventTypeRepo }) =>
   routes([
     getSingleResource(
-      '/artifact-sources/:id',
-      artifactSourceRepo.artifactSourceExists,
-      ({ params }) =>
-        artifactSourceRepo.readArtifactSource(params.id).then(toResult),
+      '/event-types/:id',
+      eventTypeRepo.eventTypeExists,
+      ({ params }) => eventTypeRepo.readEventType(params.id).then(toResult),
     ),
-    getAllResources('/artifact-sources', V.any(), () =>
-      artifactSourceRepo.readAllArtifactSources().then(U.map(toResult)),
+    getAllResources('/event-types', V.any(), () =>
+      eventTypeRepo.readAllEventTypes().then(U.map(toResult)),
     ),
     postResource(
-      '/artifact-sources',
-      postBody((id) => artifactSourceRepo.artifactSourceExists(id).then(U.not)),
+      '/event-types',
+      postBody((id) => eventTypeRepo.eventTypeExists(id).then(U.not)),
       ({ userId, body }) =>
-        artifactSourceRepo
-          .createArtifactSource(
+        eventTypeRepo
+          .createEventType(
             U.compose(
               U.assoc('creatorId', userId),
               U.pick(['id', 'title']),
@@ -54,12 +49,12 @@ export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
           .then(toResult),
     ),
     patchResource(
-      '/artifact-sources/:id',
-      artifactSourceRepo.artifactSourceExists,
+      '/event-types/:id',
+      eventTypeRepo.eventTypeExists,
       patchBody(),
       ({ params, body }) =>
-        artifactSourceRepo
-          .updateArtifactSource(
+        eventTypeRepo
+          .updateEventType(
             params.id,
             U.compose(U.filterEmptyProps, U.pick(['title']))(body),
           )

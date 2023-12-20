@@ -1,13 +1,9 @@
 import {
-  optionalField,
   routes,
-  withUserId,
-  withParams,
   getSingleResource,
   getAllResources,
   postResource,
   patchResource,
-  withContext,
   getAllChildResources,
   postChildResource,
 } from '../resource-helpers';
@@ -38,13 +34,6 @@ const postArtifactBody = (validArtifactTypeFn, validArtifactSourceFn) =>
     ),
   });
 
-const newArtifactCollection = (userId, payload) => ({
-  title: payload.title,
-  shortName: payload.shortName,
-  description: payload.description,
-  creatorId: userId,
-});
-
 const patchBody = () =>
   V.and(
     V.object({
@@ -52,28 +41,8 @@ const patchBody = () =>
       shortName: V.optional(V.isNotNull()),
       description: V.optional(),
     }),
-    ({ value }) => {
-      if (Object.keys(value).length === 0) {
-        throw new ParameterError('No fields to update!');
-      }
-      return value;
-    },
+    V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
-
-const artifactCollectionFieldsFromPayload = (payload) => ({
-  ...optionalField('title', payload),
-  ...optionalField('shortName', payload),
-  ...optionalField('description', payload),
-});
-
-const params = (validArtifactCollectionFn) =>
-  V.object({
-    id: V.and(
-      V.required(),
-      V.isNotNull(),
-      V.validResource(validArtifactCollectionFn),
-    ),
-  });
 
 const toResult = U.pick([
   'id',
@@ -101,8 +70,8 @@ export const artifactCollectionRoutes = ({
 }) =>
   routes([
     getSingleResource(
-      '/artifact-collection/:id',
-      params(artifactCollectionRepo.artifactCollectionExists),
+      '/artifact-collections/:id',
+      artifactCollectionRepo.artifactCollectionExists,
       ({ params }) =>
         artifactCollectionRepo.readArtifactCollection(params.id).then(toResult),
     ),
@@ -121,7 +90,7 @@ export const artifactCollectionRoutes = ({
     ),
     patchResource(
       '/artifact-collections/:id',
-      params(artifactCollectionRepo.artifactCollectionExists),
+      artifactCollectionRepo.artifactCollectionExists,
       patchBody(),
       ({ params, body }) =>
         artifactCollectionRepo
@@ -136,7 +105,7 @@ export const artifactCollectionRoutes = ({
     ),
     getAllChildResources(
       '/artifact-collections/:id/artifacts',
-      params(artifactCollectionRepo.artifactCollectionExists),
+      artifactCollectionRepo.artifactCollectionExists,
       ({ params }) =>
         artifactRepo
           .readAllArtifacts({ collectionId: params.id })
@@ -144,7 +113,7 @@ export const artifactCollectionRoutes = ({
     ),
     postChildResource(
       '/artifact-collections/:id/artifacts',
-      params((id) => artifactCollectionRepo.artifactCollectionExists(id)),
+      artifactCollectionRepo.artifactCollectionExists,
       postArtifactBody(
         artifactTypeRepo.artifactTypeExists,
         artifactSourceRepo.artifactSourceExists,
