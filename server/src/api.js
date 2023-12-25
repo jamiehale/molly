@@ -9,6 +9,8 @@ import { locationRoutes } from './resources/locations';
 import { artifactSourceRoutes } from './resources/artifact-sources';
 import { artifactCollectionRoutes } from './resources/artifact-collections';
 import { eventTypeRoutes } from './resources/event-types';
+import { genderRoutes } from './resources/genders';
+import { personRoutes } from './resources/people';
 
 export const api = (repos) => {
   const router = express.Router();
@@ -21,7 +23,9 @@ export const api = (repos) => {
   router.use(authenticated(repos), assetRoutes(repos));
   router.use(authenticated(repos), eventRoutes(repos));
   router.use(authenticated(repos), eventTypeRoutes(repos));
+  router.use(authenticated(repos), genderRoutes(repos));
   router.use(authenticated(repos), locationRoutes(repos));
+  router.use(authenticated(repos), personRoutes(repos));
 
   return router;
 };

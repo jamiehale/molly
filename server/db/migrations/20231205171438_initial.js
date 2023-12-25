@@ -53,7 +53,7 @@ export const up = (knex) =>
       table.string('id').primary().notNullable();
       table.string('title').notNullable();
     })
-    .createTable('artifact_people_roles', (table) => {
+    .createTable('artifact_person_roles', (table) => {
       table.string('id').primary().notNullable();
       table.string('title').notNullable();
     })
@@ -69,7 +69,7 @@ export const up = (knex) =>
       table.string('id').primary().notNullable();
       table.string('title').notNullable();
     })
-    .createTable('people_date_types', (table) => {
+    .createTable('person_date_types', (table) => {
       table.string('id').primary().notNullable();
       table.string('title').notNullable();
     })
@@ -172,7 +172,7 @@ export const up = (knex) =>
 
       table.foreign('artifact_id').references('artifacts.id');
       table.foreign('person_id').references('people.id');
-      table.foreign('role_id').references('artifact_people_roles.id');
+      table.foreign('role_id').references('artifact_person_roles.id');
     })
     .createTable('artifact_locations', (table) => {
       table.uuid('artifact_id').notNullable();
@@ -215,7 +215,7 @@ export const up = (knex) =>
 
     // Dates
     //
-    .createTable('people_dates', (table) => {
+    .createTable('person_dates', (table) => {
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
       table.uuid('person_id').notNullable();
       table.string('type_id').notNullable();
@@ -223,7 +223,7 @@ export const up = (knex) =>
       table.uuid('creator_id').notNullable();
 
       table.foreign('person_id').references('people.id');
-      table.foreign('type_id').references('people_date_types.id');
+      table.foreign('type_id').references('person_date_types.id');
       table.foreign('creator_id').references('users.id');
     })
     .createTable('artifact_dates', (table) => {
@@ -265,7 +265,7 @@ export const up = (knex) =>
       ]),
     )
     .then(() =>
-      knex('artifact_people_roles').insert([
+      knex('artifact_person_roles').insert([
         artifactPersonRole('recipient', 'Recipient'),
         artifactPersonRole('sender', 'Sender'),
         artifactPersonRole('author', 'Author'),
@@ -337,26 +337,26 @@ export const up = (knex) =>
 export const down = (knex) =>
   knex.schema
     .dropTableIfExists('artifact_dates')
-    .dropTableIfExists('people_dates')
+    .dropTableIfExists('person_dates')
     .dropTableIfExists('assets')
-    .dropTableIfExists('asset_vaults')
+    .dropTableIfExists('vaults')
     .dropTableIfExists('artifact_events')
     .dropTableIfExists('artifact_locations')
     .dropTableIfExists('artifact_people')
     .dropTableIfExists('artifacts')
+    .dropTableIfExists('artifact_collections')
     .dropTableIfExists('events')
     .dropTableIfExists('locations')
     .dropTableIfExists('parents')
     .dropTableIfExists('partners')
     .dropTableIfExists('partnerships')
     .dropTableIfExists('people')
-    .dropTableIfExists('asset_collections')
     .dropTableIfExists('artifact_date_types')
-    .dropTableIfExists('people_date_types')
+    .dropTableIfExists('person_date_types')
     .dropTableIfExists('artifact_location_types')
     .dropTableIfExists('artifact_sources')
     .dropTableIfExists('artifact_types')
-    .dropTableIfExists('artifact_people_roles')
+    .dropTableIfExists('artifact_person_roles')
     .dropTableIfExists('event_types')
     .dropTableIfExists('parent_roles')
     .dropTableIfExists('partnership_types')

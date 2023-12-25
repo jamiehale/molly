@@ -50,7 +50,10 @@ const toAssetResult = U.pick([
   'creatorId',
 ]);
 
+const toArtifactPersonResult = U.pick([]);
+
 export const artifactRoutes = ({
+  artifactPersonRepo,
   artifactRepo,
   artifactTypeRepo,
   artifactSourceRepo,
@@ -107,5 +110,13 @@ export const artifactRoutes = ({
             )(body),
           )
           .then(toAssetResult),
+    ),
+    getAllChildResources(
+      '/artifacts/:id/people',
+      artifactRepo.artifactExists,
+      ({ params }) =>
+        artifactPersonRepo
+          .readAllArtifactPeople({ artifactId: params.id })
+          .then(U.map(toArtifactPersonResult)),
     ),
   ]);

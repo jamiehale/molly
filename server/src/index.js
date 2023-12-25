@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import Knex from 'knex';
+import cors from 'cors';
 import { config } from 'dotenv';
 import { api } from './api';
 import { HttpError, isHttpError } from './error';
@@ -26,6 +27,12 @@ import { createArtifactCollectionRepo } from './data/repos/artifact-collections'
 import { createArtifactCollectionStore } from './data/stores/artifact-collections';
 import { createVaultStore } from './data/stores/vaults';
 import { createVaultRepo } from './data/repos/vaults';
+import { createGenderStore } from './data/stores/genders';
+import { createGenderRepo } from './data/repos/genders';
+import { createPersonStore } from './data/stores/people';
+import { createPersonRepo } from './data/repos/people';
+import { createArtifactPersonRoleStore } from './data/stores/artifact-person-roles';
+import { createArtifactPersonRoleRepo } from './data/repos/artifact-person-roles';
 
 config();
 
@@ -43,13 +50,16 @@ const db = Knex({
 const stores = {
   apiKeyStore: createApiKeyStore(db),
   artifactCollectionStore: createArtifactCollectionStore(db),
+  artifactPersonRoleStore: createArtifactPersonRoleStore(db),
   artifactSourceStore: createArtifactSourceStore(db),
   artifactTypeStore: createArtifactTypeStore(db),
   artifactStore: createArtifactStore(db),
   assetStore: createAssetStore(db),
   eventTypeStore: createEventTypeStore(db),
   eventStore: createEventStore(db),
+  genderStore: createGenderStore(db),
   locationStore: createLocationStore(db),
+  personStore: createPersonStore(db),
   userStore: createUsersStore(db),
   vaultStore: createVaultStore(db),
 };
@@ -57,13 +67,16 @@ const stores = {
 const repos = {
   apiKeyRepo: createApiKeyRepo(stores),
   artifactCollectionRepo: createArtifactCollectionRepo(stores),
+  artifactPersonRoleRepo: createArtifactPersonRoleRepo(stores),
   artifactSourceRepo: createArtifactSourceRepo(stores),
   artifactTypeRepo: createArtifactTypeRepo(stores),
   artifactRepo: createArtifactRepo(stores),
   assetRepo: createAssetRepo(stores),
   eventTypeRepo: createEventTypeRepo(stores),
   eventRepo: createEventRepo(stores),
+  genderRepo: createGenderRepo(stores),
   locationRepo: createLocationRepo(stores),
+  personRepo: createPersonRepo(stores),
   userRepo: createUserRepo(stores),
   vaultRepo: createVaultRepo(stores),
 };
@@ -71,6 +84,7 @@ const repos = {
 const app = express();
 const port = process.env.PORT;
 
+app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
