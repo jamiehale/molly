@@ -1,13 +1,14 @@
 import PropTypes from "prop-types";
+import { List, ListItem } from "./List";
 
 export const People = ({ people }) => (
-  <ul>
+  <List>
     {people.map((person) => (
-      <li key={person.id}>
+      <ListItem key={person.id}>
         {person.surname}, {person.givenNames}
-      </li>
+      </ListItem>
     ))}
-  </ul>
+  </List>
 );
 
 People.propTypes = {
