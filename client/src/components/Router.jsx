@@ -1,3 +1,4 @@
+import React from "react";
 import {
   createContext,
   useCallback,
@@ -34,11 +35,26 @@ Router.propTypes = {
 export const Route = ({ path, children }) => {
   const { path: currentPath } = useContext(RouterContext);
 
-  if (path === currentPath) {
-    return children;
+  const pathParts = path.split("/");
+  const currentPathParts = currentPath.split("/");
+  if (pathParts.length !== currentPathParts.length) {
+    return null;
   }
 
-  return null;
+  const params = {};
+  for (let i = 0; i < pathParts.length; i++) {
+    if (pathParts[i].startsWith(":")) {
+      params[pathParts[i].substr(1)] = currentPathParts[i];
+    } else {
+      if (pathParts[i] !== currentPathParts[i]) {
+        return null;
+      }
+    }
+  }
+
+  return React.Children.map(children, (child) =>
+    React.cloneElement(child, { params })
+  );
 };
 
 Route.propTypes = {
@@ -68,4 +84,13 @@ export const Link = ({ to, children }) => {
 Link.propTypes = {
   to: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+};
+
+export const useParams = () => {
+  const { path } = useContext(RouterContext);
+
+  return useMemo(() => {
+    const parts = path.split("/").filter((s) => s.startsWith(":"));
+    console.log(parts);
+  }, [path]);
 };

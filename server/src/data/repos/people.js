@@ -7,6 +7,7 @@ import {
   updateResource,
 } from '../resource-repo';
 import * as U from '../../util';
+import { toInternalError } from '../../error';
 
 const fromModel = U.transform({
   id: U.prop('id'),
@@ -24,6 +25,9 @@ const toModel = U.transform({
   creatorId: U.prop('creator_id'),
 });
 
+const queryPeople = (store, toModelFn) => (q) =>
+  store.queryPeople(q).then(U.map(toModelFn)).catch(toInternalError);
+
 export const createPersonRepo = ({ personStore }) => ({
   createPerson: createResource(personStore, fromModel, toModel),
   readPerson: readResource(personStore, toModel),
@@ -32,6 +36,7 @@ export const createPersonRepo = ({ personStore }) => ({
     U.compose(U.filterEmptyProps, fromModel),
     toModel,
   ),
+  queryPeople: queryPeople(personStore, toModel),
   personExists: resourceExists(personStore),
   updatePerson: updateResource(personStore, fromModel, toModel),
   updateAllPeople: updateAllResources(personStore, fromModel, toModel),

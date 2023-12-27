@@ -33,6 +33,12 @@ import { createPersonStore } from './data/stores/people';
 import { createPersonRepo } from './data/repos/people';
 import { createArtifactPersonRoleStore } from './data/stores/artifact-person-roles';
 import { createArtifactPersonRoleRepo } from './data/repos/artifact-person-roles';
+import { createParentStore } from './data/stores/parents';
+import { createParentRepo } from './data/repos/parents';
+import { createChildStore } from './data/stores/children';
+import { createChildRepo } from './data/repos/children';
+import { createParentRoleStore } from './data/stores/parent-roles';
+import { createParentRoleRepo } from './data/repos/parent-roles';
 
 config();
 
@@ -55,10 +61,13 @@ const stores = {
   artifactTypeStore: createArtifactTypeStore(db),
   artifactStore: createArtifactStore(db),
   assetStore: createAssetStore(db),
+  childStore: createChildStore(db),
   eventTypeStore: createEventTypeStore(db),
   eventStore: createEventStore(db),
   genderStore: createGenderStore(db),
   locationStore: createLocationStore(db),
+  parentRoleStore: createParentRoleStore(db),
+  parentStore: createParentStore(db),
   personStore: createPersonStore(db),
   userStore: createUsersStore(db),
   vaultStore: createVaultStore(db),
@@ -72,10 +81,13 @@ const repos = {
   artifactTypeRepo: createArtifactTypeRepo(stores),
   artifactRepo: createArtifactRepo(stores),
   assetRepo: createAssetRepo(stores),
+  childRepo: createChildRepo(stores),
   eventTypeRepo: createEventTypeRepo(stores),
   eventRepo: createEventRepo(stores),
   genderRepo: createGenderRepo(stores),
   locationRepo: createLocationRepo(stores),
+  parentRoleRepo: createParentRoleRepo(stores),
+  parentRepo: createParentRepo(stores),
   personRepo: createPersonRepo(stores),
   userRepo: createUserRepo(stores),
   vaultRepo: createVaultRepo(stores),

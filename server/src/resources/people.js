@@ -4,10 +4,16 @@ import {
   getAllResources,
   postResource,
   patchResource,
+  getAllChildResources,
 } from '../resource-helpers';
 import * as V from '../validation';
 import * as U from '../util';
 import { ParameterError } from '../error';
+
+const query = () =>
+  V.object({
+    q: V.optional(V.isNotNull()),
+  });
 
 const postBody = (validGenderFn) =>
   V.object({
@@ -40,14 +46,40 @@ const toResult = U.pick([
   'creatorId',
 ]);
 
-export const personRoutes = ({ personRepo, genderRepo }) =>
+const toChildResult = U.pick([
+  'id',
+  'givenNames',
+  'surname',
+  'genderId',
+  'creatorId',
+  'parentRoleId',
+]);
+
+const toParentResult = U.pick([
+  'id',
+  'givenNames',
+  'surname',
+  'genderId',
+  'creatorId',
+  'parentRoleId',
+]);
+
+export const personRoutes = ({
+  personRepo,
+  genderRepo,
+  childRepo,
+  parentRepo,
+}) =>
   routes([
     getSingleResource('/people/:id', personRepo.personExists, ({ params }) =>
       personRepo.readPerson(params.id).then(toResult),
     ),
-    getAllResources('/people', V.any(), () =>
-      personRepo.readAllPeople().then(U.map(toResult)),
-    ),
+    getAllResources('/people', query(), ({ query }) => {
+      if (query.q) {
+        return personRepo.queryPeople(query.q).then(U.map(toResult));
+      }
+      return personRepo.readAllPeople().then(U.map(toResult));
+    }),
     postResource(
       '/people',
       postBody(genderRepo.genderExists),
@@ -75,5 +107,21 @@ export const personRoutes = ({ personRepo, genderRepo }) =>
             )(body),
           )
           .then(toResult),
+    ),
+    getAllChildResources(
+      '/people/:id/children',
+      personRepo.personExists,
+      ({ params }) =>
+        childRepo
+          .readAllChildren({ parentId: params.id })
+          .then(U.map(toChildResult)),
+    ),
+    getAllChildResources(
+      '/people/:id/parents',
+      personRepo.personExists,
+      ({ params }) =>
+        parentRepo
+          .readAllParents({ childId: params.id })
+          .then(U.map(toParentResult)),
     ),
   ]);

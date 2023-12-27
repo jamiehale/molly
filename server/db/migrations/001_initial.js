@@ -1,3 +1,5 @@
+import { readSql } from './support';
+
 const gender = (id, title) => ({ id, title });
 const partnerRole = (id, title) => ({ id, title });
 const partnershipType = (id, title) => ({ id, title });
@@ -108,14 +110,14 @@ export const up = (knex) =>
       table.foreign('person_id').references('people.id');
       table.foreign('role_id').references('partner_roles.id');
     })
-    .createTable('parents', (table) => {
+    .createTable('parent_children', (table) => {
       table.uuid('parent_id').notNullable();
       table.uuid('child_id').notNullable();
-      table.string('role_id').notNullable();
+      table.string('parent_role_id').notNullable();
 
       table.foreign('parent_id').references('people.id');
       table.foreign('child_id').references('people.id');
-      table.foreign('role_id').references('parent_roles.id');
+      table.foreign('parent_role_id').references('parent_roles.id');
     })
 
     // Locations
@@ -238,6 +240,9 @@ export const up = (knex) =>
       table.foreign('creator_id').references('users.id');
     })
 
+    .then(() => knex.raw(readSql('001/children.sql')))
+    .then(() => knex.raw(readSql('001/parents.sql')))
+
     .then(() =>
       knex('artifact_types').insert([
         artifactType('birth-certificate', 'Birth Certificate'),
@@ -336,6 +341,8 @@ export const up = (knex) =>
 
 export const down = (knex) =>
   knex.schema
+    .dropViewIfExists('parents')
+    .dropViewIfExists('children')
     .dropTableIfExists('artifact_dates')
     .dropTableIfExists('person_dates')
     .dropTableIfExists('assets')
@@ -347,7 +354,7 @@ export const down = (knex) =>
     .dropTableIfExists('artifact_collections')
     .dropTableIfExists('events')
     .dropTableIfExists('locations')
-    .dropTableIfExists('parents')
+    .dropTableIfExists('parent_children')
     .dropTableIfExists('partners')
     .dropTableIfExists('partnerships')
     .dropTableIfExists('people')
