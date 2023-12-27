@@ -5,6 +5,7 @@ import {
   postResource,
   patchResource,
   getAllChildResources,
+  postChildResource,
 } from '../resource-helpers';
 import * as V from '../validation';
 import * as U from '../util';
@@ -38,6 +39,16 @@ const patchBody = (validGenderFn) =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
+const postChildBody = (validChildfn, validParentRoleFn) =>
+  V.object({
+    childId: V.and(V.required(), V.isNotNull(), V.validResource(validChildfn)),
+    parentRoleId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validParentRoleFn),
+    ),
+  });
+
 const toResult = U.pick([
   'id',
   'givenNames',
@@ -65,10 +76,12 @@ const toParentResult = U.pick([
 ]);
 
 export const personRoutes = ({
-  personRepo,
-  genderRepo,
   childRepo,
+  genderRepo,
+  parentChildRepo,
   parentRepo,
+  parentRoleRepo,
+  personRepo,
 }) =>
   routes([
     getSingleResource('/people/:id', personRepo.personExists, ({ params }) =>
@@ -115,6 +128,19 @@ export const personRoutes = ({
         childRepo
           .readAllChildren({ parentId: params.id })
           .then(U.map(toChildResult)),
+    ),
+    postChildResource(
+      '/people/:id/children',
+      personRepo.personExists,
+      postChildBody(personRepo.personExists, parentRoleRepo.parentRoleExists),
+      ({ params, body, userId }) =>
+        parentChildRepo.createParentChild(
+          U.compose(
+            U.assoc('creatorId', userId),
+            U.assoc('parentId', params.id),
+            U.pick(['childId', 'parentRoleId']),
+          )(body),
+        ),
     ),
     getAllChildResources(
       '/people/:id/parents',

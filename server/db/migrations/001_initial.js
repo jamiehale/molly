@@ -115,6 +115,7 @@ export const up = (knex) =>
       table.uuid('child_id').notNullable();
       table.string('parent_role_id').notNullable();
 
+      table.unique(['parent_id', 'child_id']);
       table.foreign('parent_id').references('people.id');
       table.foreign('child_id').references('people.id');
       table.foreign('parent_role_id').references('parent_roles.id');

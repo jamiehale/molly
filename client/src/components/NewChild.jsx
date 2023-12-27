@@ -5,19 +5,26 @@ import { useApi } from '../hooks/api';
 import { usePeopleSearch } from '../hooks/people-search';
 import { NewChildForm } from './NewChildForm';
 import * as J from '../lib/jlib';
+import { useChildren } from '../hooks/children';
 
-export const NewChild = ({ parentId }) => {
-  const { authorizedGet } = useApi('http://localhost:3000/api', '12345');
+export const NewChild = ({ parentId, onNewChild }) => {
+  const { authorizedGet, authorizedPost } = useApi(
+    'http://localhost:3000/api',
+    '12345',
+  );
   const { parentRoles } = useParentRoles(authorizedGet);
   const { searchForPeople } = usePeopleSearch(authorizedGet);
   const [searchResults, setSearchResults] = useState([]);
+  const { addChild } = useChildren(parentId, authorizedGet, authorizedPost);
 
   const handleSubmit = useCallback(
     ({ childId, parentRoleId }) => {
-      console.log('new child', { parentId, childId, parentRoleId });
-      setSearchResults([]);
+      addChild(childId, parentRoleId).then(() => {
+        setSearchResults([]);
+        onNewChild();
+      });
     },
-    [parentId],
+    [addChild, setSearchResults, onNewChild],
   );
 
   const handleSearch = useCallback(
@@ -45,4 +52,5 @@ export const NewChild = ({ parentId }) => {
 
 NewChild.propTypes = {
   parentId: PropTypes.string.isRequired,
+  onNewChild: PropTypes.func.isRequired,
 };

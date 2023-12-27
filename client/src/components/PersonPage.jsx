@@ -6,11 +6,16 @@ import { usePerson } from '../hooks/person';
 import { useChildren } from '../hooks/children';
 import { List, ListItem } from './List';
 import { NewChild } from './NewChild';
+import { useCallback } from 'react';
 
 export const PersonPage = ({ params }) => {
   const { authorizedGet } = useApi('http://localhost:3000/api', '12345');
   const { person } = usePerson(params.id, authorizedGet);
-  const { children } = useChildren(params.id, authorizedGet);
+  const { children, reloadChildren } = useChildren(params.id, authorizedGet);
+
+  const handleNewChild = useCallback(() => {
+    reloadChildren();
+  }, [reloadChildren]);
 
   return (
     <Layout>
@@ -30,7 +35,7 @@ export const PersonPage = ({ params }) => {
                 </ListItem>
               ))}
             </List>
-            <NewChild parentId={person.id} />
+            <NewChild parentId={person.id} onNewChild={handleNewChild} />
           </div>
         </>
       )}

@@ -39,6 +39,8 @@ import { createChildStore } from './data/stores/children';
 import { createChildRepo } from './data/repos/children';
 import { createParentRoleStore } from './data/stores/parent-roles';
 import { createParentRoleRepo } from './data/repos/parent-roles';
+import { createParentChildStore } from './data/stores/parent-children';
+import { createParentChildRepo } from './data/repos/parent-children';
 
 config();
 
@@ -66,6 +68,7 @@ const stores = {
   eventStore: createEventStore(db),
   genderStore: createGenderStore(db),
   locationStore: createLocationStore(db),
+  parentChildStore: createParentChildStore(db),
   parentRoleStore: createParentRoleStore(db),
   parentStore: createParentStore(db),
   personStore: createPersonStore(db),
@@ -86,6 +89,7 @@ const repos = {
   eventRepo: createEventRepo(stores),
   genderRepo: createGenderRepo(stores),
   locationRepo: createLocationRepo(stores),
+  parentChildRepo: createParentChildRepo(stores),
   parentRoleRepo: createParentRoleRepo(stores),
   parentRepo: createParentRepo(stores),
   personRepo: createPersonRepo(stores),
