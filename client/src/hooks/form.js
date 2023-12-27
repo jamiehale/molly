@@ -24,7 +24,10 @@ const initialValueFrom = (fields) =>
   Object.keys(fields).reduce(
     (acc, field) => ({
       ...acc,
-      [field]: fields[field].initialValue || "",
+      [field]:
+        fields[field].initialValue === undefined
+          ? ""
+          : fields[field].initialValue,
     }),
     {}
   );
@@ -44,8 +47,8 @@ export const useForm = (fields, onSubmit) => {
 
   const propsForField = useCallback(
     (field) => {
-      const handleChangeField = (e) => {
-        dispatch({ type: "set", field, value: e.target.value });
+      const handleChangeField = (value) => {
+        dispatch({ type: "set", field, value });
       };
 
       return {

@@ -1,13 +1,10 @@
 import PropTypes from "prop-types";
-import { useCallback } from "react";
 import { useApi } from "../hooks/api";
 import { Typography } from "./Typography";
 import { Layout } from "./Layout";
 import { usePerson } from "../hooks/person";
 import { useChildren } from "../hooks/children";
 import { List, ListItem } from "./List";
-import { useParentRoles } from "../hooks/parent-roles";
-import { usePeopleSearch } from "../hooks/people-search";
 import { NewChild } from "./NewChild";
 
 export const PersonPage = ({ params }) => {

@@ -86,11 +86,21 @@ Link.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const useParams = () => {
-  const { path } = useContext(RouterContext);
+export const useNav = () => {
+  const { setPath } = useContext(RouterContext);
 
-  return useMemo(() => {
-    const parts = path.split("/").filter((s) => s.startsWith(":"));
-    console.log(parts);
-  }, [path]);
+  const navigateTo = useCallback(
+    (path) => {
+      window.history.pushState(null, path, path);
+      setPath(path);
+    },
+    [setPath]
+  );
+
+  return useMemo(
+    () => ({
+      navigateTo,
+    }),
+    [navigateTo]
+  );
 };

@@ -1,21 +1,31 @@
 import PropTypes from "prop-types";
+import { Label } from "./Label";
+import { Select } from "./Select";
 
-export const SelectField = ({ label, value, onChange, children }) => (
-  <label className="flex flex-col">
-    <p className="">{label}:</p>
-    <select
-      className="px-2 py-2.5 rounded-md border"
+export const SelectField = ({
+  label,
+  options,
+  valueFn,
+  displayFn,
+  value,
+  onChange,
+}) => (
+  <Label value={label}>
+    <Select
+      options={options}
+      valueFn={valueFn}
+      displayFn={displayFn}
       value={value}
       onChange={onChange}
-    >
-      {children}
-    </select>
-  </label>
+    />
+  </Label>
 );
 
 SelectField.propTypes = {
   label: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
+  valueFn: PropTypes.func,
+  displayFn: PropTypes.func,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  children: PropTypes.node.isRequired,
 };

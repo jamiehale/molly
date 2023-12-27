@@ -20,13 +20,13 @@ export const NewPersonForm = ({ genders, onSubmit }) => {
     <Form {...propsForForm()}>
       <TextField label="Given Names" {...propsForField("givenNames")} />
       <TextField label="Surname" {...propsForField("surname")} />
-      <SelectField label="Gender" {...propsForField("genderId")}>
-        {genders.map((gender) => (
-          <option key={gender.id} value={gender.id}>
-            {gender.title}
-          </option>
-        ))}
-      </SelectField>
+      <SelectField
+        options={genders}
+        valueFn={(o) => o.id}
+        displayFn={(o) => o.title}
+        label="Gender"
+        {...propsForField("genderId")}
+      />
       <FlexRow className="mt-1">
         <Button type="submit">Add</Button>
       </FlexRow>

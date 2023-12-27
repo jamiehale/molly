@@ -4,33 +4,44 @@ import { Form } from "./Form";
 import { SelectField } from "./SelectField";
 import { FlexRow } from "./FlexRow";
 import { Button } from "./Button";
-import { TypeAheadSelectField } from "./TypeAheadSelectField";
+import { PersonSelectField } from "./PersonSelectField";
+import * as J from "../lib/jlib";
 
-export const NewChildForm = ({ parentRoles, onSearch, onSubmit }) => {
+export const NewChildForm = ({
+  people,
+  valueFn,
+  displayFn,
+  onSearch,
+  parentRoles,
+  onSubmit,
+}) => {
   const { propsForField, propsForForm } = useForm(
     {
-      childId: {},
-      parentRoleId: { initialValue: "birth" },
+      child: { initialValue: null },
+      parentRoleId: { initialValue: "biological" },
     },
-    onSubmit
+    ({ child, parentRoleId }) => {
+      onSubmit({ childId: child.id, parentRoleId });
+    }
   );
 
   return (
     <Form {...propsForForm()}>
-      <TypeAheadSelectField
+      <PersonSelectField
         label="Child"
-        {...propsForField("childId")}
+        people={people}
+        valueFn={valueFn}
+        displayFn={displayFn}
         onSearch={onSearch}
-        valueFn={(child) => child.id}
-        displayFn={(child) => `${child.surname}, ${child.givenNames}`}
+        {...propsForField("child")}
       />
-      <SelectField label="Parent Role" {...propsForField("parentRoleId")}>
-        {parentRoles.map((parentRole) => (
-          <option key={parentRole.id} value={parentRole.id}>
-            {parentRole.title}
-          </option>
-        ))}
-      </SelectField>
+      <SelectField
+        label="Parent Role"
+        options={parentRoles}
+        valueFn={J.prop("id")}
+        displayFn={J.prop("title")}
+        {...propsForField("parentRoleId")}
+      />
       <FlexRow className="mt-1">
         <Button type="submit">Add</Button>
       </FlexRow>
@@ -39,6 +50,15 @@ export const NewChildForm = ({ parentRoles, onSearch, onSubmit }) => {
 };
 
 NewChildForm.propTypes = {
+  people: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      givenNames: PropTypes.string,
+      surname: PropTypes.string,
+    })
+  ),
+  valueFn: PropTypes.func,
+  displayFn: PropTypes.func,
   parentRoles: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

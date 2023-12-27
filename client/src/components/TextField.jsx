@@ -1,17 +1,13 @@
 import PropTypes from "prop-types";
 import { Typography } from "./Typography";
+import { TextInput } from "./TextInput";
+import { Label } from "./Label";
 
 export const TextField = ({ label, value, onChange }) => (
-  <label className="flex flex-col">
-    <Typography>{label}:</Typography>
-    <input
-      className="mt-1 px-2 py-2 rounded-md border"
-      type="text"
-      value={value}
-      onChange={onChange}
-    />
+  <Label value={label}>
+    <TextInput value={value} onChange={onChange} />
     <Typography className="invisible">Error</Typography>
-  </label>
+  </Label>
 );
 
 TextField.propTypes = {
