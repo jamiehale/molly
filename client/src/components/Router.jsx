@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 import {
   createContext,
   useCallback,
   useContext,
   useMemo,
   useState,
-} from "react";
-import PropTypes from "prop-types";
+} from 'react';
+import PropTypes from 'prop-types';
 
 const RouterContext = createContext({
-  path: "",
+  path: '',
   setPath: () => {},
 });
 
@@ -35,15 +35,15 @@ Router.propTypes = {
 export const Route = ({ path, children }) => {
   const { path: currentPath } = useContext(RouterContext);
 
-  const pathParts = path.split("/");
-  const currentPathParts = currentPath.split("/");
+  const pathParts = path.split('/');
+  const currentPathParts = currentPath.split('/');
   if (pathParts.length !== currentPathParts.length) {
     return null;
   }
 
   const params = {};
   for (let i = 0; i < pathParts.length; i++) {
-    if (pathParts[i].startsWith(":")) {
+    if (pathParts[i].startsWith(':')) {
       params[pathParts[i].substr(1)] = currentPathParts[i];
     } else {
       if (pathParts[i] !== currentPathParts[i]) {
@@ -53,7 +53,7 @@ export const Route = ({ path, children }) => {
   }
 
   return React.Children.map(children, (child) =>
-    React.cloneElement(child, { params })
+    React.cloneElement(child, { params }),
   );
 };
 
@@ -71,7 +71,7 @@ export const Link = ({ to, children }) => {
       window.history.pushState(null, to, to);
       setPath(to);
     },
-    [to, setPath]
+    [to, setPath],
   );
 
   return (
@@ -94,13 +94,13 @@ export const useNav = () => {
       window.history.pushState(null, path, path);
       setPath(path);
     },
-    [setPath]
+    [setPath],
   );
 
   return useMemo(
     () => ({
       navigateTo,
     }),
-    [navigateTo]
+    [navigateTo],
   );
 };

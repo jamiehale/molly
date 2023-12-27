@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export const useGenders = ({ authorizedGet }) => {
   const [genders, setGenders] = useState([]);
 
   useEffect(() => {
-    authorizedGet("/genders").then(setGenders);
+    authorizedGet('/genders').then(setGenders);
   }, []);
 
   return { genders };

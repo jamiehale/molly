@@ -1,7 +1,7 @@
-import PropTypes from "prop-types";
-import { Typography } from "./Typography";
-import { TextInput } from "./TextInput";
-import { Label } from "./Label";
+import PropTypes from 'prop-types';
+import { Typography } from './Typography';
+import { TextInput } from './TextInput';
+import { Label } from './Label';
 
 export const TextField = ({ label, value, onChange }) => (
   <Label value={label}>

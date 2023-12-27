@@ -1,14 +1,14 @@
-import PropTypes from "prop-types";
-import { useApi } from "../hooks/api";
-import { Typography } from "./Typography";
-import { Layout } from "./Layout";
-import { usePerson } from "../hooks/person";
-import { useChildren } from "../hooks/children";
-import { List, ListItem } from "./List";
-import { NewChild } from "./NewChild";
+import PropTypes from 'prop-types';
+import { useApi } from '../hooks/api';
+import { Typography } from './Typography';
+import { Layout } from './Layout';
+import { usePerson } from '../hooks/person';
+import { useChildren } from '../hooks/children';
+import { List, ListItem } from './List';
+import { NewChild } from './NewChild';
 
 export const PersonPage = ({ params }) => {
-  const { authorizedGet } = useApi("http://localhost:3000/api", "12345");
+  const { authorizedGet } = useApi('http://localhost:3000/api', '12345');
   const { person } = usePerson(params.id, authorizedGet);
   const { children } = useChildren(params.id, authorizedGet);
 

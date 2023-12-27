@@ -1,8 +1,8 @@
-import PropTypes from "prop-types";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { TextInput } from "./TextInput";
-import { Label } from "./Label";
-import { TypeAheadSearch } from "./TypeAheadSearch";
+import PropTypes from 'prop-types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TextInput } from './TextInput';
+import { Label } from './Label';
+import { TypeAheadSearch } from './TypeAheadSearch';
 
 export const PersonSelectField = ({
   label,
@@ -13,7 +13,7 @@ export const PersonSelectField = ({
   valueFn,
   displayFn,
 }) => {
-  console.log("PersonSelectField", value);
+  console.log('PersonSelectField', value);
   const [editing, setEditing] = useState(!value);
 
   const peopleLookup = useMemo(
@@ -23,9 +23,9 @@ export const PersonSelectField = ({
           ...acc,
           [valueFn(person)]: person,
         }),
-        {}
+        {},
       ),
-    [people, valueFn]
+    [people, valueFn],
   );
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export const PersonSelectField = ({
       setEditing(false);
       onChange(peopleLookup[id]);
     },
-    [setEditing, onChange, peopleLookup]
+    [setEditing, onChange, peopleLookup],
   );
 
   const handleFocus = useCallback(() => {
@@ -52,14 +52,14 @@ export const PersonSelectField = ({
           valueFn={valueFn}
           displayFn={displayFn}
           onSearch={onSearch}
-          value={value ? valueFn(value) : ""}
+          value={value ? valueFn(value) : ''}
           onChange={handleChange}
         />
       ) : (
         <TextInput
           readOnly={true}
           onFocus={handleFocus}
-          value={value ? displayFn(value) : ""}
+          value={value ? displayFn(value) : ''}
           onChange={() => {}}
         />
       )}

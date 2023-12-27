@@ -1,12 +1,12 @@
-import PropTypes from "prop-types";
-import { useCallback } from "react";
+import PropTypes from 'prop-types';
+import { useCallback } from 'react';
 
 export const TextInput = ({ value, onChange, ...props }) => {
   const handleChange = useCallback(
     (e) => {
       onChange(e.target.value);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

@@ -1,5 +1,5 @@
-import { Typography } from "./Typography";
-import { Layout } from "./Layout";
+import { Typography } from './Typography';
+import { Layout } from './Layout';
 
 export const Home = () => (
   <Layout>

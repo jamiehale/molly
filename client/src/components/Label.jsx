@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
-import { Typography } from "./Typography";
+import PropTypes from 'prop-types';
+import { Typography } from './Typography';
 
 export const Label = ({ value, children }) => (
   <label className="flex flex-col">

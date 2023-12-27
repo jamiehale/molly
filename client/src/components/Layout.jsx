@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import { Link } from "./Router";
-import { List, ListItem } from "./List";
+import PropTypes from 'prop-types';
+import { Link } from './Router';
+import { List, ListItem } from './List';
 
 export const Layout = ({ children }) => (
   <div>

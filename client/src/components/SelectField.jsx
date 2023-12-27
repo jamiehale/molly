@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import { Label } from "./Label";
-import { Select } from "./Select";
+import PropTypes from 'prop-types';
+import { Label } from './Label';
+import { Select } from './Select';
 
 export const SelectField = ({
   label,

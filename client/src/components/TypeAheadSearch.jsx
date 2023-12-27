@@ -1,9 +1,9 @@
-import PropTypes from "prop-types";
-import { useCallback, useEffect, useState } from "react";
-import { useDebounced } from "../hooks/debounced";
-import { Typography } from "./Typography";
-import { TextInput } from "./TextInput";
-import { PickList } from "./PickList";
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useDebounced } from '../hooks/debounced';
+import { Typography } from './Typography';
+import { TextInput } from './TextInput';
+import { PickList } from './PickList';
 
 export const TypeAheadSearch = ({
   options,

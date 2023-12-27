@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
-import { useCallback } from "react";
+import PropTypes from 'prop-types';
+import { useCallback } from 'react';
 
 export const PickList = ({ options, valueFn, displayFn, value, onChange }) => {
   const theValueFn = valueFn || ((o) => o.value);
@@ -9,7 +9,7 @@ export const PickList = ({ options, valueFn, displayFn, value, onChange }) => {
     (e) => {
       onChange(e.target.value);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

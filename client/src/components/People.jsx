@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import { List, ListItem } from "./List";
-import { Link } from "./Router";
+import PropTypes from 'prop-types';
+import { List, ListItem } from './List';
+import { Link } from './Router';
 
 export const People = ({ people }) => (
   <List>

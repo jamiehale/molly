@@ -1,13 +1,13 @@
-import PropTypes from "prop-types";
-import { NewPersonForm } from "./NewPersonForm";
-import { useCallback } from "react";
+import PropTypes from 'prop-types';
+import { NewPersonForm } from './NewPersonForm';
+import { useCallback } from 'react';
 
 export const NewPerson = ({ onNewPerson, genders }) => {
   const handleSubmit = useCallback(
     ({ givenNames, surname, genderId }) => {
       onNewPerson(givenNames, surname, genderId);
     },
-    [onNewPerson]
+    [onNewPerson],
   );
 
   return (

@@ -1,11 +1,11 @@
-import PropTypes from "prop-types";
-import { useForm } from "../hooks/form";
-import { Form } from "./Form";
-import { SelectField } from "./SelectField";
-import { FlexRow } from "./FlexRow";
-import { Button } from "./Button";
-import { PersonSelectField } from "./PersonSelectField";
-import * as J from "../lib/jlib";
+import PropTypes from 'prop-types';
+import { useForm } from '../hooks/form';
+import { Form } from './Form';
+import { SelectField } from './SelectField';
+import { FlexRow } from './FlexRow';
+import { Button } from './Button';
+import { PersonSelectField } from './PersonSelectField';
+import * as J from '../lib/jlib';
 
 export const NewChildForm = ({
   people,
@@ -18,11 +18,11 @@ export const NewChildForm = ({
   const { propsForField, propsForForm } = useForm(
     {
       child: { initialValue: null },
-      parentRoleId: { initialValue: "biological" },
+      parentRoleId: { initialValue: 'biological' },
     },
     ({ child, parentRoleId }) => {
       onSubmit({ childId: child.id, parentRoleId });
-    }
+    },
   );
 
   return (
@@ -33,14 +33,14 @@ export const NewChildForm = ({
         valueFn={valueFn}
         displayFn={displayFn}
         onSearch={onSearch}
-        {...propsForField("child")}
+        {...propsForField('child')}
       />
       <SelectField
         label="Parent Role"
         options={parentRoles}
-        valueFn={J.prop("id")}
-        displayFn={J.prop("title")}
-        {...propsForField("parentRoleId")}
+        valueFn={J.prop('id')}
+        displayFn={J.prop('title')}
+        {...propsForField('parentRoleId')}
       />
       <FlexRow className="mt-1">
         <Button type="submit">Add</Button>
@@ -55,7 +55,7 @@ NewChildForm.propTypes = {
       id: PropTypes.string.isRequired,
       givenNames: PropTypes.string,
       surname: PropTypes.string,
-    })
+    }),
   ),
   valueFn: PropTypes.func,
   displayFn: PropTypes.func,
@@ -63,7 +63,7 @@ NewChildForm.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
-    })
+    }),
   ),
   onSearch: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,

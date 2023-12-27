@@ -1,9 +1,9 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
 export const usePeopleSearch = (authorizedGet) => {
   const searchForPeople = useCallback(
     (q) => authorizedGet(`/people?q=${q}`),
-    [authorizedGet]
+    [authorizedGet],
   );
 
   return {

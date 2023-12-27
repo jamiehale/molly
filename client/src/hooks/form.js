@@ -1,8 +1,8 @@
-import { useCallback, useReducer } from "react";
+import { useCallback, useReducer } from 'react';
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "set":
+    case 'set':
       return {
         ...state,
         values: {
@@ -10,7 +10,7 @@ const reducer = (state, action) => {
           [action.field]: action.value,
         },
       };
-    case "reset":
+    case 'reset':
       return {
         ...state,
         values: action.values,
@@ -26,10 +26,10 @@ const initialValueFrom = (fields) =>
       ...acc,
       [field]:
         fields[field].initialValue === undefined
-          ? ""
+          ? ''
           : fields[field].initialValue,
     }),
-    {}
+    {},
   );
 
 export const useForm = (fields, onSubmit) => {
@@ -40,15 +40,15 @@ export const useForm = (fields, onSubmit) => {
 
   const setFormValue = useCallback(
     (field, value) => {
-      dispatch({ type: "set", field, value });
+      dispatch({ type: 'set', field, value });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const propsForField = useCallback(
     (field) => {
       const handleChangeField = (value) => {
-        dispatch({ type: "set", field, value });
+        dispatch({ type: 'set', field, value });
       };
 
       return {
@@ -56,14 +56,14 @@ export const useForm = (fields, onSubmit) => {
         onChange: handleChangeField,
       };
     },
-    [state, dispatch]
+    [state, dispatch],
   );
 
   const propsForForm = useCallback(() => {
     const handleSubmit = (e) => {
       e.preventDefault();
       onSubmit(state.values);
-      dispatch({ type: "reset", values: initialValueFrom(fields) });
+      dispatch({ type: 'reset', values: initialValueFrom(fields) });
     };
 
     return {
