@@ -49,6 +49,20 @@ const postChildBody = (validChildfn, validParentRoleFn) =>
     ),
   });
 
+const postParentBody = (validParentFn, validParentRoleFn) =>
+  V.object({
+    parentId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validParentFn),
+    ),
+    parentRoleId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validParentRoleFn),
+    ),
+  });
+
 const toResult = U.pick([
   'id',
   'givenNames',
@@ -64,6 +78,7 @@ const toChildResult = U.pick([
   'genderId',
   'creatorId',
   'parentRoleId',
+  'parentRoleTitle',
 ]);
 
 const toParentResult = U.pick([
@@ -73,6 +88,7 @@ const toParentResult = U.pick([
   'genderId',
   'creatorId',
   'parentRoleId',
+  'parentRoleTitle',
 ]);
 
 export const personRoutes = ({
@@ -149,5 +165,18 @@ export const personRoutes = ({
         parentRepo
           .readAllParents({ childId: params.id })
           .then(U.map(toParentResult)),
+    ),
+    postChildResource(
+      '/people/:id/parents',
+      personRepo.personExists,
+      postParentBody(personRepo.personExists, parentRoleRepo.parentRoleExists),
+      ({ params, body, userId }) =>
+        parentChildRepo.createParentChild(
+          U.compose(
+            U.assoc('creatorId', userId),
+            U.assoc('childId', params.id),
+            U.pick(['parentId', 'parentRoleId']),
+          )(body),
+        ),
     ),
   ]);

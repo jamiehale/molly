@@ -2,41 +2,41 @@ import PropTypes from 'prop-types';
 import { useCallback, useState } from 'react';
 import { useParentRoles } from '../hooks/parent-roles';
 import { usePeopleSearch } from '../hooks/people-search';
-import { NewChildForm } from './NewChildForm';
 import * as J from 'jlib';
-import { useChildren } from '../hooks/children';
+import { useParents } from '../hooks/parents';
+import { NewParentForm } from './NewParentForm';
 
-export const NewChild = ({ parentId, onNewChild }) => {
+export const NewParent = ({ childId, onNewParent }) => {
   const { parentRoles } = useParentRoles();
   const { searchForPeople } = usePeopleSearch();
   const [searchResults, setSearchResults] = useState([]);
-  const { addChild } = useChildren(parentId);
+  const { addParent } = useParents(childId);
 
   const handleSubmit = useCallback(
-    ({ childId, parentRoleId }) => {
-      addChild(childId, parentRoleId).then(() => {
+    ({ parentId, parentRoleId }) => {
+      addParent(parentId, parentRoleId).then(() => {
         setSearchResults([]);
-        onNewChild();
+        onNewParent();
       });
     },
-    [addChild, setSearchResults, onNewChild],
+    [addParent, setSearchResults, onNewParent],
   );
 
   const handleSearch = useCallback(
     (q) => {
       searchForPeople(q)
-        .then((people) => people.filter((person) => person.id !== parentId))
+        .then((people) => people.filter((person) => person.id !== childId))
         .then(setSearchResults);
     },
-    [searchForPeople, parentId],
+    [searchForPeople, childId],
   );
 
   return (
     <div className="max-w-md">
-      <NewChildForm
+      <NewParentForm
         people={searchResults}
         valueFn={J.prop('id')}
-        displayFn={(child) => `${child.surname}, ${child.givenNames}`}
+        displayFn={(parent) => `${parent.surname}, ${parent.givenNames}`}
         parentRoles={parentRoles}
         onSearch={handleSearch}
         onSubmit={handleSubmit}
@@ -45,7 +45,7 @@ export const NewChild = ({ parentId, onNewChild }) => {
   );
 };
 
-NewChild.propTypes = {
-  parentId: PropTypes.string.isRequired,
-  onNewChild: PropTypes.func.isRequired,
+NewParent.propTypes = {
+  childId: PropTypes.string.isRequired,
+  onNewParent: PropTypes.func.isRequired,
 };

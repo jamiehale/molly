@@ -3,18 +3,17 @@ import { Typography } from './Typography';
 import { Layout } from './Layout';
 import { usePerson } from '../hooks/person';
 import { useChildren } from '../hooks/children';
-import { List, ListItem } from './List';
+import { useParents } from '../hooks/parents';
 import { NewChild } from './NewChild';
-import { useCallback } from 'react';
-import { Link } from './Router';
+import { Button } from './Button';
+import { NewParent } from './NewParent';
+import { PersonList } from './PersonList';
+import { ButtonToggle } from './ButtonToggle';
 
 export const PersonPage = ({ params }) => {
   const { person } = usePerson(params.id);
   const { children, reloadChildren } = useChildren(params.id);
-
-  const handleNewChild = useCallback(() => {
-    reloadChildren();
-  }, [reloadChildren]);
+  const { parents, reloadParents } = useParents(params.id);
 
   return (
     <Layout>
@@ -25,18 +24,53 @@ export const PersonPage = ({ params }) => {
           </Typography>
           <div>
             <Typography>Children</Typography>
-            <List>
-              {children.map((child) => (
-                <ListItem key={child.id}>
-                  <Link to={`/people/${child.id}`}>
-                    <Typography>
-                      {child.surname}, {child.givenNames}
-                    </Typography>
-                  </Link>
-                </ListItem>
-              ))}
-            </List>
-            <NewChild parentId={person.id} onNewChild={handleNewChild} />
+            <PersonList
+              people={children}
+              displayFn={(person) =>
+                `${person.surname}, ${person.givenNames} (${person.parentRoleTitle})`
+              }
+            />
+            <ButtonToggle
+              buttonText="Add Child"
+              renderOpen={(onClose) => (
+                <div>
+                  <NewChild
+                    parentId={person.id}
+                    onNewChild={() => {
+                      reloadChildren();
+                      onClose();
+                    }}
+                  />
+                  <Button type="button" onClick={onClose}>
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            />
+            <Typography>Parents</Typography>
+            <PersonList
+              people={parents}
+              displayFn={(person) =>
+                `${person.surname}, ${person.givenNames} (${person.parentRoleTitle})`
+              }
+            ></PersonList>
+            <ButtonToggle
+              buttonText="Add Parent"
+              renderOpen={(onClose) => (
+                <div>
+                  <NewParent
+                    childId={person.id}
+                    onNewParent={() => {
+                      reloadParents();
+                      onClose();
+                    }}
+                  />
+                  <Button type="button" onClick={onClose}>
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            />
           </div>
         </>
       )}

@@ -7,7 +7,7 @@ import { Button } from './Button';
 import { PersonSelectField } from './PersonSelectField';
 import * as J from 'jlib';
 
-export const NewChildForm = ({
+export const NewParentForm = ({
   people,
   valueFn,
   displayFn,
@@ -17,23 +17,23 @@ export const NewChildForm = ({
 }) => {
   const { propsForField, propsForForm } = useForm(
     {
-      child: { initialValue: null },
+      parent: { initialValue: null },
       parentRoleId: { initialValue: 'biological' },
     },
-    ({ child, parentRoleId }) => {
-      onSubmit({ childId: child.id, parentRoleId });
+    ({ parent, parentRoleId }) => {
+      onSubmit({ parentId: parent.id, parentRoleId });
     },
   );
 
   return (
     <Form {...propsForForm()}>
       <PersonSelectField
-        label="Child"
+        label="Parent"
         people={people}
         valueFn={valueFn}
         displayFn={displayFn}
         onSearch={onSearch}
-        {...propsForField('child')}
+        {...propsForField('parent')}
       />
       <SelectField
         label="Parent Role"
@@ -49,7 +49,7 @@ export const NewChildForm = ({
   );
 };
 
-NewChildForm.propTypes = {
+NewParentForm.propTypes = {
   people: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

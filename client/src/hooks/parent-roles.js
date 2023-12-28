@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useApi } from './api';
 
 export const useParentRoles = () => {
-  const { authorizedGet } = useApi('http://localhost:3000/api', '12345');
+  const { authorizedGet } = useApi();
 
   const [parentRoles, setParentRoles] = useState([]);
 

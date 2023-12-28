@@ -4,9 +4,10 @@ import { NewPerson } from './NewPerson';
 import { People } from './People';
 import { Typography } from './Typography';
 import { Layout } from './Layout';
+import { ButtonToggle } from './ButtonToggle';
 
 export const PeoplePage = () => {
-  const { people, createPerson } = usePeople();
+  const { people, createPerson, reloadPeople } = usePeople();
   const { genders } = useGenders();
 
   const handleNewPerson = (givenNames, surname, genderId) => {
@@ -17,7 +18,18 @@ export const PeoplePage = () => {
     <Layout>
       <Typography as="title">People</Typography>
       <People people={people} />
-      <NewPerson genders={genders} onNewPerson={handleNewPerson} />
+      <ButtonToggle
+        buttonText="Add Person"
+        renderOpen={(onClose) => (
+          <NewPerson
+            genders={genders}
+            onNewPerson={() => {
+              reloadPeople();
+              onClose();
+            }}
+          />
+        )}
+      />
     </Layout>
   );
 };
