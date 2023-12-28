@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   createContext,
   useCallback,
@@ -15,6 +15,14 @@ const RouterContext = createContext({
 
 export const Router = ({ children }) => {
   const [path, setPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopstate = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', handlePopstate);
+    return () => {
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, []);
 
   const value = useMemo(() => {
     return {

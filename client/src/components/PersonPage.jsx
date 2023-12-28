@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { useApi } from '../hooks/api';
 import { Typography } from './Typography';
 import { Layout } from './Layout';
 import { usePerson } from '../hooks/person';
@@ -7,11 +6,11 @@ import { useChildren } from '../hooks/children';
 import { List, ListItem } from './List';
 import { NewChild } from './NewChild';
 import { useCallback } from 'react';
+import { Link } from './Router';
 
 export const PersonPage = ({ params }) => {
-  const { authorizedGet } = useApi('http://localhost:3000/api', '12345');
-  const { person } = usePerson(params.id, authorizedGet);
-  const { children, reloadChildren } = useChildren(params.id, authorizedGet);
+  const { person } = usePerson(params.id);
+  const { children, reloadChildren } = useChildren(params.id);
 
   const handleNewChild = useCallback(() => {
     reloadChildren();
@@ -29,9 +28,11 @@ export const PersonPage = ({ params }) => {
             <List>
               {children.map((child) => (
                 <ListItem key={child.id}>
-                  <Typography>
-                    {child.surname}, {child.givenNames}
-                  </Typography>
+                  <Link to={`/people/${child.id}`}>
+                    <Typography>
+                      {child.surname}, {child.givenNames}
+                    </Typography>
+                  </Link>
                 </ListItem>
               ))}
             </List>

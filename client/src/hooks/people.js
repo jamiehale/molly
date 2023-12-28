@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useApi } from './api';
 
-export const usePeople = ({ authorizedGet, authorizedPost }) => {
+export const usePeople = () => {
+  const { authorizedGet, authorizedPost } = useApi(
+    'http://localhost:3000/api',
+    '12345',
+  );
+
   const [people, setPeople] = useState([]);
 
   useEffect(() => {

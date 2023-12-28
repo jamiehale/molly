@@ -1,30 +1,12 @@
-import { useCallback, useMemo } from 'react';
+import React, { useContext } from 'react';
 
-export const useApi = (baseUrl, apiKey) => {
-  const authorizedGet = useCallback(
-    (path) =>
-      fetch(`${baseUrl}${path}`, {
-        method: 'GET',
-        headers: { Authorization: `ApiKey ${apiKey}` },
-      }).then((response) => response.json()),
-    [baseUrl, apiKey],
-  );
+export const ApiContext = React.createContext({});
 
-  const authorizedPost = useCallback(
-    (path, body) =>
-      fetch(`${baseUrl}${path}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `ApiKey ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      }).then((response) => response.json()),
-    [baseUrl, apiKey],
-  );
+export const useApi = () => {
+  const context = useContext(ApiContext);
+  if (!context) {
+    throw new Error('useApi must be used inside ApiProvider');
+  }
 
-  return useMemo(
-    () => ({ authorizedGet, authorizedPost }),
-    [authorizedGet, authorizedPost],
-  );
+  return context;
 };
