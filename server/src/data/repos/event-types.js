@@ -18,16 +18,16 @@ const toModel = J.transform({
   title: J.prop('title'),
 });
 
-export const createEventTypeRepo = ({ eventTypeStore }) => ({
-  createEventType: createResource(eventTypeStore, fromModel, toModel),
-  readEventType: readResource(eventTypeStore, toModel),
+export const createEventTypesRepo = ({ eventTypesStore }) => ({
+  createEventType: createResource(eventTypesStore, fromModel, toModel),
+  readEventType: readResource(eventTypesStore, toModel),
   readAllEventTypes: readAllResources(
-    eventTypeStore,
+    eventTypesStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  eventTypeExists: resourceExists(eventTypeStore),
-  updateEventType: updateResource(eventTypeStore, fromModel, toModel),
-  updateAllEventTypes: updateAllResources(eventTypeStore, fromModel, toModel),
+  eventTypeExists: resourceExists(eventTypesStore),
+  updateEventType: updateResource(eventTypesStore, fromModel, toModel),
+  updateAllEventTypes: updateAllResources(eventTypesStore, fromModel, toModel),
   // del: del(db, table),
 });

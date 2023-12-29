@@ -1,5 +1,5 @@
 export const authenticated =
-  ({ apiKeyRepo }) =>
+  ({ apiKeysRepo }) =>
   async (req, res, next) => {
     const authorization = req.get('Authorization');
     if (authorization) {
@@ -7,7 +7,7 @@ export const authenticated =
         const [_ignore, secret] = authorization.split(' ');
         if (secret) {
           try {
-            const apiKey = await apiKeyRepo.readApiKeyBySecret(secret);
+            const apiKey = await apiKeysRepo.readApiKeyBySecret(secret);
             if (apiKey) {
               res.locals.userId = apiKey.userId;
               next();

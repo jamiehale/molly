@@ -1,4 +1,4 @@
 import { createResourceStore } from '../resource-store';
 
-export const createArtifactTypeStore = (db) =>
+export const createArtifactTypesStore = (db) =>
   createResourceStore(db, 'artifact_types');

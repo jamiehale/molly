@@ -25,9 +25,9 @@ const toModel = J.transform({
   parentRoleTitle: J.prop('parent_role_title'),
 });
 
-export const createChildRepo = ({ childStore }) => ({
+export const createChildrenRepo = ({ childrenStore }) => ({
   readAllChildren: readAllResources(
-    childStore,
+    childrenStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),

@@ -27,21 +27,21 @@ const toResult = J.pick([
   'creatorId',
 ]);
 
-export const assetRoutes = ({ assetRepo, vaultRepo }) =>
+export const assetRoutes = ({ assetsRepo, vaultsRepo }) =>
   routes([
-    getSingleResource('/assets/:id', assetRepo.assetExists, ({ params }) =>
-      assetRepo.readAsset(params.id).then(toResult),
+    getSingleResource('/assets/:id', assetsRepo.assetExists, ({ params }) =>
+      assetsRepo.readAsset(params.id).then(toResult),
     ),
     getAllResources('/assets', V.any(), () =>
-      assetRepo.readAllAssets().then(J.map(toResult)),
+      assetsRepo.readAllAssets().then(J.map(toResult)),
     ),
     // no post
     patchResource(
       '/assets/:id',
-      assetRepo.assetExists,
-      patchBody(vaultRepo.vaultExists),
+      assetsRepo.assetExists,
+      patchBody(vaultsRepo.vaultExists),
       ({ params, body }) =>
-        assetRepo
+        assetsRepo
           .updateAsset(
             params.id,
             J.compose(

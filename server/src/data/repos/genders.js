@@ -18,16 +18,16 @@ const toModel = J.transform({
   title: J.prop('title'),
 });
 
-export const createGenderRepo = ({ genderStore }) => ({
-  createGender: createResource(genderStore, fromModel, toModel),
-  readGender: readResource(genderStore, toModel),
+export const createGendersRepo = ({ gendersStore }) => ({
+  createGender: createResource(gendersStore, fromModel, toModel),
+  readGender: readResource(gendersStore, toModel),
   readAllGenders: readAllResources(
-    genderStore,
+    gendersStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  genderExists: resourceExists(genderStore),
-  updateGender: updateResource(genderStore, fromModel, toModel),
-  updateAllGenders: updateAllResources(genderStore, fromModel, toModel),
+  genderExists: resourceExists(gendersStore),
+  updateGender: updateResource(gendersStore, fromModel, toModel),
+  updateAllGenders: updateAllResources(gendersStore, fromModel, toModel),
   // del: del(db, table),
 });

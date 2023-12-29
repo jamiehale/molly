@@ -20,17 +20,17 @@ const toModel = J.transform({
   secret: J.prop('secret'),
 });
 
-const readBySecret = J.curry((apiKeyStore, toModel, secret) =>
-  apiKeyStore.readSingle({ secret }).then(toModel),
+const readBySecret = J.curry((apiKeysStore, toModel, secret) =>
+  apiKeysStore.readSingle({ secret }).then(toModel),
 );
 
-export const createApiKeyRepo = ({ apiKeyStore }) => ({
-  createApiKey: createResource(apiKeyStore, fromModel, toModel),
-  readApiKey: readResource(apiKeyStore, toModel),
-  readAllApiKeys: readAllResources(apiKeyStore, fromModel, toModel),
-  apiKeyExists: resourceExists(apiKeyStore),
-  updateApiKey: updateResource(apiKeyStore, fromModel, toModel),
-  updateApiKey: updateAllResources(apiKeyStore, fromModel, toModel),
+export const createApiKeysRepo = ({ apiKeysStore }) => ({
+  createApiKey: createResource(apiKeysStore, fromModel, toModel),
+  readApiKey: readResource(apiKeysStore, toModel),
+  readAllApiKeys: readAllResources(apiKeysStore, fromModel, toModel),
+  apiKeyExists: resourceExists(apiKeysStore),
+  updateApiKey: updateResource(apiKeysStore, fromModel, toModel),
+  updateApiKey: updateAllResources(apiKeysStore, fromModel, toModel),
   // del: del(db, table),
-  readApiKeyBySecret: readBySecret(apiKeyStore, toModel),
+  readApiKeyBySecret: readBySecret(apiKeysStore, toModel),
 });

@@ -1,4 +1,4 @@
 import { createResourceStore } from '../resource-store';
 
-export const createParentRoleStore = (db) =>
+export const createParentRolesStore = (db) =>
   createResourceStore(db, 'parent_roles');

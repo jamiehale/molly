@@ -1,4 +1,4 @@
 import { createResourceStore } from '../resource-store';
 
-export const createEventTypeStore = (db) =>
+export const createEventTypesStore = (db) =>
   createResourceStore(db, 'event_types');

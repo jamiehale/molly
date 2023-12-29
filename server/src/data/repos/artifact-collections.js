@@ -24,26 +24,28 @@ const toModel = J.transform({
   creatorId: J.prop('creator_id'),
 });
 
-export const createArtifactCollectionRepo = ({ artifactCollectionStore }) => ({
+export const createArtifactCollectionsRepo = ({
+  artifactCollectionsStore,
+}) => ({
   createArtifactCollection: createResource(
-    artifactCollectionStore,
+    artifactCollectionsStore,
     fromModel,
     toModel,
   ),
-  readArtifactCollection: readResource(artifactCollectionStore, toModel),
+  readArtifactCollection: readResource(artifactCollectionsStore, toModel),
   readAllArtifactCollections: readAllResources(
-    artifactCollectionStore,
+    artifactCollectionsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  artifactCollectionExists: resourceExists(artifactCollectionStore),
+  artifactCollectionExists: resourceExists(artifactCollectionsStore),
   updateArtifactCollection: updateResource(
-    artifactCollectionStore,
+    artifactCollectionsStore,
     fromModel,
     toModel,
   ),
   updateAllArtifactCollection: updateAllResources(
-    artifactCollectionStore,
+    artifactCollectionsStore,
     fromModel,
     toModel,
   ),

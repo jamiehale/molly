@@ -22,16 +22,16 @@ const toModel = J.transform({
   baseUrl: J.prop('base_url'),
 });
 
-export const createVaultRepo = ({ vaultStore }) => ({
-  createVault: createResource(vaultStore, fromModel, toModel),
-  readVault: readResource(vaultStore, toModel),
+export const createVaultsRepo = ({ vaultsStore }) => ({
+  createVault: createResource(vaultsStore, fromModel, toModel),
+  readVault: readResource(vaultsStore, toModel),
   readAllVaults: readAllResources(
-    vaultStore,
+    vaultsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  vaultExists: resourceExists(vaultStore),
-  updateVault: updateResource(vaultStore, fromModel, toModel),
-  updateAllVaults: updateAllResources(vaultStore, fromModel, toModel),
+  vaultExists: resourceExists(vaultsStore),
+  updateVault: updateResource(vaultsStore, fromModel, toModel),
+  updateAllVaults: updateAllResources(vaultsStore, fromModel, toModel),
   // del: del(db, table),
 });

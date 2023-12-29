@@ -24,18 +24,18 @@ const patchBody = () =>
 
 const toResult = J.pick(['id', 'value']);
 
-export const locationRoutes = ({ locationRepo }) =>
+export const locationRoutes = ({ locationsRepo }) =>
   routes([
     getSingleResource(
       '/locations/:id',
-      locationRepo.locationExists,
-      ({ params }) => locationRepo.readLocation(params.id).then(toResult),
+      locationsRepo.locationExists,
+      ({ params }) => locationsRepo.readLocation(params.id).then(toResult),
     ),
     getAllResources('/locations', V.any(), () =>
-      locationRepo.readAllLocations().then(J.map(toResult)),
+      locationsRepo.readAllLocations().then(J.map(toResult)),
     ),
     postResource('/locations', postBody(), ({ userId, body }) =>
-      locationRepo
+      locationsRepo
         .createLocation(
           J.compose(J.assoc('creatorId', userId), J.pick(['value']))(body),
         )
@@ -43,10 +43,10 @@ export const locationRoutes = ({ locationRepo }) =>
     ),
     patchResource(
       '/locations/:id',
-      locationRepo.locationExists,
+      locationsRepo.locationExists,
       patchBody(),
       ({ params, body }) =>
-        locationRepo
+        locationsRepo
           .updateLocation(
             params.id,
             J.compose(J.filterEmptyProps, J.pick(['value']))(body),

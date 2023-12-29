@@ -25,21 +25,21 @@ const patchBody = () =>
 
 const toResult = J.pick(['id', 'title']);
 
-export const eventTypeRoutes = ({ eventTypeRepo }) =>
+export const eventTypeRoutes = ({ eventTypesRepo }) =>
   routes([
     getSingleResource(
       '/event-types/:id',
-      eventTypeRepo.eventTypeExists,
-      ({ params }) => eventTypeRepo.readEventType(params.id).then(toResult),
+      eventTypesRepo.eventTypeExists,
+      ({ params }) => eventTypesRepo.readEventType(params.id).then(toResult),
     ),
     getAllResources('/event-types', V.any(), () =>
-      eventTypeRepo.readAllEventTypes().then(J.map(toResult)),
+      eventTypesRepo.readAllEventTypes().then(J.map(toResult)),
     ),
     postResource(
       '/event-types',
-      postBody((id) => eventTypeRepo.eventTypeExists(id).then(J.not)),
+      postBody((id) => eventTypesRepo.eventTypeExists(id).then(J.not)),
       ({ userId, body }) =>
-        eventTypeRepo
+        eventTypesRepo
           .createEventType(
             J.compose(
               J.assoc('creatorId', userId),
@@ -50,10 +50,10 @@ export const eventTypeRoutes = ({ eventTypeRepo }) =>
     ),
     patchResource(
       '/event-types/:id',
-      eventTypeRepo.eventTypeExists,
+      eventTypesRepo.eventTypeExists,
       patchBody(),
       ({ params, body }) =>
-        eventTypeRepo
+        eventTypesRepo
           .updateEventType(
             params.id,
             J.compose(J.filterEmptyProps, J.pick(['title']))(body),

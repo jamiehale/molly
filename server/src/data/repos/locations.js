@@ -18,16 +18,16 @@ const toModel = J.transform({
   value: J.prop('value'),
 });
 
-export const createLocationRepo = ({ locationStore }) => ({
-  createLocation: createResource(locationStore, fromModel, toModel),
-  readLocation: readResource(locationStore, toModel),
+export const createLocationsRepo = ({ locationsStore }) => ({
+  createLocation: createResource(locationsStore, fromModel, toModel),
+  readLocation: readResource(locationsStore, toModel),
   readAllLocations: readAllResources(
-    locationStore,
+    locationsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  locationExists: resourceExists(locationStore),
-  updateLocation: updateResource(locationStore, fromModel, toModel),
-  updateAllLocations: updateAllResources(locationStore, fromModel, toModel),
+  locationExists: resourceExists(locationsStore),
+  updateLocation: updateResource(locationsStore, fromModel, toModel),
+  updateAllLocations: updateAllResources(locationsStore, fromModel, toModel),
   // del: del(db, table),
 });

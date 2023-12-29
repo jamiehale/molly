@@ -25,19 +25,19 @@ const patchBody = () =>
 
 const toResult = J.pick(['id', 'title']);
 
-export const genderRoutes = ({ genderRepo }) =>
+export const genderRoutes = ({ gendersRepo }) =>
   routes([
-    getSingleResource('/genders/:id', genderRepo.genderExists, ({ params }) =>
-      genderRepo.readGender(params.id).then(toResult),
+    getSingleResource('/genders/:id', gendersRepo.genderExists, ({ params }) =>
+      gendersRepo.readGender(params.id).then(toResult),
     ),
     getAllResources('/genders', V.any(), () =>
-      genderRepo.readAllGenders().then(J.map(toResult)),
+      gendersRepo.readAllGenders().then(J.map(toResult)),
     ),
     postResource(
       '/genders',
-      postBody((id) => genderRepo.genderExists(id).then(J.not)),
+      postBody((id) => gendersRepo.genderExists(id).then(J.not)),
       ({ userId, body }) =>
-        genderRepo
+        gendersRepo
           .createGender(
             J.compose(
               J.assoc('creatorId', userId),
@@ -48,10 +48,10 @@ export const genderRoutes = ({ genderRepo }) =>
     ),
     patchResource(
       '/genders/:id',
-      genderRepo.genderExists,
+      gendersRepo.genderExists,
       patchBody(),
       ({ params, body }) =>
-        genderRepo
+        gendersRepo
           .updateGender(
             params.id,
             J.compose(J.filterEmptyProps, J.pick(['title']))(body),

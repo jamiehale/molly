@@ -37,17 +37,17 @@ const toDetailsModel = J.transform({
 const queryPeople = (store, toModelFn) => (q) =>
   store.queryPeople(q).then(J.map(toModelFn)).catch(toInternalError);
 
-export const createPersonRepo = ({ personStore, peopleDetailsStore }) => ({
-  createPerson: createResource(personStore, fromModel, toModel),
-  readPerson: readResource(peopleDetailsStore, toDetailsModel),
+export const createPeopleRepo = ({ peopleStore, personDetailsStore }) => ({
+  createPerson: createResource(peopleStore, fromModel, toModel),
+  readPerson: readResource(personDetailsStore, toDetailsModel),
   readAllPeople: readAllResources(
-    peopleDetailsStore,
+    personDetailsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toDetailsModel,
   ),
-  queryPeople: queryPeople(peopleDetailsStore, toDetailsModel),
-  personExists: resourceExists(personStore),
-  updatePerson: updateResource(personStore, fromModel, toModel),
-  updateAllPeople: updateAllResources(personStore, fromModel, toModel),
+  queryPeople: queryPeople(personDetailsStore, toDetailsModel),
+  personExists: resourceExists(peopleStore),
+  updatePerson: updateResource(peopleStore, fromModel, toModel),
+  updateAllPeople: updateAllResources(peopleStore, fromModel, toModel),
   // del: del(db, table),
 });

@@ -1,5 +1,5 @@
-DROP VIEW IF EXISTS people_details;
-CREATE VIEW people_details AS
+DROP VIEW IF EXISTS person_details;
+CREATE VIEW person_details AS
   SELECT
     p.id,
     p.given_names,

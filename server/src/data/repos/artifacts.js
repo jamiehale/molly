@@ -28,16 +28,16 @@ const toModel = J.transform({
   creatorId: J.prop('creator_id'),
 });
 
-export const createArtifactRepo = ({ artifactStore }) => ({
-  createArtifact: createResource(artifactStore, fromModel, toModel),
-  readArtifact: readResource(artifactStore, toModel),
+export const createArtifactsRepo = ({ artifactsStore }) => ({
+  createArtifact: createResource(artifactsStore, fromModel, toModel),
+  readArtifact: readResource(artifactsStore, toModel),
   readAllArtifacts: readAllResources(
-    artifactStore,
+    artifactsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  artifactExists: resourceExists(artifactStore),
-  updateArtifact: updateResource(artifactStore, fromModel, toModel),
-  updateAllArtifacts: updateAllResources(artifactStore, fromModel, toModel),
+  artifactExists: resourceExists(artifactsStore),
+  updateArtifact: updateResource(artifactsStore, fromModel, toModel),
+  updateAllArtifacts: updateAllResources(artifactsStore, fromModel, toModel),
   // del: del(db, table),
 });

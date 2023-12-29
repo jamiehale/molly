@@ -8,7 +8,7 @@ const queryPeople = J.curry((db, q) =>
     .select('*'),
 );
 
-export const createPeopleStore = (db) => ({
-  ...createResourceStore(db, 'people'),
+export const createPersonDetailsStore = (db) => ({
+  ...createResourceStore(db, 'person_details'),
   queryPeople: queryPeople(db),
 });

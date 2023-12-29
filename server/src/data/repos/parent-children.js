@@ -13,7 +13,7 @@ const toModel = J.transform({
   parentRoleId: J.prop('parent_role_id'),
 });
 
-export const createParentChildRepo = ({ parentChildStore }) => ({
-  createParentChild: createResource(parentChildStore, fromModel, toModel),
+export const createParentChildrenRepo = ({ parentChildrenStore }) => ({
+  createParentChild: createResource(parentChildrenStore, fromModel, toModel),
   // del: del(db, table),
 });

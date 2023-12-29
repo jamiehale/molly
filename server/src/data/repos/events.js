@@ -24,16 +24,16 @@ const toModel = J.transform({
   locationId: J.prop('location_id'),
 });
 
-export const createEventRepo = ({ eventStore }) => ({
-  createEvent: createResource(eventStore, fromModel, toModel),
-  readEvent: readResource(eventStore, toModel),
+export const createEventsRepo = ({ eventsStore }) => ({
+  createEvent: createResource(eventsStore, fromModel, toModel),
+  readEvent: readResource(eventsStore, toModel),
   readAllEvents: readAllResources(
-    eventStore,
+    eventsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  eventExists: resourceExists(eventStore),
-  updateEvent: updateResource(eventStore, fromModel, toModel),
-  updateAllEvents: updateAllResources(eventStore, fromModel, toModel),
+  eventExists: resourceExists(eventsStore),
+  updateEvent: updateResource(eventsStore, fromModel, toModel),
+  updateAllEvents: updateAllResources(eventsStore, fromModel, toModel),
   // del: del(db, table),
 });

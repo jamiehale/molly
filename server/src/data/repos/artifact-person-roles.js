@@ -18,26 +18,28 @@ const toModel = J.transform({
   title: J.prop('title'),
 });
 
-export const createArtifactPersonRoleRepo = ({ artifactPersonRoleStore }) => ({
+export const createArtifactPersonRolesRepo = ({
+  artifactPersonRolesStore,
+}) => ({
   createArtifactPersonRole: createResource(
-    artifactPersonRoleStore,
+    artifactPersonRolesStore,
     fromModel,
     toModel,
   ),
-  readArtifactPersonRole: readResource(artifactPersonRoleStore, toModel),
+  readArtifactPersonRole: readResource(artifactPersonRolesStore, toModel),
   readAllArtifactPersonRoles: readAllResources(
-    artifactPersonRoleStore,
+    artifactPersonRolesStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  artifactPersonRoleExists: resourceExists(artifactPersonRoleStore),
+  artifactPersonRoleExists: resourceExists(artifactPersonRolesStore),
   updateArtifactPersonRole: updateResource(
-    artifactPersonRoleStore,
+    artifactPersonRolesStore,
     fromModel,
     toModel,
   ),
   updateAllArtifactPersonRoles: updateAllResources(
-    artifactPersonRoleStore,
+    artifactPersonRolesStore,
     fromModel,
     toModel,
   ),

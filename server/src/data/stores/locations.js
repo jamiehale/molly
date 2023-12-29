@@ -1,3 +1,4 @@
 import { createResourceStore } from '../resource-store';
 
-export const createLocationStore = (db) => createResourceStore(db, 'locations');
+export const createLocationsStore = (db) =>
+  createResourceStore(db, 'locations');

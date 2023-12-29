@@ -3,7 +3,7 @@ import { readAllUsers } from '../data/stores/users';
 import { get } from '../resource-helpers';
 
 export const getUsers =
-  ({ userRepo }) =>
+  ({ usersRepo }) =>
   () =>
     readAllUsers(db);
 

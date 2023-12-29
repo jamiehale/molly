@@ -93,28 +93,28 @@ const toParentResult = J.pick([
 ]);
 
 export const personRoutes = ({
-  childRepo,
-  genderRepo,
-  parentChildRepo,
-  parentRepo,
-  parentRoleRepo,
-  personRepo,
+  childrenRepo,
+  gendersRepo,
+  parentChildrenRepo,
+  parentsRepo,
+  parentRolesRepo,
+  peopleRepo,
 }) =>
   routes([
-    getSingleResource('/people/:id', personRepo.personExists, ({ params }) =>
-      personRepo.readPerson(params.id).then(toResult),
+    getSingleResource('/people/:id', peopleRepo.personExists, ({ params }) =>
+      peopleRepo.readPerson(params.id).then(toResult),
     ),
     getAllResources('/people', query(), ({ query }) => {
       if (query.q) {
-        return personRepo.queryPeople(query.q).then(J.map(toResult));
+        return peopleRepo.queryPeople(query.q).then(J.map(toResult));
       }
-      return personRepo.readAllPeople().then(J.map(toResult));
+      return peopleRepo.readAllPeople().then(J.map(toResult));
     }),
     postResource(
       '/people',
-      postBody(genderRepo.genderExists),
+      postBody(gendersRepo.genderExists),
       ({ userId, body }) =>
-        personRepo
+        peopleRepo
           .createPerson(
             J.compose(
               J.assoc('creatorId', userId),
@@ -125,10 +125,10 @@ export const personRoutes = ({
     ),
     patchResource(
       '/people/:id',
-      personRepo.personExists,
-      patchBody(genderRepo.genderExists),
+      peopleRepo.personExists,
+      patchBody(gendersRepo.genderExists),
       ({ params, body }) =>
-        personRepo
+        peopleRepo
           .updatePerson(
             params.id,
             J.compose(
@@ -140,18 +140,18 @@ export const personRoutes = ({
     ),
     getAllChildResources(
       '/people/:id/children',
-      personRepo.personExists,
+      peopleRepo.personExists,
       ({ params }) =>
-        childRepo
+        childrenRepo
           .readAllChildren({ parentId: params.id })
           .then(J.map(toChildResult)),
     ),
     postChildResource(
       '/people/:id/children',
-      personRepo.personExists,
-      postChildBody(personRepo.personExists, parentRoleRepo.parentRoleExists),
+      peopleRepo.personExists,
+      postChildBody(peopleRepo.personExists, parentRolesRepo.parentRoleExists),
       ({ params, body, userId }) =>
-        parentChildRepo.createParentChild(
+        parentChildrenRepo.createParentChild(
           J.compose(
             J.assoc('creatorId', userId),
             J.assoc('parentId', params.id),
@@ -161,18 +161,18 @@ export const personRoutes = ({
     ),
     getAllChildResources(
       '/people/:id/parents',
-      personRepo.personExists,
+      peopleRepo.personExists,
       ({ params }) =>
-        parentRepo
+        parentsRepo
           .readAllParents({ childId: params.id })
           .then(J.map(toParentResult)),
     ),
     postChildResource(
       '/people/:id/parents',
-      personRepo.personExists,
-      postParentBody(personRepo.personExists, parentRoleRepo.parentRoleExists),
+      peopleRepo.personExists,
+      postParentBody(peopleRepo.personExists, parentRolesRepo.parentRoleExists),
       ({ params, body, userId }) =>
-        parentChildRepo.createParentChild(
+        parentChildrenRepo.createParentChild(
           J.compose(
             J.assoc('creatorId', userId),
             J.assoc('childId', params.id),

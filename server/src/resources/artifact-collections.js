@@ -63,23 +63,27 @@ const toArtifactResult = J.pick([
 ]);
 
 export const artifactCollectionRoutes = ({
-  artifactCollectionRepo,
-  artifactRepo,
-  artifactTypeRepo,
-  artifactSourceRepo,
+  artifactCollectionsRepo,
+  artifactsRepo,
+  artifactTypesRepo,
+  artifactSourcesRepo,
 }) =>
   routes([
     getSingleResource(
       '/artifact-collections/:id',
-      artifactCollectionRepo.artifactCollectionExists,
+      artifactCollectionsRepo.artifactCollectionExists,
       ({ params }) =>
-        artifactCollectionRepo.readArtifactCollection(params.id).then(toResult),
+        artifactCollectionsRepo
+          .readArtifactCollection(params.id)
+          .then(toResult),
     ),
     getAllResources('/artifact-collections', V.any(), () =>
-      artifactCollectionRepo.readAllArtifactCollections().then(J.map(toResult)),
+      artifactCollectionsRepo
+        .readAllArtifactCollections()
+        .then(J.map(toResult)),
     ),
     postResource('/artifact-collections', postBody(), ({ userId, body }) =>
-      artifactCollectionRepo
+      artifactCollectionsRepo
         .createArtifactCollection(
           J.compose(
             J.assoc('creatorId', userId),
@@ -90,10 +94,10 @@ export const artifactCollectionRoutes = ({
     ),
     patchResource(
       '/artifact-collections/:id',
-      artifactCollectionRepo.artifactCollectionExists,
+      artifactCollectionsRepo.artifactCollectionExists,
       patchBody(),
       ({ params, body }) =>
-        artifactCollectionRepo
+        artifactCollectionsRepo
           .updateArtifactCollection(
             params.id,
             J.compose(
@@ -105,21 +109,21 @@ export const artifactCollectionRoutes = ({
     ),
     getAllChildResources(
       '/artifact-collections/:id/artifacts',
-      artifactCollectionRepo.artifactCollectionExists,
+      artifactCollectionsRepo.artifactCollectionExists,
       ({ params }) =>
-        artifactRepo
+        artifactsRepo
           .readAllArtifacts({ collectionId: params.id })
           .then(J.map(toArtifactResult)),
     ),
     postChildResource(
       '/artifact-collections/:id/artifacts',
-      artifactCollectionRepo.artifactCollectionExists,
+      artifactCollectionsRepo.artifactCollectionExists,
       postArtifactBody(
-        artifactTypeRepo.artifactTypeExists,
-        artifactSourceRepo.artifactSourceExists,
+        artifactTypesRepo.artifactTypeExists,
+        artifactSourcesRepo.artifactSourceExists,
       ),
       ({ userId, params, body }) =>
-        artifactRepo
+        artifactsRepo
           .createArtifact(
             J.compose(
               J.assoc('collectionId', params.id),

@@ -26,16 +26,16 @@ const toModel = J.transform({
   creatorId: J.prop('creator_id'),
 });
 
-export const createAssetRepo = ({ assetStore }) => ({
-  createAsset: createResource(assetStore, fromModel, toModel),
-  readAsset: readResource(assetStore, toModel),
+export const createAssetsRepo = ({ assetsStore }) => ({
+  createAsset: createResource(assetsStore, fromModel, toModel),
+  readAsset: readResource(assetsStore, toModel),
   readAllAssets: readAllResources(
-    assetStore,
+    assetsStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  assetExists: resourceExists(assetStore),
-  updateAsset: updateResource(assetStore, fromModel, toModel),
-  updateAllAssets: updateAllResources(assetStore, fromModel, toModel),
+  assetExists: resourceExists(assetsStore),
+  updateAsset: updateResource(assetsStore, fromModel, toModel),
+  updateAllAssets: updateAllResources(assetsStore, fromModel, toModel),
   // del: del(db, table),
 });

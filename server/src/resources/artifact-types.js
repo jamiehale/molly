@@ -25,22 +25,22 @@ const patchBody = () =>
 
 const toResult = J.pick(['id', 'title']);
 
-export const artifactTypeRoutes = ({ artifactTypeRepo }) =>
+export const artifactTypeRoutes = ({ artifactTypesRepo }) =>
   routes([
     getSingleResource(
       '/artifact-types/:id',
-      artifactTypeRepo.artifactTypeExists,
+      artifactTypesRepo.artifactTypeExists,
       ({ params }) =>
-        artifactTypeRepo.readArtifactType(params.id).then(toResult),
+        artifactTypesRepo.readArtifactType(params.id).then(toResult),
     ),
     getAllResources('/artifact-types', V.any(), () =>
-      artifactTypeRepo.readAllArtifactTypes().then(J.map(toResult)),
+      artifactTypesRepo.readAllArtifactTypes().then(J.map(toResult)),
     ),
     postResource(
       '/artifact-types',
-      postBody((id) => artifactTypeRepo.artifactTypeExists(id).then(J.not)),
+      postBody((id) => artifactTypesRepo.artifactTypeExists(id).then(J.not)),
       ({ userId, body }) =>
-        artifactTypeRepo
+        artifactTypesRepo
           .createArtifactType(
             J.compose(
               J.assoc('creatorId', userId),
@@ -51,10 +51,10 @@ export const artifactTypeRoutes = ({ artifactTypeRepo }) =>
     ),
     patchResource(
       '/artifact-types/:id',
-      artifactTypeRepo.artifactTypeExists,
+      artifactTypesRepo.artifactTypeExists,
       patchBody(),
       ({ params, body }) =>
-        artifactTypeRepo
+        artifactTypesRepo
           .updateArtifactType(
             params.id,
             J.compose(J.filterEmptyProps, J.pick(['title']))(body),

@@ -18,18 +18,18 @@ const toModel = J.transform({
   title: J.prop('title'),
 });
 
-export const createArtifactTypeRepo = ({ artifactTypeStore }) => ({
-  createArtifactType: createResource(artifactTypeStore, fromModel, toModel),
-  readArtifactType: readResource(artifactTypeStore, toModel),
+export const createArtifactTypesRepo = ({ artifactTypesStore }) => ({
+  createArtifactType: createResource(artifactTypesStore, fromModel, toModel),
+  readArtifactType: readResource(artifactTypesStore, toModel),
   readAllArtifactTypes: readAllResources(
-    artifactTypeStore,
+    artifactTypesStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  artifactTypeExists: resourceExists(artifactTypeStore),
-  updateArtifactType: updateResource(artifactTypeStore, fromModel, toModel),
+  artifactTypeExists: resourceExists(artifactTypesStore),
+  updateArtifactType: updateResource(artifactTypesStore, fromModel, toModel),
   updateAllArtifactTypes: updateAllResources(
-    artifactTypeStore,
+    artifactTypesStore,
     fromModel,
     toModel,
   ),

@@ -1,3 +1,3 @@
 import { createResourceStore } from '../resource-store';
 
-export const createParentStore = (db) => createResourceStore(db, 'parents');
+export const createParentsStore = (db) => createResourceStore(db, 'parents');

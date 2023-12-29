@@ -29,22 +29,24 @@ const patchBody = () =>
 
 const toResult = J.pick(['id', 'title']);
 
-export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
+export const artifactSourceRoutes = ({ artifactSourcesRepo }) =>
   routes([
     getSingleResource(
       '/artifact-sources/:id',
-      artifactSourceRepo.artifactSourceExists,
+      artifactSourcesRepo.artifactSourceExists,
       ({ params }) =>
-        artifactSourceRepo.readArtifactSource(params.id).then(toResult),
+        artifactSourcesRepo.readArtifactSource(params.id).then(toResult),
     ),
     getAllResources('/artifact-sources', V.any(), () =>
-      artifactSourceRepo.readAllArtifactSources().then(J.map(toResult)),
+      artifactSourcesRepo.readAllArtifactSources().then(J.map(toResult)),
     ),
     postResource(
       '/artifact-sources',
-      postBody((id) => artifactSourceRepo.artifactSourceExists(id).then(J.not)),
+      postBody((id) =>
+        artifactSourcesRepo.artifactSourceExists(id).then(J.not),
+      ),
       ({ userId, body }) =>
-        artifactSourceRepo
+        artifactSourcesRepo
           .createArtifactSource(
             J.compose(
               J.assoc('creatorId', userId),
@@ -55,10 +57,10 @@ export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
     ),
     patchResource(
       '/artifact-sources/:id',
-      artifactSourceRepo.artifactSourceExists,
+      artifactSourcesRepo.artifactSourceExists,
       patchBody(),
       ({ params, body }) =>
-        artifactSourceRepo
+        artifactSourcesRepo
           .updateArtifactSource(
             params.id,
             J.compose(J.filterEmptyProps, J.pick(['title']))(body),

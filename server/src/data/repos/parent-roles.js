@@ -18,16 +18,20 @@ const toModel = J.transform({
   title: J.prop('title'),
 });
 
-export const createParentRoleRepo = ({ parentRoleStore }) => ({
-  createParentRole: createResource(parentRoleStore, fromModel, toModel),
-  readParentRole: readResource(parentRoleStore, toModel),
+export const createParentRolesRepo = ({ parentRolesStore }) => ({
+  createParentRole: createResource(parentRolesStore, fromModel, toModel),
+  readParentRole: readResource(parentRolesStore, toModel),
   readAllParentRoles: readAllResources(
-    parentRoleStore,
+    parentRolesStore,
     J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
-  parentRoleExists: resourceExists(parentRoleStore),
-  updateParentRole: updateResource(parentRoleStore, fromModel, toModel),
-  updateAllParentRoles: updateAllResources(parentRoleStore, fromModel, toModel),
+  parentRoleExists: resourceExists(parentRolesStore),
+  updateParentRole: updateResource(parentRolesStore, fromModel, toModel),
+  updateAllParentRoles: updateAllResources(
+    parentRolesStore,
+    fromModel,
+    toModel,
+  ),
   // del: del(db, table),
 });

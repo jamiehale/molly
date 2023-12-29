@@ -25,21 +25,21 @@ const patchBody = () =>
 
 const toResult = J.pick(['id', 'title']);
 
-export const parentRoleRoutes = ({ parentRoleRepo }) =>
+export const parentRoleRoutes = ({ parentRolesRepo }) =>
   routes([
     getSingleResource(
       '/parent-roles/:id',
-      parentRoleRepo.parentRoleExists,
-      ({ params }) => parentRoleRepo.readParentRole(params.id).then(toResult),
+      parentRolesRepo.parentRoleExists,
+      ({ params }) => parentRolesRepo.readParentRole(params.id).then(toResult),
     ),
     getAllResources('/parent-roles', V.any(), () =>
-      parentRoleRepo.readAllParentRoles().then(J.map(toResult)),
+      parentRolesRepo.readAllParentRoles().then(J.map(toResult)),
     ),
     postResource(
       '/parent-roles',
-      postBody((id) => parentRoleRepo.parentRoleExists(id).then(J.not)),
+      postBody((id) => parentRolesRepo.parentRoleExists(id).then(J.not)),
       ({ userId, body }) =>
-        parentRoleRepo
+        parentRolesRepo
           .createParentRole(
             J.compose(
               J.assoc('creatorId', userId),
@@ -50,10 +50,10 @@ export const parentRoleRoutes = ({ parentRoleRepo }) =>
     ),
     patchResource(
       '/parent-roles/:id',
-      parentRoleRepo.parentRoleExists,
+      parentRolesRepo.parentRoleExists,
       patchBody(),
       ({ params, body }) =>
-        parentRoleRepo
+        parentRolesRepo
           .updateParentRole(
             params.id,
             J.compose(J.filterEmptyProps, J.pick(['title']))(body),

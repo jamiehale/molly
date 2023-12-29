@@ -5,43 +5,43 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import { api } from './api';
 import { HttpError, isHttpError } from './error';
-import { createEventStore } from './data/stores/events';
-import { createEventRepo } from './data/repos/events';
-import { createArtifactStore } from './data/stores/artifacts';
-import { createArtifactRepo } from './data/repos/artifacts';
-import { createLocationStore } from './data/stores/locations';
-import { createArtifactTypeRepo } from './data/repos/artifact-types';
-import { createEventTypeRepo } from './data/repos/event-types';
-import { createLocationRepo } from './data/repos/locations';
-import { createApiKeyStore } from './data/stores/api-keys';
-import { createAssetStore } from './data/stores/assets';
-import { createArtifactTypeStore } from './data/stores/artifact-types';
-import { createEventTypeStore } from './data/stores/event-types';
+import { createEventsStore } from './data/stores/events';
+import { createEventsRepo } from './data/repos/events';
+import { createArtifactsStore } from './data/stores/artifacts';
+import { createArtifactsRepo } from './data/repos/artifacts';
+import { createLocationsStore } from './data/stores/locations';
+import { createArtifactTypesRepo } from './data/repos/artifact-types';
+import { createEventTypesRepo } from './data/repos/event-types';
+import { createLocationsRepo } from './data/repos/locations';
+import { createApiKeysStore } from './data/stores/api-keys';
+import { createAssetsStore } from './data/stores/assets';
+import { createArtifactTypesStore } from './data/stores/artifact-types';
+import { createEventTypesStore } from './data/stores/event-types';
 import { createUsersStore } from './data/stores/users';
-import { createApiKeyRepo } from './data/repos/api-keys';
-import { createAssetRepo } from './data/repos/assets';
-import { createUserRepo } from './data/repos/users';
-import { createArtifactSourceRepo } from './data/repos/artifact-sources';
-import { createArtifactSourceStore } from './data/stores/artifact-sources';
-import { createArtifactCollectionRepo } from './data/repos/artifact-collections';
-import { createArtifactCollectionStore } from './data/stores/artifact-collections';
-import { createVaultStore } from './data/stores/vaults';
-import { createVaultRepo } from './data/repos/vaults';
-import { createGenderStore } from './data/stores/genders';
-import { createGenderRepo } from './data/repos/genders';
-import { createPersonStore } from './data/stores/people';
-import { createPersonRepo } from './data/repos/people';
-import { createArtifactPersonRoleStore } from './data/stores/artifact-person-roles';
-import { createArtifactPersonRoleRepo } from './data/repos/artifact-person-roles';
-import { createParentStore } from './data/stores/parents';
-import { createParentRepo } from './data/repos/parents';
-import { createChildStore } from './data/stores/children';
-import { createChildRepo } from './data/repos/children';
-import { createParentRoleStore } from './data/stores/parent-roles';
-import { createParentRoleRepo } from './data/repos/parent-roles';
-import { createParentChildStore } from './data/stores/parent-children';
-import { createParentChildRepo } from './data/repos/parent-children';
-import { createPeopleDetailsStore } from './data/stores/people-details';
+import { createApiKeysRepo } from './data/repos/api-keys';
+import { createAssetsRepo } from './data/repos/assets';
+import { createUsersRepo } from './data/repos/users';
+import { createArtifactSourcesRepo } from './data/repos/artifact-sources';
+import { createArtifactSourcesStore } from './data/stores/artifact-sources';
+import { createArtifactCollectionsRepo } from './data/repos/artifact-collections';
+import { createArtifactCollectionsStore } from './data/stores/artifact-collections';
+import { createVaultsStore } from './data/stores/vaults';
+import { createVaultsRepo } from './data/repos/vaults';
+import { createGendersStore } from './data/stores/genders';
+import { createGendersRepo } from './data/repos/genders';
+import { createPeopleStore } from './data/stores/people';
+import { createPeopleRepo } from './data/repos/people';
+import { createArtifactPersonRolesStore } from './data/stores/artifact-person-roles';
+import { createArtifactPersonRolesRepo } from './data/repos/artifact-person-roles';
+import { createParentsStore } from './data/stores/parents';
+import { createParentsRepo } from './data/repos/parents';
+import { createChildrenStore } from './data/stores/children';
+import { createChildrenRepo } from './data/repos/children';
+import { createParentRolesStore } from './data/stores/parent-roles';
+import { createParentRolesRepo } from './data/repos/parent-roles';
+import { createParentChildrenStore } from './data/stores/parent-children';
+import { createParentChildrenRepo } from './data/repos/parent-children';
+import { createPersonDetailsStore } from './data/stores/person-details';
 
 config();
 
@@ -57,46 +57,46 @@ const db = Knex({
 });
 
 const stores = {
-  apiKeyStore: createApiKeyStore(db),
-  artifactCollectionStore: createArtifactCollectionStore(db),
-  artifactPersonRoleStore: createArtifactPersonRoleStore(db),
-  artifactSourceStore: createArtifactSourceStore(db),
-  artifactTypeStore: createArtifactTypeStore(db),
-  artifactStore: createArtifactStore(db),
-  assetStore: createAssetStore(db),
-  childStore: createChildStore(db),
-  eventTypeStore: createEventTypeStore(db),
-  eventStore: createEventStore(db),
-  genderStore: createGenderStore(db),
-  locationStore: createLocationStore(db),
-  parentChildStore: createParentChildStore(db),
-  parentRoleStore: createParentRoleStore(db),
-  parentStore: createParentStore(db),
-  personStore: createPersonStore(db),
-  peopleDetailsStore: createPeopleDetailsStore(db),
-  userStore: createUsersStore(db),
-  vaultStore: createVaultStore(db),
+  apiKeysStore: createApiKeysStore(db),
+  artifactCollectionsStore: createArtifactCollectionsStore(db),
+  artifactPersonRolesStore: createArtifactPersonRolesStore(db),
+  artifactSourcesStore: createArtifactSourcesStore(db),
+  artifactTypesStore: createArtifactTypesStore(db),
+  artifactsStore: createArtifactsStore(db),
+  assetsStore: createAssetsStore(db),
+  childrenStore: createChildrenStore(db),
+  eventTypesStore: createEventTypesStore(db),
+  eventsStore: createEventsStore(db),
+  gendersStore: createGendersStore(db),
+  locationsStore: createLocationsStore(db),
+  parentChildrenStore: createParentChildrenStore(db),
+  parentRolesStore: createParentRolesStore(db),
+  parentsStore: createParentsStore(db),
+  peopleStore: createPeopleStore(db),
+  personDetailsStore: createPersonDetailsStore(db),
+  usersStore: createUsersStore(db),
+  vaultsStore: createVaultsStore(db),
 };
 
 const repos = {
-  apiKeyRepo: createApiKeyRepo(stores),
-  artifactCollectionRepo: createArtifactCollectionRepo(stores),
-  artifactPersonRoleRepo: createArtifactPersonRoleRepo(stores),
-  artifactSourceRepo: createArtifactSourceRepo(stores),
-  artifactTypeRepo: createArtifactTypeRepo(stores),
-  artifactRepo: createArtifactRepo(stores),
-  assetRepo: createAssetRepo(stores),
-  childRepo: createChildRepo(stores),
-  eventTypeRepo: createEventTypeRepo(stores),
-  eventRepo: createEventRepo(stores),
-  genderRepo: createGenderRepo(stores),
-  locationRepo: createLocationRepo(stores),
-  parentChildRepo: createParentChildRepo(stores),
-  parentRoleRepo: createParentRoleRepo(stores),
-  parentRepo: createParentRepo(stores),
-  personRepo: createPersonRepo(stores),
-  userRepo: createUserRepo(stores),
-  vaultRepo: createVaultRepo(stores),
+  apiKeysRepo: createApiKeysRepo(stores),
+  artifactCollectionsRepo: createArtifactCollectionsRepo(stores),
+  artifactPersonRolesRepo: createArtifactPersonRolesRepo(stores),
+  artifactSourcesRepo: createArtifactSourcesRepo(stores),
+  artifactTypesRepo: createArtifactTypesRepo(stores),
+  artifactsRepo: createArtifactsRepo(stores),
+  assetsRepo: createAssetsRepo(stores),
+  childrenRepo: createChildrenRepo(stores),
+  eventTypesRepo: createEventTypesRepo(stores),
+  eventsRepo: createEventsRepo(stores),
+  gendersRepo: createGendersRepo(stores),
+  locationsRepo: createLocationsRepo(stores),
+  parentChildrenRepo: createParentChildrenRepo(stores),
+  parentRolesRepo: createParentRolesRepo(stores),
+  parentsRepo: createParentsRepo(stores),
+  peopleRepo: createPeopleRepo(stores),
+  usersRepo: createUsersRepo(stores),
+  vaultsRepo: createVaultsRepo(stores),
 };
 
 const app = express();

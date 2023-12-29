@@ -38,19 +38,19 @@ const patchBody = (validEventTypeFn, validLocationFn) =>
 
 const toResult = J.pick(['id', 'title', 'typeId', 'dateValue', 'locationId']);
 
-export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
+export const eventRoutes = ({ eventsRepo, eventTypesRepo, locationsRepo }) =>
   routes([
-    getSingleResource('/events/:id', eventRepo.eventExists, ({ params }) =>
-      eventRepo.readEvent(params.id).then(toResult),
+    getSingleResource('/events/:id', eventsRepo.eventExists, ({ params }) =>
+      eventsRepo.readEvent(params.id).then(toResult),
     ),
     getAllResources('/events', V.any(), () =>
-      eventRepo.readAllEvents().then(J.map(toResult)),
+      eventsRepo.readAllEvents().then(J.map(toResult)),
     ),
     postResource(
       '/events',
-      postBody(eventTypeRepo.eventTypeExists, locationRepo.locationExists),
+      postBody(eventTypesRepo.eventTypeExists, locationsRepo.locationExists),
       ({ userId, body }) =>
-        eventRepo
+        eventsRepo
           .createEvent(
             J.compose(
               J.assoc('creatorId', userId),
@@ -61,10 +61,10 @@ export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
     ),
     patchResource(
       '/events/:id',
-      eventRepo.eventExists,
-      patchBody(eventTypeRepo.eventTypeExists, locationRepo.locationExists),
+      eventsRepo.eventExists,
+      patchBody(eventTypesRepo.eventTypeExists, locationsRepo.locationExists),
       ({ params, body }) =>
-        eventRepo
+        eventsRepo
           .updateEvent(
             params.id,
             J.compose(

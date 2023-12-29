@@ -53,32 +53,32 @@ const toAssetResult = J.pick([
 const toArtifactPersonResult = J.pick([]);
 
 export const artifactRoutes = ({
-  artifactPersonRepo,
-  artifactRepo,
-  artifactTypeRepo,
-  artifactSourceRepo,
-  assetRepo,
-  vaultRepo,
+  artifactPeopleRepo,
+  artifactsRepo,
+  artifactTypesRepo,
+  artifactSourcesRepo,
+  assetsRepo,
+  vaultsRepo,
 }) =>
   routes([
     getSingleResource(
       '/artifacts/:id',
-      artifactRepo.artifactExists,
-      ({ params }) => artifactRepo.readArtifact(params.id).then(toResult),
+      artifactsRepo.artifactExists,
+      ({ params }) => artifactsRepo.readArtifact(params.id).then(toResult),
     ),
     getAllResources('/artifacts', V.any(), () =>
-      artifactRepo.readAllArtifacts().then(J.map(toResult)),
+      artifactsRepo.readAllArtifacts().then(J.map(toResult)),
     ),
     // no post
     patchResource(
       '/artifacts/:id',
-      artifactRepo.artifactExists,
+      artifactsRepo.artifactExists,
       patchBody(
-        artifactTypeRepo.artifactTypeExists,
-        artifactSourceRepo.artifactSourceExists,
+        artifactTypesRepo.artifactTypeExists,
+        artifactSourcesRepo.artifactSourceExists,
       ),
       ({ params, body }) =>
-        artifactRepo
+        artifactsRepo
           .updateArtifact(
             params.id,
             J.compose(
@@ -90,18 +90,18 @@ export const artifactRoutes = ({
     ),
     getAllChildResources(
       '/artifacts/:id/assets',
-      artifactRepo.artifactExists,
+      artifactsRepo.artifactExists,
       ({ params }) =>
-        assetRepo
+        assetsRepo
           .readAllAssets({ artifactId: params.id })
           .then(J.map(toAssetResult)),
     ),
     postChildResource(
       '/artifacts/:id/assets',
-      artifactRepo.artifactExists,
-      postAssetBody(vaultRepo.vaultExists),
+      artifactsRepo.artifactExists,
+      postAssetBody(vaultsRepo.vaultExists),
       ({ userId, params, body }) =>
-        assetRepo
+        assetsRepo
           .createAsset(
             J.compose(
               J.assoc('artifactId', params.id),
@@ -113,9 +113,9 @@ export const artifactRoutes = ({
     ),
     getAllChildResources(
       '/artifacts/:id/people',
-      artifactRepo.artifactExists,
+      artifactsRepo.artifactExists,
       ({ params }) =>
-        artifactPersonRepo
+        artifactPeopleRepo
           .readAllArtifactPeople({ artifactId: params.id })
           .then(J.map(toArtifactPersonResult)),
     ),
