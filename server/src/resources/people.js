@@ -68,6 +68,7 @@ const toResult = J.pick([
   'givenNames',
   'surname',
   'genderId',
+  'genderTitle',
   'creatorId',
 ]);
 

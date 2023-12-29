@@ -16,4 +16,5 @@ CREATE VIEW parents AS
     INNER JOIN genders AS g
       ON g.id = pe.gender_id
     INNER JOIN parent_roles AS pr
-      ON pr.id = pc.parent_role_id;
+      ON pr.id = pc.parent_role_id
+;

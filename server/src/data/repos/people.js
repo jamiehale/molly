@@ -25,18 +25,27 @@ const toModel = J.transform({
   creatorId: J.prop('creator_id'),
 });
 
+const toDetailsModel = J.transform({
+  id: J.prop('id'),
+  givenNames: J.prop('given_names'),
+  surname: J.prop('surname'),
+  genderId: J.prop('gender_id'),
+  genderTitle: J.prop('gender_title'),
+  creatorId: J.prop('creator_id'),
+});
+
 const queryPeople = (store, toModelFn) => (q) =>
   store.queryPeople(q).then(J.map(toModelFn)).catch(toInternalError);
 
-export const createPersonRepo = ({ personStore }) => ({
+export const createPersonRepo = ({ personStore, peopleDetailsStore }) => ({
   createPerson: createResource(personStore, fromModel, toModel),
-  readPerson: readResource(personStore, toModel),
+  readPerson: readResource(peopleDetailsStore, toDetailsModel),
   readAllPeople: readAllResources(
-    personStore,
+    peopleDetailsStore,
     J.compose(J.filterEmptyProps, fromModel),
-    toModel,
+    toDetailsModel,
   ),
-  queryPeople: queryPeople(personStore, toModel),
+  queryPeople: queryPeople(peopleDetailsStore, toDetailsModel),
   personExists: resourceExists(personStore),
   updatePerson: updateResource(personStore, fromModel, toModel),
   updateAllPeople: updateAllResources(personStore, fromModel, toModel),

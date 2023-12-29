@@ -41,6 +41,7 @@ import { createParentRoleStore } from './data/stores/parent-roles';
 import { createParentRoleRepo } from './data/repos/parent-roles';
 import { createParentChildStore } from './data/stores/parent-children';
 import { createParentChildRepo } from './data/repos/parent-children';
+import { createPeopleDetailsStore } from './data/stores/people-details';
 
 config();
 
@@ -72,6 +73,7 @@ const stores = {
   parentRoleStore: createParentRoleStore(db),
   parentStore: createParentStore(db),
   personStore: createPersonStore(db),
+  peopleDetailsStore: createPeopleDetailsStore(db),
   userStore: createUsersStore(db),
   vaultStore: createVaultStore(db),
 };

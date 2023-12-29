@@ -22,6 +22,7 @@ export const PersonPage = ({ params }) => {
           <Typography as="title">
             Person: {person.surname}, {person.givenNames}
           </Typography>
+          <Typography>Gender: {person.genderTitle}</Typography>
           <div>
             <Typography>Children</Typography>
             <PersonList
