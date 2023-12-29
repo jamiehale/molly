@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ApiContext } from '../hooks/api';
 
@@ -28,13 +28,24 @@ export const ApiProvider = ({ baseUrl, children }) => {
     [baseUrl, apiKey],
   );
 
-  const value = useMemo(
-    () => ({
-      authorizedGet,
-      authorizedPost,
-    }),
-    [authorizedGet, authorizedPost],
+  const authorizedPatch = useCallback(
+    (path, body) =>
+      fetch(`${baseUrl}${path}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `ApiKey ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }).then((response) => response.json()),
+    [baseUrl, apiKey],
   );
+
+  const value = {
+    authorizedGet,
+    authorizedPost,
+    authorizedPatch,
+  };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };

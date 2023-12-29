@@ -9,20 +9,50 @@ import { Button } from './Button';
 import { NewParent } from './NewParent';
 import { PersonList } from './PersonList';
 import { ButtonToggle } from './ButtonToggle';
+import { CustomToggle } from './CustomToggle';
+import { EditPerson } from './EditPerson';
+import { useEffect } from 'react';
 
 export const PersonPage = ({ params }) => {
-  const { person } = usePerson(params.id);
+  const { person, reload: reloadPerson } = usePerson(params.id);
   const { children, reloadChildren } = useChildren(params.id);
   const { parents, reloadParents } = useParents(params.id);
+
+  useEffect(reloadPerson, [reloadPerson]);
 
   return (
     <Layout>
       {person && (
         <>
-          <Typography as="title">
-            Person: {person.surname}, {person.givenNames}
-          </Typography>
-          <Typography>Gender: {person.genderTitle}</Typography>
+          <CustomToggle
+            buttonText="Edit"
+            renderOpen={(onClose) => (
+              <div>
+                <Typography>Editing</Typography>
+                <EditPerson
+                  person={person}
+                  onUpdatePerson={() => {
+                    reloadPerson();
+                    onClose();
+                  }}
+                />
+                <Button type="button" onClick={onClose}>
+                  Cancel
+                </Button>
+              </div>
+            )}
+            renderClosed={(onOpen) => (
+              <div>
+                <Typography as="title">
+                  Person: {person.surname}, {person.givenNames}
+                </Typography>
+                <Typography>Gender: {person.genderTitle}</Typography>
+                <Button type="button" onClick={onOpen}>
+                  Edit
+                </Button>
+              </div>
+            )}
+          />
           <div>
             <Typography>Children</Typography>
             <PersonList

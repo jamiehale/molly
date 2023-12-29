@@ -5,13 +5,14 @@ import { SelectField } from './SelectField';
 import { Button } from './Button';
 import { Form } from './Form';
 import { FlexRow } from './FlexRow';
+import * as J from '../lib/jlib';
 
-export const NewPersonForm = ({ genders, onSubmit }) => {
+export const PersonForm = ({ person, genders, submitButtonText, onSubmit }) => {
   const { propsForField, propsForForm } = useForm(
     {
-      givenNames: {},
-      surname: {},
-      genderId: { initialValue: 'male' },
+      givenNames: { initialValue: person ? person.givenNames : '' },
+      surname: { initialValue: person ? person.surname : '' },
+      genderId: { initialValue: person ? person.genderId : 'male' },
     },
     onSubmit,
   );
@@ -22,24 +23,31 @@ export const NewPersonForm = ({ genders, onSubmit }) => {
       <TextField label="Surname" {...propsForField('surname')} />
       <SelectField
         options={genders}
-        valueFn={(o) => o.id}
-        displayFn={(o) => o.title}
+        valueFn={J.prop('id')}
+        displayFn={J.prop('title')}
         label="Gender"
         {...propsForField('genderId')}
       />
       <FlexRow className="mt-1">
-        <Button type="submit">Add</Button>
+        <Button type="submit">{submitButtonText || 'Add'}</Button>
       </FlexRow>
     </Form>
   );
 };
 
-NewPersonForm.propTypes = {
+PersonForm.propTypes = {
+  person: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    givenNames: PropTypes.string,
+    surname: PropTypes.string,
+    genderId: PropTypes.string.isRequired,
+  }),
   genders: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
     }),
   ),
+  submitButtonText: PropTypes.string,
   onSubmit: PropTypes.func.isRequired,
 };

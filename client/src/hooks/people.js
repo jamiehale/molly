@@ -6,8 +6,13 @@ export const usePeople = () => {
 
   const [people, setPeople] = useState([]);
 
+  const loadPeople = useCallback(
+    () => authorizedGet('/people').then(setPeople),
+    [authorizedGet, setPeople],
+  );
+
   useEffect(() => {
-    authorizedGet('/people').then(setPeople);
+    loadPeople();
   }, [authorizedGet, setPeople]);
 
   const createPerson = useCallback(
@@ -22,10 +27,5 @@ export const usePeople = () => {
     [authorizedPost, people, setPeople],
   );
 
-  const reloadPeople = useCallback(
-    () => authorizedGet('/people').then(setPeople),
-    [authorizedGet, setPeople],
-  );
-
-  return { people, createPerson, reloadPeople };
+  return { people, createPerson, reloadPeople: loadPeople };
 };
