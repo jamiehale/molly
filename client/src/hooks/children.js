@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useApi } from './api';
 
 export const useChildren = (parentId) => {
@@ -16,12 +16,10 @@ export const useChildren = (parentId) => {
     [parentId, authorizedPost],
   );
 
-  const reloadChildren = useCallback(() => {
-    authorizedGet(`/people/${parentId}/children`).then(setChildren);
-  }, [parentId, authorizedGet, setChildren]);
-
-  return useMemo(
-    () => ({ children, reloadChildren, addChild }),
-    [children, reloadChildren, addChild],
+  const reloadChildren = useCallback(
+    () => authorizedGet(`/people/${parentId}/children`).then(setChildren),
+    [parentId, authorizedGet, setChildren],
   );
+
+  return { children, reloadChildren, addChild };
 };

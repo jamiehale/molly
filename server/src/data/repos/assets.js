@@ -6,24 +6,24 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  filename: U.prop('filename'),
-  mimetype: U.prop('mimetype'),
-  vault_id: U.prop('vaultId'),
-  artifact_id: U.prop('artifactId'),
-  creator_id: U.prop('creatorId'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  filename: J.prop('filename'),
+  mimetype: J.prop('mimetype'),
+  vault_id: J.prop('vaultId'),
+  artifact_id: J.prop('artifactId'),
+  creator_id: J.prop('creatorId'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  filename: U.prop('filename'),
-  mimetype: U.prop('mimetype'),
-  vaultId: U.prop('vault_id'),
-  artifactId: U.prop('artifact_id'),
-  creatorId: U.prop('creator_id'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  filename: J.prop('filename'),
+  mimetype: J.prop('mimetype'),
+  vaultId: J.prop('vault_id'),
+  artifactId: J.prop('artifact_id'),
+  creatorId: J.prop('creator_id'),
 });
 
 export const createAssetRepo = ({ assetStore }) => ({
@@ -31,7 +31,7 @@ export const createAssetRepo = ({ assetStore }) => ({
   readAsset: readResource(assetStore, toModel),
   readAllAssets: readAllResources(
     assetStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   assetExists: resourceExists(assetStore),

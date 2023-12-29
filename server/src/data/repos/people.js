@@ -6,34 +6,34 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 import { toInternalError } from '../../error';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  given_names: U.prop('givenNames'),
-  surname: U.prop('surname'),
-  gender_id: U.prop('genderId'),
-  creator_id: U.prop('creatorId'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  given_names: J.prop('givenNames'),
+  surname: J.prop('surname'),
+  gender_id: J.prop('genderId'),
+  creator_id: J.prop('creatorId'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  givenNames: U.prop('given_names'),
-  surname: U.prop('surname'),
-  genderId: U.prop('gender_id'),
-  creatorId: U.prop('creator_id'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  givenNames: J.prop('given_names'),
+  surname: J.prop('surname'),
+  genderId: J.prop('gender_id'),
+  creatorId: J.prop('creator_id'),
 });
 
 const queryPeople = (store, toModelFn) => (q) =>
-  store.queryPeople(q).then(U.map(toModelFn)).catch(toInternalError);
+  store.queryPeople(q).then(J.map(toModelFn)).catch(toInternalError);
 
 export const createPersonRepo = ({ personStore }) => ({
   createPerson: createResource(personStore, fromModel, toModel),
   readPerson: readResource(personStore, toModel),
   readAllPeople: readAllResources(
     personStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   queryPeople: queryPeople(personStore, toModel),

@@ -1,6 +1,5 @@
 import { ParameterError } from './error';
-import { always, identityP, ifElse, isUndefined, throwIfFalse } from './util';
-import * as U from './util';
+import * as J from './jlib';
 
 const removeEmptyValues = (o) =>
   Object.keys(o).reduce(
@@ -22,9 +21,9 @@ export const and =
 export const object =
   (descriptor) =>
   ({ scope, value }) => {
-    if (U.type(value) !== 'Object') {
+    if (J.type(value) !== 'Object') {
       throw new ParameterError(
-        `${scope}: expecting object but got ${U.type(value)}`,
+        `${scope}: expecting object but got ${J.type(value)}`,
       );
     }
     return Object.keys(descriptor).reduce(
@@ -35,7 +34,7 @@ export const object =
             value: value[key],
           }).then((result) => ({
             ...acc,
-            ...(U.isUndefined(result) ? {} : { [key]: result }),
+            ...(J.isUndefined(result) ? {} : { [key]: result }),
           })),
         ),
       Promise.resolve({}),
@@ -151,13 +150,13 @@ export const validResource = (
   validateResourceIdFn,
   errorFn = defaultValidResourceErrorFn,
 ) =>
-  ifElse(
-    (o) => isUndefined(o.value),
-    identityP,
+  J.ifElse(
+    (o) => J.isUndefined(o.value),
+    J.identityP,
     (o) =>
       validateResourceIdFn(o.value)
-        .then(throwIfFalse(() => errorFn(o)))
-        .then(always(o.value)),
+        .then(J.throwIfFalse(() => errorFn(o)))
+        .then(J.always(o.value)),
   );
 const defaultAvailableKeyErrorFn = ({ scope, value }) =>
   new ParameterError(`${scope}: key in use '${value}'`);
@@ -166,8 +165,8 @@ export const availableKey =
   (keyAvailableFn, errorFn = defaultAvailableKeyErrorFn) =>
   (o) =>
     keyAvailableFn(o.value)
-      .then(throwIfFalse(() => errorFn(o)))
-      .then(U.always(o.value));
+      .then(J.throwIfFalse(() => errorFn(o)))
+      .then(J.always(o.value));
 
 const defaultValidDateValueErrorFn = ({ scope, value }) =>
   new ParameterError(`${scope}: invalid date ${value}`);
@@ -193,11 +192,11 @@ const defaultIsNotEmptyErrorFn = ({ scope }) =>
 export const isNotEmpty =
   (errorFn = defaultIsNotEmptyErrorFn) =>
   async (o) => {
-    if (U.type(o.value) === 'Object') {
+    if (J.type(o.value) === 'Object') {
       if (Object.keys(o.value).length === 0) {
         throw errorFn(o);
       }
-    } else if (U.type(o.value) === 'Array') {
+    } else if (J.type(o.value) === 'Array') {
       if (o.value.length === 0) {
         throw errorFn(o);
       }

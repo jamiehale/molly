@@ -6,20 +6,20 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
-  description: U.prop('description'),
-  base_url: U.prop('baseUrl'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
+  description: J.prop('description'),
+  base_url: J.prop('baseUrl'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
-  description: U.prop('description'),
-  baseUrl: U.prop('base_url'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
+  description: J.prop('description'),
+  baseUrl: J.prop('base_url'),
 });
 
 export const createVaultRepo = ({ vaultStore }) => ({
@@ -27,7 +27,7 @@ export const createVaultRepo = ({ vaultStore }) => ({
   readVault: readResource(vaultStore, toModel),
   readAllVaults: readAllResources(
     vaultStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   vaultExists: resourceExists(vaultStore),

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useApi } from './api';
 
 export const usePeople = () => {
@@ -11,17 +11,21 @@ export const usePeople = () => {
   }, [authorizedGet, setPeople]);
 
   const createPerson = useCallback(
-    (givenNames, surname, genderId) => {
+    (givenNames, surname, genderId) =>
       authorizedPost('/people', {
         givenNames,
         surname,
         genderId,
       }).then((person) => {
         setPeople([...people, person]);
-      });
-    },
+      }),
     [authorizedPost, people, setPeople],
   );
 
-  return useMemo(() => ({ people, createPerson }), [people, createPerson]);
+  const reloadPeople = useCallback(
+    () => authorizedGet('/people').then(setPeople),
+    [authorizedGet, setPeople],
+  );
+
+  return { people, createPerson, reloadPeople };
 };

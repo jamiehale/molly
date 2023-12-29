@@ -8,7 +8,7 @@ import {
   postChildResource,
 } from '../resource-helpers';
 import * as V from '../validation';
-import * as U from '../util';
+import * as J from '../jlib';
 import { ParameterError } from '../error';
 
 const query = () =>
@@ -63,7 +63,7 @@ const postParentBody = (validParentFn, validParentRoleFn) =>
     ),
   });
 
-const toResult = U.pick([
+const toResult = J.pick([
   'id',
   'givenNames',
   'surname',
@@ -71,7 +71,7 @@ const toResult = U.pick([
   'creatorId',
 ]);
 
-const toChildResult = U.pick([
+const toChildResult = J.pick([
   'id',
   'givenNames',
   'surname',
@@ -81,7 +81,7 @@ const toChildResult = U.pick([
   'parentRoleTitle',
 ]);
 
-const toParentResult = U.pick([
+const toParentResult = J.pick([
   'id',
   'givenNames',
   'surname',
@@ -105,9 +105,9 @@ export const personRoutes = ({
     ),
     getAllResources('/people', query(), ({ query }) => {
       if (query.q) {
-        return personRepo.queryPeople(query.q).then(U.map(toResult));
+        return personRepo.queryPeople(query.q).then(J.map(toResult));
       }
-      return personRepo.readAllPeople().then(U.map(toResult));
+      return personRepo.readAllPeople().then(J.map(toResult));
     }),
     postResource(
       '/people',
@@ -115,9 +115,9 @@ export const personRoutes = ({
       ({ userId, body }) =>
         personRepo
           .createPerson(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['givenNames', 'surname', 'genderId']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['givenNames', 'surname', 'genderId']),
             )(body),
           )
           .then(toResult),
@@ -130,9 +130,9 @@ export const personRoutes = ({
         personRepo
           .updatePerson(
             params.id,
-            U.compose(
-              U.filterEmptyProps,
-              U.pick(['givenNames', 'surname', 'genderId']),
+            J.compose(
+              J.filterEmptyProps,
+              J.pick(['givenNames', 'surname', 'genderId']),
             )(body),
           )
           .then(toResult),
@@ -143,7 +143,7 @@ export const personRoutes = ({
       ({ params }) =>
         childRepo
           .readAllChildren({ parentId: params.id })
-          .then(U.map(toChildResult)),
+          .then(J.map(toChildResult)),
     ),
     postChildResource(
       '/people/:id/children',
@@ -151,10 +151,10 @@ export const personRoutes = ({
       postChildBody(personRepo.personExists, parentRoleRepo.parentRoleExists),
       ({ params, body, userId }) =>
         parentChildRepo.createParentChild(
-          U.compose(
-            U.assoc('creatorId', userId),
-            U.assoc('parentId', params.id),
-            U.pick(['childId', 'parentRoleId']),
+          J.compose(
+            J.assoc('creatorId', userId),
+            J.assoc('parentId', params.id),
+            J.pick(['childId', 'parentRoleId']),
           )(body),
         ),
     ),
@@ -164,7 +164,7 @@ export const personRoutes = ({
       ({ params }) =>
         parentRepo
           .readAllParents({ childId: params.id })
-          .then(U.map(toParentResult)),
+          .then(J.map(toParentResult)),
     ),
     postChildResource(
       '/people/:id/parents',
@@ -172,10 +172,10 @@ export const personRoutes = ({
       postParentBody(personRepo.personExists, parentRoleRepo.parentRoleExists),
       ({ params, body, userId }) =>
         parentChildRepo.createParentChild(
-          U.compose(
-            U.assoc('creatorId', userId),
-            U.assoc('childId', params.id),
-            U.pick(['parentId', 'parentRoleId']),
+          J.compose(
+            J.assoc('creatorId', userId),
+            J.assoc('childId', params.id),
+            J.pick(['parentId', 'parentRoleId']),
           )(body),
         ),
     ),

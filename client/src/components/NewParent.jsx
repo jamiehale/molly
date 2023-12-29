@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useCallback, useState } from 'react';
 import { useParentRoles } from '../hooks/parent-roles';
 import { usePeopleSearch } from '../hooks/people-search';
-import * as J from 'jlib';
+import * as J from '../lib/jlib';
 import { useParents } from '../hooks/parents';
 import { NewParentForm } from './NewParentForm';
 

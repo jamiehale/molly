@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from './api';
 
 export const usePerson = (id) => {
@@ -9,5 +9,5 @@ export const usePerson = (id) => {
     authorizedGet(`/people/${id}`).then(setPerson);
   }, [id, authorizedGet, setPerson]);
 
-  return useMemo(() => ({ person }), [person]);
+  return { person };
 };

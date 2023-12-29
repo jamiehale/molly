@@ -6,7 +6,7 @@ import {
   patchResource,
 } from '../resource-helpers';
 import * as V from '../validation';
-import * as U from '../util';
+import * as J from '../jlib';
 import { ParameterError } from '../error';
 
 const postBody = () =>
@@ -22,7 +22,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'value']);
+const toResult = J.pick(['id', 'value']);
 
 export const locationRoutes = ({ locationRepo }) =>
   routes([
@@ -32,12 +32,12 @@ export const locationRoutes = ({ locationRepo }) =>
       ({ params }) => locationRepo.readLocation(params.id).then(toResult),
     ),
     getAllResources('/locations', V.any(), () =>
-      locationRepo.readAllLocations().then(U.map(toResult)),
+      locationRepo.readAllLocations().then(J.map(toResult)),
     ),
     postResource('/locations', postBody(), ({ userId, body }) =>
       locationRepo
         .createLocation(
-          U.compose(U.assoc('creatorId', userId), U.pick(['value']))(body),
+          J.compose(J.assoc('creatorId', userId), J.pick(['value']))(body),
         )
         .then(toResult),
     ),
@@ -49,7 +49,7 @@ export const locationRoutes = ({ locationRepo }) =>
         locationRepo
           .updateLocation(
             params.id,
-            U.compose(U.filterEmptyProps, U.pick(['value']))(body),
+            J.compose(J.filterEmptyProps, J.pick(['value']))(body),
           )
           .then(toResult),
     ),

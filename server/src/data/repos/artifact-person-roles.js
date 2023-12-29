@@ -6,16 +6,16 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
 });
 
 export const createArtifactPersonRoleRepo = ({ artifactPersonRoleStore }) => ({
@@ -27,7 +27,7 @@ export const createArtifactPersonRoleRepo = ({ artifactPersonRoleStore }) => ({
   readArtifactPersonRole: readResource(artifactPersonRoleStore, toModel),
   readAllArtifactPersonRoles: readAllResources(
     artifactPersonRoleStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   artifactPersonRoleExists: resourceExists(artifactPersonRoleStore),

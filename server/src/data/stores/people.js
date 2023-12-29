@@ -1,7 +1,7 @@
 import { createResourceStore } from '../resource-store';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const queryPeople = U.curry((db, q) =>
+const queryPeople = J.curry((db, q) =>
   db('people')
     .whereILike('given_names', `%${q}%`)
     .orWhereILike('surname', `%${q}%`)

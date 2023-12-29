@@ -6,16 +6,16 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  value: U.prop('value'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  value: J.prop('value'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  value: U.prop('value'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  value: J.prop('value'),
 });
 
 export const createLocationRepo = ({ locationStore }) => ({
@@ -23,7 +23,7 @@ export const createLocationRepo = ({ locationStore }) => ({
   readLocation: readResource(locationStore, toModel),
   readAllLocations: readAllResources(
     locationStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   locationExists: resourceExists(locationStore),

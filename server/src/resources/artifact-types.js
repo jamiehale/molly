@@ -6,7 +6,7 @@ import {
   patchResource,
   postResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const postBody = (validArtifactTypeFn) =>
@@ -23,7 +23,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'title']);
+const toResult = J.pick(['id', 'title']);
 
 export const artifactTypeRoutes = ({ artifactTypeRepo }) =>
   routes([
@@ -34,17 +34,17 @@ export const artifactTypeRoutes = ({ artifactTypeRepo }) =>
         artifactTypeRepo.readArtifactType(params.id).then(toResult),
     ),
     getAllResources('/artifact-types', V.any(), () =>
-      artifactTypeRepo.readAllArtifactTypes().then(U.map(toResult)),
+      artifactTypeRepo.readAllArtifactTypes().then(J.map(toResult)),
     ),
     postResource(
       '/artifact-types',
-      postBody((id) => artifactTypeRepo.artifactTypeExists(id).then(U.not)),
+      postBody((id) => artifactTypeRepo.artifactTypeExists(id).then(J.not)),
       ({ userId, body }) =>
         artifactTypeRepo
           .createArtifactType(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['id', 'title']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['id', 'title']),
             )(body),
           )
           .then(toResult),
@@ -57,7 +57,7 @@ export const artifactTypeRoutes = ({ artifactTypeRepo }) =>
         artifactTypeRepo
           .updateArtifactType(
             params.id,
-            U.compose(U.filterEmptyProps, U.pick(['title']))(body),
+            J.compose(J.filterEmptyProps, J.pick(['title']))(body),
           )
           .then(toResult),
     ),

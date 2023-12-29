@@ -8,7 +8,7 @@ import {
   postChildResource,
 } from '../resource-helpers';
 import * as V from '../validation';
-import * as U from '../util';
+import * as J from '../jlib';
 import { ParameterError } from '../error';
 
 const postBody = () =>
@@ -44,7 +44,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick([
+const toResult = J.pick([
   'id',
   'title',
   'shortName',
@@ -52,7 +52,7 @@ const toResult = U.pick([
   'creatorId',
 ]);
 
-const toArtifactResult = U.pick([
+const toArtifactResult = J.pick([
   'id',
   'title',
   'description',
@@ -76,14 +76,14 @@ export const artifactCollectionRoutes = ({
         artifactCollectionRepo.readArtifactCollection(params.id).then(toResult),
     ),
     getAllResources('/artifact-collections', V.any(), () =>
-      artifactCollectionRepo.readAllArtifactCollections().then(U.map(toResult)),
+      artifactCollectionRepo.readAllArtifactCollections().then(J.map(toResult)),
     ),
     postResource('/artifact-collections', postBody(), ({ userId, body }) =>
       artifactCollectionRepo
         .createArtifactCollection(
-          U.compose(
-            U.assoc('creatorId', userId),
-            U.pick(['title', 'shortName', 'description', 'creatorId']),
+          J.compose(
+            J.assoc('creatorId', userId),
+            J.pick(['title', 'shortName', 'description', 'creatorId']),
           )(body),
         )
         .then(toResult),
@@ -96,9 +96,9 @@ export const artifactCollectionRoutes = ({
         artifactCollectionRepo
           .updateArtifactCollection(
             params.id,
-            U.compose(
-              U.filterEmptyProps,
-              U.pick(['title', 'shortName', 'description']),
+            J.compose(
+              J.filterEmptyProps,
+              J.pick(['title', 'shortName', 'description']),
             )(body),
           )
           .then(toResult),
@@ -109,7 +109,7 @@ export const artifactCollectionRoutes = ({
       ({ params }) =>
         artifactRepo
           .readAllArtifacts({ collectionId: params.id })
-          .then(U.map(toArtifactResult)),
+          .then(J.map(toArtifactResult)),
     ),
     postChildResource(
       '/artifact-collections/:id/artifacts',
@@ -121,10 +121,10 @@ export const artifactCollectionRoutes = ({
       ({ userId, params, body }) =>
         artifactRepo
           .createArtifact(
-            U.compose(
-              U.assoc('collectionId', params.id),
-              U.assoc('creatorId', userId),
-              U.pick([
+            J.compose(
+              J.assoc('collectionId', params.id),
+              J.assoc('creatorId', userId),
+              J.pick([
                 'title',
                 'description',
                 'typeId',

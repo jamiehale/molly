@@ -6,7 +6,7 @@ import {
   getAllChildResources,
   postChildResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const postAssetBody = (validVaultFn) =>
@@ -31,7 +31,7 @@ const patchBody = (validArtifactTypeFn, validArtifactSourceFn) =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick([
+const toResult = J.pick([
   'id',
   'title',
   'description',
@@ -41,7 +41,7 @@ const toResult = U.pick([
   'creatorId',
 ]);
 
-const toAssetResult = U.pick([
+const toAssetResult = J.pick([
   'id',
   'filename',
   'mimetype',
@@ -50,7 +50,7 @@ const toAssetResult = U.pick([
   'creatorId',
 ]);
 
-const toArtifactPersonResult = U.pick([]);
+const toArtifactPersonResult = J.pick([]);
 
 export const artifactRoutes = ({
   artifactPersonRepo,
@@ -67,7 +67,7 @@ export const artifactRoutes = ({
       ({ params }) => artifactRepo.readArtifact(params.id).then(toResult),
     ),
     getAllResources('/artifacts', V.any(), () =>
-      artifactRepo.readAllArtifacts().then(U.map(toResult)),
+      artifactRepo.readAllArtifacts().then(J.map(toResult)),
     ),
     // no post
     patchResource(
@@ -81,9 +81,9 @@ export const artifactRoutes = ({
         artifactRepo
           .updateArtifact(
             params.id,
-            U.compose(
-              U.filterEmptyProps,
-              U.pick(['title', 'description', 'typeId', 'sourceId']),
+            J.compose(
+              J.filterEmptyProps,
+              J.pick(['title', 'description', 'typeId', 'sourceId']),
             )(body),
           )
           .then(toResult),
@@ -94,7 +94,7 @@ export const artifactRoutes = ({
       ({ params }) =>
         assetRepo
           .readAllAssets({ artifactId: params.id })
-          .then(U.map(toAssetResult)),
+          .then(J.map(toAssetResult)),
     ),
     postChildResource(
       '/artifacts/:id/assets',
@@ -103,10 +103,10 @@ export const artifactRoutes = ({
       ({ userId, params, body }) =>
         assetRepo
           .createAsset(
-            U.compose(
-              U.assoc('artifactId', params.id),
-              U.assoc('creatorId', userId),
-              U.pick(['filename', 'mimetype', 'vaultId']),
+            J.compose(
+              J.assoc('artifactId', params.id),
+              J.assoc('creatorId', userId),
+              J.pick(['filename', 'mimetype', 'vaultId']),
             )(body),
           )
           .then(toAssetResult),
@@ -117,6 +117,6 @@ export const artifactRoutes = ({
       ({ params }) =>
         artifactPersonRepo
           .readAllArtifactPeople({ artifactId: params.id })
-          .then(U.map(toArtifactPersonResult)),
+          .then(J.map(toArtifactPersonResult)),
     ),
   ]);

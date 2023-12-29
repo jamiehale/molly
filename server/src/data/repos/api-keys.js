@@ -6,21 +6,21 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  user_id: U.prop('userId'),
-  secret: U.prop('secret'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  user_id: J.prop('userId'),
+  secret: J.prop('secret'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  userId: U.prop('user_id'),
-  secret: U.prop('secret'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  userId: J.prop('user_id'),
+  secret: J.prop('secret'),
 });
 
-const readBySecret = U.curry((apiKeyStore, toModel, secret) =>
+const readBySecret = J.curry((apiKeyStore, toModel, secret) =>
   apiKeyStore.readSingle({ secret }).then(toModel),
 );
 

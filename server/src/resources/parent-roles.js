@@ -6,7 +6,7 @@ import {
   patchResource,
   postResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const postBody = (validParentRoleFn) =>
@@ -23,7 +23,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'title']);
+const toResult = J.pick(['id', 'title']);
 
 export const parentRoleRoutes = ({ parentRoleRepo }) =>
   routes([
@@ -33,17 +33,17 @@ export const parentRoleRoutes = ({ parentRoleRepo }) =>
       ({ params }) => parentRoleRepo.readParentRole(params.id).then(toResult),
     ),
     getAllResources('/parent-roles', V.any(), () =>
-      parentRoleRepo.readAllParentRoles().then(U.map(toResult)),
+      parentRoleRepo.readAllParentRoles().then(J.map(toResult)),
     ),
     postResource(
       '/parent-roles',
-      postBody((id) => parentRoleRepo.parentRoleExists(id).then(U.not)),
+      postBody((id) => parentRoleRepo.parentRoleExists(id).then(J.not)),
       ({ userId, body }) =>
         parentRoleRepo
           .createParentRole(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['id', 'title']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['id', 'title']),
             )(body),
           )
           .then(toResult),
@@ -56,7 +56,7 @@ export const parentRoleRoutes = ({ parentRoleRepo }) =>
         parentRoleRepo
           .updateParentRole(
             params.id,
-            U.compose(U.filterEmptyProps, U.pick(['title']))(body),
+            J.compose(J.filterEmptyProps, J.pick(['title']))(body),
           )
           .then(toResult),
     ),

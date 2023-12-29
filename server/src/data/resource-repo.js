@@ -1,5 +1,5 @@
 import { toInternalError } from '../error';
-import * as U from '../util';
+import * as J from '../jlib';
 
 export const createResource =
   (store, fromModelFn, toModelFn) => (newResource) =>
@@ -16,7 +16,7 @@ export const readAllResources =
   (filters = {}) =>
     store
       .readAll(fromModelFn(filters))
-      .then(U.map(toModelFn))
+      .then(J.map(toModelFn))
       .catch(toInternalError);
 
 export const resourceExists = (store) => (id) =>
@@ -33,5 +33,5 @@ export const updateAllResources =
   (store, fromModelFn, toModelFn) => async (filters, fields) =>
     store
       .updateAll(fromModelFn(filters), fromModelFn(fields))
-      .then(U.map(toModelFn))
+      .then(J.map(toModelFn))
       .catch(toInternalError);

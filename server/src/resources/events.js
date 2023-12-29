@@ -6,7 +6,7 @@ import {
   patchResource,
 } from '../resource-helpers';
 import * as V from '../validation';
-import * as U from '../util';
+import * as J from '../jlib';
 import { ParameterError } from '../error';
 
 const postBody = (validEventTypeFn, validLocationFn) =>
@@ -36,7 +36,7 @@ const patchBody = (validEventTypeFn, validLocationFn) =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'title', 'typeId', 'dateValue', 'locationId']);
+const toResult = J.pick(['id', 'title', 'typeId', 'dateValue', 'locationId']);
 
 export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
   routes([
@@ -44,7 +44,7 @@ export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
       eventRepo.readEvent(params.id).then(toResult),
     ),
     getAllResources('/events', V.any(), () =>
-      eventRepo.readAllEvents().then(U.map(toResult)),
+      eventRepo.readAllEvents().then(J.map(toResult)),
     ),
     postResource(
       '/events',
@@ -52,9 +52,9 @@ export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
       ({ userId, body }) =>
         eventRepo
           .createEvent(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['title', 'typeId', 'dateValue', 'locationId']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['title', 'typeId', 'dateValue', 'locationId']),
             )(body),
           )
           .then(toResult),
@@ -67,9 +67,9 @@ export const eventRoutes = ({ eventRepo, eventTypeRepo, locationRepo }) =>
         eventRepo
           .updateEvent(
             params.id,
-            U.compose(
-              U.filterEmptyProps,
-              U.pick(['title', 'typeId', 'dateValue', 'locationId']),
+            J.compose(
+              J.filterEmptyProps,
+              J.pick(['title', 'typeId', 'dateValue', 'locationId']),
             )(body),
           )
           .then(toResult),

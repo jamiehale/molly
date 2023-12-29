@@ -6,22 +6,22 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
-  short_name: U.prop('shortName'),
-  description: U.prop('description'),
-  creator_id: U.prop('creatorId'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
+  short_name: J.prop('shortName'),
+  description: J.prop('description'),
+  creator_id: J.prop('creatorId'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
-  shortName: U.prop('short_name'),
-  description: U.prop('description'),
-  creatorId: U.prop('creator_id'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
+  shortName: J.prop('short_name'),
+  description: J.prop('description'),
+  creatorId: J.prop('creator_id'),
 });
 
 export const createArtifactCollectionRepo = ({ artifactCollectionStore }) => ({
@@ -33,7 +33,7 @@ export const createArtifactCollectionRepo = ({ artifactCollectionStore }) => ({
   readArtifactCollection: readResource(artifactCollectionStore, toModel),
   readAllArtifactCollections: readAllResources(
     artifactCollectionStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   artifactCollectionExists: resourceExists(artifactCollectionStore),

@@ -5,7 +5,7 @@ import { SelectField } from './SelectField';
 import { FlexRow } from './FlexRow';
 import { Button } from './Button';
 import { PersonSelectField } from './PersonSelectField';
-import * as J from 'jlib';
+import * as J from '../lib/jlib';
 
 export const NewChildForm = ({
   people,

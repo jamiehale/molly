@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { useParentRoles } from '../hooks/parent-roles';
 import { usePeopleSearch } from '../hooks/people-search';
 import { NewChildForm } from './NewChildForm';
-import * as J from 'jlib';
+import * as J from '../lib/jlib';
 import { useChildren } from '../hooks/children';
 
 export const NewChild = ({ parentId, onNewChild }) => {

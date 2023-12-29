@@ -1,32 +1,3 @@
-export const firstRecord = (records) => records[0];
-
-export const throwIfNil = (eFn) => (v) => {
-  if (!v) {
-    throw eFn();
-  }
-  return v;
-};
-
-export const throwIfEmpty = (eFn) => (v) => {
-  if (Array.isArray(v) && v.length === 0) {
-    throw eFn();
-  }
-  return v;
-};
-
-export const throwIfFalse = (eFn) => (v) => {
-  if (!v) {
-    throw eFn();
-  }
-  return v;
-};
-
-export const thunk =
-  (f) =>
-  (...args) =>
-  () =>
-    f(...args);
-
 export const curry = (func) => {
   const curried = (...args) => {
     if (args.length >= func.length) {
@@ -40,6 +11,37 @@ export const curry = (func) => {
   return curried;
 };
 
+export const prop = curry((s, o) => o[s]);
+
+export const first = (os) => os[0];
+
+export const throwIfNil = curry((eFn, v) => {
+  if (!v) {
+    throw eFn();
+  }
+  return v;
+});
+
+export const throwIfEmpty = curry((eFn, v) => {
+  if (Array.isArray(v) && v.length === 0) {
+    throw eFn();
+  }
+  return v;
+});
+
+export const throwIfFalse = curry((eFn, v) => {
+  if (!v) {
+    throw eFn();
+  }
+  return v;
+});
+
+export const thunk =
+  (f) =>
+  (...args) =>
+  () =>
+    f(...args);
+
 export const identity = (v) => v;
 export const identityP = async (v) => v;
 
@@ -50,8 +52,6 @@ export const ifElse = curry((condFn, trueFn, falseFn, v) =>
 );
 
 export const isUndefined = (v) => v === undefined;
-
-export const prop = curry((s, o) => o[s]);
 
 export const eq = curry((expected, value) => value === expected);
 export const gte = curry((limit, value) => value >= limit);

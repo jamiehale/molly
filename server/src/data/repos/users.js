@@ -6,14 +6,14 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
+const fromModel = J.transform({
+  id: J.prop('id'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
+const toModel = J.transform({
+  id: J.prop('id'),
 });
 
 export const createUserRepo = ({ userStore }) => ({

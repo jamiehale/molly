@@ -6,22 +6,22 @@ import {
   updateAllResources,
   updateResource,
 } from '../resource-repo';
-import * as U from '../../util';
+import * as J from '../../jlib';
 
-const fromModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
-  type_id: U.prop('typeId'),
-  date_value: U.prop('dateValue'),
-  location_id: U.prop('locationId'),
+const fromModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
+  type_id: J.prop('typeId'),
+  date_value: J.prop('dateValue'),
+  location_id: J.prop('locationId'),
 });
 
-const toModel = U.transform({
-  id: U.prop('id'),
-  title: U.prop('title'),
-  typeId: U.prop('type_id'),
-  dateValue: U.prop('date_value'),
-  locationId: U.prop('location_id'),
+const toModel = J.transform({
+  id: J.prop('id'),
+  title: J.prop('title'),
+  typeId: J.prop('type_id'),
+  dateValue: J.prop('date_value'),
+  locationId: J.prop('location_id'),
 });
 
 export const createEventRepo = ({ eventStore }) => ({
@@ -29,7 +29,7 @@ export const createEventRepo = ({ eventStore }) => ({
   readEvent: readResource(eventStore, toModel),
   readAllEvents: readAllResources(
     eventStore,
-    U.compose(U.filterEmptyProps, fromModel),
+    J.compose(J.filterEmptyProps, fromModel),
     toModel,
   ),
   eventExists: resourceExists(eventStore),

@@ -7,8 +7,7 @@ import {
   isParameterError,
   isUnauthorizedError,
 } from './error';
-import { throwIfNil } from './util';
-import * as U from './util';
+import * as J from './jlib';
 import * as V from './validation';
 
 const withUserId = async (context) => {
@@ -48,7 +47,7 @@ const withContext = (fn) => async (req, res, next) =>
 
 const withJsonResponse = (context) =>
   fn(context)
-    .then(throwIfNil(() => new InternalError('Invalid response')))
+    .then(J.throwIfNil(() => new InternalError('Invalid response')))
     .then((responseValue) => {
       context.res.json(responseValue);
     });
@@ -94,7 +93,7 @@ export const getSingleResource =
     router.get(
       path,
       withContext(
-        U.composeP(
+        J.composeP(
           readResourceFn,
           withParams(resourceParams(validateResourceIdFn)),
           withUserId,
@@ -107,7 +106,7 @@ export const getAllResources =
     router.get(
       path,
       withContext(
-        U.composeP(readAllResourcesFn, withQuery(validateQueryFn), withUserId),
+        J.composeP(readAllResourcesFn, withQuery(validateQueryFn), withUserId),
       ),
     );
 
@@ -116,7 +115,7 @@ export const postResource =
     router.post(
       path,
       withContext(
-        U.composeP(createResourceFn, withBody(validateBodyFn), withUserId),
+        J.composeP(createResourceFn, withBody(validateBodyFn), withUserId),
       ),
     );
 
@@ -125,7 +124,7 @@ export const patchResource =
     router.patch(
       path,
       withContext(
-        U.composeP(
+        J.composeP(
           updateResourceFn,
           withBody(validateBodyFn),
           withParams(resourceParams(validateResourceIdFn)),
@@ -139,7 +138,7 @@ export const getAllChildResources =
     router.get(
       path,
       withContext(
-        U.composeP(
+        J.composeP(
           readAllResourcesFn,
           withParams(resourceParams(validateResourceFn)),
           withUserId,
@@ -152,7 +151,7 @@ export const postChildResource =
     router.post(
       path,
       withContext(
-        U.composeP(
+        J.composeP(
           createResourceFn,
           withBody(validateBodyFn),
           withParams(resourceParams(validateResourceFn)),

@@ -6,7 +6,7 @@ import {
   patchResource,
   postResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const postBody = (validArtifactSourceFn) =>
@@ -27,7 +27,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'title']);
+const toResult = J.pick(['id', 'title']);
 
 export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
   routes([
@@ -38,17 +38,17 @@ export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
         artifactSourceRepo.readArtifactSource(params.id).then(toResult),
     ),
     getAllResources('/artifact-sources', V.any(), () =>
-      artifactSourceRepo.readAllArtifactSources().then(U.map(toResult)),
+      artifactSourceRepo.readAllArtifactSources().then(J.map(toResult)),
     ),
     postResource(
       '/artifact-sources',
-      postBody((id) => artifactSourceRepo.artifactSourceExists(id).then(U.not)),
+      postBody((id) => artifactSourceRepo.artifactSourceExists(id).then(J.not)),
       ({ userId, body }) =>
         artifactSourceRepo
           .createArtifactSource(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['id', 'title']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['id', 'title']),
             )(body),
           )
           .then(toResult),
@@ -61,7 +61,7 @@ export const artifactSourceRoutes = ({ artifactSourceRepo }) =>
         artifactSourceRepo
           .updateArtifactSource(
             params.id,
-            U.compose(U.filterEmptyProps, U.pick(['title']))(body),
+            J.compose(J.filterEmptyProps, J.pick(['title']))(body),
           )
           .then(toResult),
     ),

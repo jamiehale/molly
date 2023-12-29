@@ -5,7 +5,7 @@ import {
   getAllResources,
   patchResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const patchBody = (validVaultFn) =>
@@ -18,7 +18,7 @@ const patchBody = (validVaultFn) =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick([
+const toResult = J.pick([
   'id',
   'filename',
   'mimetype',
@@ -33,7 +33,7 @@ export const assetRoutes = ({ assetRepo, vaultRepo }) =>
       assetRepo.readAsset(params.id).then(toResult),
     ),
     getAllResources('/assets', V.any(), () =>
-      assetRepo.readAllAssets().then(U.map(toResult)),
+      assetRepo.readAllAssets().then(J.map(toResult)),
     ),
     // no post
     patchResource(
@@ -44,9 +44,9 @@ export const assetRoutes = ({ assetRepo, vaultRepo }) =>
         assetRepo
           .updateAsset(
             params.id,
-            U.compose(
-              U.filterEmptyProps,
-              U.pick(['filename', 'mimetype', 'vaultId']),
+            J.compose(
+              J.filterEmptyProps,
+              J.pick(['filename', 'mimetype', 'vaultId']),
             )(body),
           )
           .then(toResult),

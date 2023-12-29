@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticated } from './middleware/authentication';
-import { userRoutes } from './resources/users';
+// import { userRoutes } from './resources/users';
 import { artifactRoutes } from './resources/artifacts';
 import { artifactTypeRoutes } from './resources/artifact-types';
 import { assetRoutes } from './resources/assets';

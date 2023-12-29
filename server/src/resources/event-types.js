@@ -6,7 +6,7 @@ import {
   patchResource,
   postResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const postBody = (validEventTypeFn) =>
@@ -23,7 +23,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'title']);
+const toResult = J.pick(['id', 'title']);
 
 export const eventTypeRoutes = ({ eventTypeRepo }) =>
   routes([
@@ -33,17 +33,17 @@ export const eventTypeRoutes = ({ eventTypeRepo }) =>
       ({ params }) => eventTypeRepo.readEventType(params.id).then(toResult),
     ),
     getAllResources('/event-types', V.any(), () =>
-      eventTypeRepo.readAllEventTypes().then(U.map(toResult)),
+      eventTypeRepo.readAllEventTypes().then(J.map(toResult)),
     ),
     postResource(
       '/event-types',
-      postBody((id) => eventTypeRepo.eventTypeExists(id).then(U.not)),
+      postBody((id) => eventTypeRepo.eventTypeExists(id).then(J.not)),
       ({ userId, body }) =>
         eventTypeRepo
           .createEventType(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['id', 'title']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['id', 'title']),
             )(body),
           )
           .then(toResult),
@@ -56,7 +56,7 @@ export const eventTypeRoutes = ({ eventTypeRepo }) =>
         eventTypeRepo
           .updateEventType(
             params.id,
-            U.compose(U.filterEmptyProps, U.pick(['title']))(body),
+            J.compose(J.filterEmptyProps, J.pick(['title']))(body),
           )
           .then(toResult),
     ),

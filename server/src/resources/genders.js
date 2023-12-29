@@ -6,7 +6,7 @@ import {
   patchResource,
   postResource,
 } from '../resource-helpers';
-import * as U from '../util';
+import * as J from '../jlib';
 import * as V from '../validation';
 
 const postBody = (validGenderFn) =>
@@ -23,7 +23,7 @@ const patchBody = () =>
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
   );
 
-const toResult = U.pick(['id', 'title']);
+const toResult = J.pick(['id', 'title']);
 
 export const genderRoutes = ({ genderRepo }) =>
   routes([
@@ -31,17 +31,17 @@ export const genderRoutes = ({ genderRepo }) =>
       genderRepo.readGender(params.id).then(toResult),
     ),
     getAllResources('/genders', V.any(), () =>
-      genderRepo.readAllGenders().then(U.map(toResult)),
+      genderRepo.readAllGenders().then(J.map(toResult)),
     ),
     postResource(
       '/genders',
-      postBody((id) => genderRepo.genderExists(id).then(U.not)),
+      postBody((id) => genderRepo.genderExists(id).then(J.not)),
       ({ userId, body }) =>
         genderRepo
           .createGender(
-            U.compose(
-              U.assoc('creatorId', userId),
-              U.pick(['id', 'title']),
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick(['id', 'title']),
             )(body),
           )
           .then(toResult),
@@ -54,7 +54,7 @@ export const genderRoutes = ({ genderRepo }) =>
         genderRepo
           .updateGender(
             params.id,
-            U.compose(U.filterEmptyProps, U.pick(['title']))(body),
+            J.compose(J.filterEmptyProps, J.pick(['title']))(body),
           )
           .then(toResult),
     ),
