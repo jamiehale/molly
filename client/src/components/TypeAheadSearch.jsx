@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDebounced } from '../hooks/debounced';
 import { Typography } from './Typography';
 import { TextInput } from './TextInput';
@@ -12,8 +12,9 @@ export const TypeAheadSearch = ({
   onSearch,
   value,
   onChange,
+  autoFocus,
 }) => {
-  const [typedValue, setTypedValue] = useState(value);
+  const [typedValue, setTypedValue] = useState(value ? displayFn(value) : '');
   const debouncedTypedValue = useDebounced(typedValue);
 
   useEffect(() => {
@@ -22,15 +23,24 @@ export const TypeAheadSearch = ({
     }
   }, [debouncedTypedValue, onSearch]);
 
+  const handleFocus = useCallback((e) => {
+    e.target.select();
+  }, []);
+
   return (
     <>
-      <TextInput value={typedValue} onChange={setTypedValue} />
+      <TextInput
+        value={typedValue}
+        onChange={setTypedValue}
+        autoFocus={autoFocus}
+        onFocus={handleFocus}
+      />
       {options.length > 0 ? (
         <PickList
           options={options}
           valueFn={valueFn}
           displayFn={displayFn}
-          value={value}
+          value={value ? valueFn(value) : ''}
           onChange={onChange}
         />
       ) : (
@@ -45,6 +55,7 @@ TypeAheadSearch.propTypes = {
   valueFn: PropTypes.func,
   displayFn: PropTypes.func,
   onSearch: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.object,
   onChange: PropTypes.func.isRequired,
+  autoFocus: PropTypes.bool,
 };

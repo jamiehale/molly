@@ -12,8 +12,8 @@ export const PersonSelectField = ({
   onSearch,
   valueFn,
   displayFn,
+  autoFocus,
 }) => {
-  console.log('PersonSelectField', value);
   const [editing, setEditing] = useState(!value);
 
   const peopleLookup = useMemo(
@@ -52,8 +52,9 @@ export const PersonSelectField = ({
           valueFn={valueFn}
           displayFn={displayFn}
           onSearch={onSearch}
-          value={value ? valueFn(value) : ''}
+          value={value}
           onChange={handleChange}
+          autoFocus={autoFocus}
         />
       ) : (
         <TextInput
@@ -75,4 +76,5 @@ PersonSelectField.propTypes = {
   onSearch: PropTypes.func.isRequired,
   valueFn: PropTypes.func.isRequired,
   displayFn: PropTypes.func.isRequired,
+  autoFocus: PropTypes.bool,
 };

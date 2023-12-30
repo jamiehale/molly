@@ -54,6 +54,7 @@ export const useForm = (fields, onSubmit) => {
       return {
         value: state.values[field],
         onChange: handleChangeField,
+        ...(state.fields[field].autoFocus ? { autoFocus: true } : {}),
       };
     },
     [state, dispatch],

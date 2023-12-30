@@ -17,7 +17,7 @@ export const NewChildForm = ({
 }) => {
   const { propsForField, propsForForm } = useForm(
     {
-      child: { initialValue: null },
+      child: { initialValue: null, autoFocus: true },
       parentRoleId: { initialValue: 'biological' },
     },
     ({ child, parentRoleId }) => {
