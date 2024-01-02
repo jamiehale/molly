@@ -3,6 +3,19 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ApiContext } from '../hooks/api';
 
+const handleError = (response) => {
+  if (!response.ok) {
+    let body;
+    try {
+      body = response.json();
+    } catch {
+      throw new Error(`Server returned ${response.status}`);
+    }
+    throw new Error(body.message);
+  }
+  return response;
+};
+
 export const ApiProvider = ({ baseUrl, children }) => {
   const [apiKey, setApiKey] = useState('12345');
 
@@ -11,7 +24,9 @@ export const ApiProvider = ({ baseUrl, children }) => {
       fetch(`${baseUrl}${path}`, {
         method: 'GET',
         headers: { Authorization: `ApiKey ${apiKey}` },
-      }).then((response) => response.json()),
+      })
+        .then(handleError)
+        .then((response) => response.json()),
     [baseUrl, apiKey],
   );
 
@@ -24,7 +39,9 @@ export const ApiProvider = ({ baseUrl, children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      }).then((response) => response.json()),
+      })
+        .then(handleError)
+        .then((response) => response.json()),
     [baseUrl, apiKey],
   );
 
@@ -37,7 +54,9 @@ export const ApiProvider = ({ baseUrl, children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-      }).then((response) => response.json()),
+      })
+        .then(handleError)
+        .then((response) => response.json()),
     [baseUrl, apiKey],
   );
 

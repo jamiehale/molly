@@ -10,6 +10,9 @@ export const Layout = ({ children }) => (
           <Link to="/">Home</Link>
         </ListItem>
         <ListItem>
+          <Link to="/events">Events</Link>
+        </ListItem>
+        <ListItem>
           <Link to="/people">People</Link>
         </ListItem>
       </List>

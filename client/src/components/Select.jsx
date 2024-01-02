@@ -18,6 +18,7 @@ export const Select = ({ options, valueFn, displayFn, value, onChange }) => {
       value={value}
       onChange={handleChange}
     >
+      <option value=""></option>
       {options.map((option) => (
         <option key={theValueFn(option)} value={theValueFn(option)}>
           {theDisplayFn(option)}

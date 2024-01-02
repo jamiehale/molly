@@ -11,6 +11,11 @@ const types = {
       {children}
     </p>
   ),
+  error: ({ className, children, ...props }) => (
+    <p className={classnames(className, 'italic text-red-600')} {...props}>
+      {children}
+    </p>
+  ),
 };
 
 export const Typography = ({ as, ...props }) => types[as || 'p'](props);

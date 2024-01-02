@@ -108,6 +108,13 @@ export const filterEmptyProps = (o) =>
     {},
   );
 
+export const isEmpty = (o) =>
+  o === null ||
+  o === undefined ||
+  o === '' ||
+  (Array.isArray(o) && o.length === 0) ||
+  Object.keys(o).length == 0;
+
 export const pick = curry((keys, o) =>
   keys.reduce(
     (acc, key) => ({

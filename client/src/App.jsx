@@ -3,6 +3,7 @@ import { Route, Router } from './components/Router';
 import { PeoplePage } from './components/PeoplePage';
 import { Home } from './components/Home';
 import { PersonPage } from './components/PersonPage';
+import { EventsPage } from './components/EventsPage';
 
 const App = () => {
   return (
@@ -15,6 +16,9 @@ const App = () => {
       </Route>
       <Route path="/people/:id">
         <PersonPage />
+      </Route>
+      <Route path="/events">
+        <EventsPage />
       </Route>
     </Router>
   );

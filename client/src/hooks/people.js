@@ -13,7 +13,7 @@ export const usePeople = () => {
 
   useEffect(() => {
     loadPeople();
-  }, [authorizedGet, setPeople]);
+  }, [loadPeople]);
 
   const createPerson = useCallback(
     (givenNames, surname, genderId) =>
