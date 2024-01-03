@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { classnames } from '../lib/classnames';
 
 export const List = ({ className, children, ...props }) => (
-  <ul className={classnames('m-1', className)} {...props}>
+  <ul className={classnames('space-y-2 font-medium', className)} {...props}>
     {children}
   </ul>
 );

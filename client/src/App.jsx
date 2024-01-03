@@ -4,7 +4,9 @@ import { PeoplePage } from './components/PeoplePage';
 import { Home } from './components/Home';
 import { PersonPage } from './components/PersonPage';
 import { EventsPage } from './components/EventsPage';
+import { EventPage } from './components/EventPage';
 import { LocationsPage } from './components/LocationsPage';
+import { LocationPage } from './components/LocationPage';
 
 const App = () => {
   return (
@@ -21,8 +23,14 @@ const App = () => {
       <Route path="/events">
         <EventsPage />
       </Route>
+      <Route path="/events/:id">
+        <EventPage />
+      </Route>
       <Route path="/locations">
         <LocationsPage />
+      </Route>
+      <Route path="/locations/:id">
+        <LocationPage />
       </Route>
     </Router>
   );

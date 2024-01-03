@@ -2,7 +2,7 @@ import { classnames } from '../lib/classnames';
 
 const types = {
   title: ({ className, children, ...props }) => (
-    <h1 className={classnames(className, '')} {...props}>
+    <h1 className={classnames('text-4xl mb-2', className)} {...props}>
       {children}
     </h1>
   ),

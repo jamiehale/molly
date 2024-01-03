@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import PropTypes from 'prop-types';
+import { classnames } from '../lib/classnames';
 
 const RouterContext = createContext({
   path: '',
@@ -70,7 +71,7 @@ Route.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const Link = ({ to, children }) => {
+export const Link = ({ className, to, children }) => {
   const { setPath } = useContext(RouterContext);
 
   const handleClick = useCallback(
@@ -83,13 +84,18 @@ export const Link = ({ to, children }) => {
   );
 
   return (
-    <a href={to} onClick={handleClick}>
+    <a
+      className={classnames('underline underline-offset-2', className)}
+      href={to}
+      onClick={handleClick}
+    >
       {children}
     </a>
   );
 };
 
 Link.propTypes = {
+  className: PropTypes.string,
   to: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };
