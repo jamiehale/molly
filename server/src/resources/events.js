@@ -38,13 +38,23 @@ const patchBody = (validEventTypeFn, validLocationFn) =>
 
 const toResult = J.pick(['id', 'title', 'typeId', 'dateValue', 'locationId']);
 
+const toDetailsResult = J.pick([
+  'id',
+  'title',
+  'typeId',
+  'typeTitle',
+  'dateValue',
+  'locationId',
+  'locationValue',
+]);
+
 export const eventRoutes = ({ eventsRepo, eventTypesRepo, locationsRepo }) =>
   routes([
     getSingleResource('/events/:id', eventsRepo.eventExists, ({ params }) =>
-      eventsRepo.readEvent(params.id).then(toResult),
+      eventsRepo.readEvent(params.id).then(toDetailsResult),
     ),
     getAllResources('/events', V.any(), () =>
-      eventsRepo.readAllEvents().then(J.map(toResult)),
+      eventsRepo.readAllEvents().then(J.map(toDetailsResult)),
     ),
     postResource(
       '/events',

@@ -1,8 +1,13 @@
 import PropTypes from 'prop-types';
+import { Typography } from './Typography';
 
 export const Form = ({ error, onSubmit, children }) => (
   <form className="flex flex-col p-1" onSubmit={onSubmit}>
-    {error && <p>{error}</p>}
+    {error && (
+      <Typography as="error" className={error ? '' : 'invisible'}>
+        {error}
+      </Typography>
+    )}
     {children}
   </form>
 );

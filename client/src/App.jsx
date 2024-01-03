@@ -4,6 +4,7 @@ import { PeoplePage } from './components/PeoplePage';
 import { Home } from './components/Home';
 import { PersonPage } from './components/PersonPage';
 import { EventsPage } from './components/EventsPage';
+import { LocationsPage } from './components/LocationsPage';
 
 const App = () => {
   return (
@@ -19,6 +20,9 @@ const App = () => {
       </Route>
       <Route path="/events">
         <EventsPage />
+      </Route>
+      <Route path="/locations">
+        <LocationsPage />
       </Route>
     </Router>
   );

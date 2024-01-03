@@ -6,7 +6,7 @@ import { Form } from './Form';
 import { FlexRow } from './FlexRow';
 import { SelectField } from './SelectField';
 import * as J from '../lib/jlib';
-import { required } from '../lib/validation';
+import { isValidDate, required } from '../lib/validation';
 
 export const EventForm = ({
   event,
@@ -15,7 +15,7 @@ export const EventForm = ({
   submitButtonText,
   onSubmit,
 }) => {
-  const { propsForField, propsForForm } = useForm(
+  const { formState, propsForField, propsForForm } = useForm(
     {
       title: {
         initialValue: event ? event.title : '',
@@ -27,7 +27,10 @@ export const EventForm = ({
       },
       dateValue: {
         initialValue: event ? event.dateValue : '',
-        validates: [required(() => 'Enter a date')],
+        validates: [
+          required(() => 'Enter a date'),
+          isValidDate(() => 'Enter a valid date value'),
+        ],
       },
       locationId: {
         initialValue: event ? event.locationId : '',
@@ -36,6 +39,8 @@ export const EventForm = ({
     },
     onSubmit,
   );
+
+  console.log(formState);
 
   return (
     <Form {...propsForForm()}>
@@ -52,7 +57,7 @@ export const EventForm = ({
       <SelectField
         label="Location"
         options={locations}
-        value={J.prop('id')}
+        valueFn={J.prop('id')}
         displayFn={J.prop('value')}
         includeEmpty
         {...propsForField('locationId')}

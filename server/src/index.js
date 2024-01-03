@@ -42,6 +42,7 @@ import { createParentRolesRepo } from './data/repos/parent-roles';
 import { createParentChildrenStore } from './data/stores/parent-children';
 import { createParentChildrenRepo } from './data/repos/parent-children';
 import { createPersonDetailsStore } from './data/stores/person-details';
+import { createEventDetailsStore } from './data/stores/event-details';
 
 config();
 
@@ -65,6 +66,7 @@ const stores = {
   artifactsStore: createArtifactsStore(db),
   assetsStore: createAssetsStore(db),
   childrenStore: createChildrenStore(db),
+  eventDetailsStore: createEventDetailsStore(db),
   eventTypesStore: createEventTypesStore(db),
   eventsStore: createEventsStore(db),
   gendersStore: createGendersStore(db),

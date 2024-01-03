@@ -3,11 +3,11 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { ApiContext } from '../hooks/api';
 
-const handleError = (response) => {
+const handleError = async (response) => {
   if (!response.ok) {
     let body;
     try {
-      body = response.json();
+      body = await response.json();
     } catch {
       throw new Error(`Server returned ${response.status}`);
     }
