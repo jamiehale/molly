@@ -5,7 +5,7 @@ import { useEvents } from '../hooks/events';
 import { useEventTypes } from '../hooks/event-types';
 import { useLocations } from '../hooks/locations';
 
-export const NewEvent = ({ onNewEvent }) => {
+export const NewEvent = ({ onNewEvent, onCancel }) => {
   const { createEvent } = useEvents();
   const { eventTypes } = useEventTypes();
   const { locations } = useLocations();
@@ -24,6 +24,7 @@ export const NewEvent = ({ onNewEvent }) => {
         eventTypes={eventTypes}
         locations={locations}
         onSubmit={handleSubmit}
+        onCancel={onCancel}
       />
     </div>
   );
@@ -31,4 +32,5 @@ export const NewEvent = ({ onNewEvent }) => {
 
 NewEvent.propTypes = {
   onNewEvent: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

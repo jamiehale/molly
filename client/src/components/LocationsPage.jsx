@@ -20,6 +20,7 @@ export const LocationsPage = () => {
               reloadLocations();
               onClose();
             }}
+            onCancel={onClose}
           />
         )}
       />

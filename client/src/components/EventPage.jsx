@@ -6,6 +6,9 @@ import { CustomToggle } from './CustomToggle';
 import { useEffect } from 'react';
 import { useEvent } from '../hooks/event';
 import { EditEvent } from './EditEvent';
+import { Event } from './Event';
+import { FlexColumn } from './FlexColumn';
+import { FlexRow } from './FlexRow';
 
 export const EventPage = ({ params }) => {
   const { event, reload: reloadEvent } = useEvent(params.id);
@@ -19,7 +22,7 @@ export const EventPage = ({ params }) => {
           <CustomToggle
             buttonText="Edit"
             renderOpen={(onClose) => (
-              <div>
+              <FlexColumn>
                 <Typography>Editing</Typography>
                 <EditEvent
                   event={event}
@@ -27,19 +30,19 @@ export const EventPage = ({ params }) => {
                     reloadEvent();
                     onClose();
                   }}
+                  onCancel={onClose}
                 />
-                <Button type="button" onClick={onClose}>
-                  Cancel
-                </Button>
-              </div>
+              </FlexColumn>
             )}
             renderClosed={(onOpen) => (
-              <div>
-                <Typography as="title">Event: {event.title}</Typography>
-                <Button type="button" onClick={onOpen}>
-                  Edit
-                </Button>
-              </div>
+              <FlexColumn>
+                <Event event={event} />
+                <FlexRow>
+                  <Button type="button" onClick={onOpen}>
+                    Edit
+                  </Button>
+                </FlexRow>
+              </FlexColumn>
             )}
           />
         </>

@@ -20,6 +20,7 @@ export const EventsPage = () => {
               reloadEvents();
               onClose();
             }}
+            onCancel={onClose}
           />
         )}
       />

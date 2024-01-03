@@ -5,7 +5,7 @@ import { useEventTypes } from '../hooks/event-types';
 import { useLocations } from '../hooks/locations';
 import { EventForm } from './EventForm';
 
-export const EditEvent = ({ event, onUpdateEvent }) => {
+export const EditEvent = ({ event, onUpdateEvent, onCancel }) => {
   const { updateEvent } = useEvent(event.id);
   const { eventTypes } = useEventTypes();
   const { locations } = useLocations();
@@ -27,6 +27,7 @@ export const EditEvent = ({ event, onUpdateEvent }) => {
         locations={locations}
         submitButtonText="Update"
         onSubmit={handleSubmit}
+        onCancel={onCancel}
       />
     </div>
   );
@@ -41,4 +42,5 @@ EditEvent.propTypes = {
     locationId: PropTypes.string,
   }).isRequired,
   onUpdateEvent: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

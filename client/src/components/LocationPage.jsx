@@ -27,10 +27,8 @@ export const LocationPage = ({ params }) => {
                     reloadLocation();
                     onClose();
                   }}
+                  onCancel={onClose}
                 />
-                <Button type="button" onClick={onClose}>
-                  Cancel
-                </Button>
               </div>
             )}
             renderClosed={(onOpen) => (

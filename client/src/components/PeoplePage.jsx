@@ -20,6 +20,7 @@ export const PeoplePage = () => {
               reloadPeople();
               onClose();
             }}
+            onCancel={onClose}
           />
         )}
       />

@@ -7,7 +7,13 @@ import { Form } from './Form';
 import { FlexRow } from './FlexRow';
 import * as J from '../lib/jlib';
 
-export const PersonForm = ({ person, genders, submitButtonText, onSubmit }) => {
+export const PersonForm = ({
+  person,
+  genders,
+  submitButtonText,
+  onSubmit,
+  onCancel,
+}) => {
   const { propsForField, propsForForm } = useForm(
     {
       givenNames: { initialValue: person ? person.givenNames : '' },
@@ -30,6 +36,9 @@ export const PersonForm = ({ person, genders, submitButtonText, onSubmit }) => {
       />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
+        <Button type="button" onClick={onCancel}>
+          Cancel
+        </Button>
       </FlexRow>
     </Form>
   );
@@ -50,4 +59,5 @@ PersonForm.propTypes = {
   ),
   submitButtonText: PropTypes.string,
   onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

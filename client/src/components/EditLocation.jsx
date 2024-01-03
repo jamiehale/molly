@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useLocation } from '../hooks/location';
 import { LocationForm } from './LocationForm';
 
-export const EditLocation = ({ location, onUpdateLocation }) => {
+export const EditLocation = ({ location, onUpdateLocation, onCancel }) => {
   const { updateLocation } = useLocation(location.id);
 
   const handleSubmit = useCallback(
@@ -21,6 +21,7 @@ export const EditLocation = ({ location, onUpdateLocation }) => {
         location={location}
         submitButtonText="Update"
         onSubmit={handleSubmit}
+        onCancel={onCancel}
       />
     </div>
   );
@@ -32,4 +33,5 @@ EditLocation.propTypes = {
     value: PropTypes.string.isRequired,
   }).isRequired,
   onUpdateLocation: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

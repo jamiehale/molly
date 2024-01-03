@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { LocationForm } from './LocationForm';
 import { useLocations } from '../hooks/locations';
 
-export const NewLocation = ({ onNewLocation }) => {
+export const NewLocation = ({ onNewLocation, onCancel }) => {
   const { createLocation } = useLocations();
 
   const handleSubmit = useCallback(
@@ -16,11 +16,12 @@ export const NewLocation = ({ onNewLocation }) => {
 
   return (
     <div className="max-w-md">
-      <LocationForm onSubmit={handleSubmit} />
+      <LocationForm onSubmit={handleSubmit} onCancel={onCancel} />
     </div>
   );
 };
 
 NewLocation.propTypes = {
   onNewLocation: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

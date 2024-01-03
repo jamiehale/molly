@@ -6,7 +6,12 @@ import { Form } from './Form';
 import { FlexRow } from './FlexRow';
 import { required } from '../lib/validation';
 
-export const LocationForm = ({ location, submitButtonText, onSubmit }) => {
+export const LocationForm = ({
+  location,
+  submitButtonText,
+  onSubmit,
+  onCancel,
+}) => {
   const { propsForField, propsForForm } = useForm(
     {
       value: {
@@ -22,6 +27,9 @@ export const LocationForm = ({ location, submitButtonText, onSubmit }) => {
       <TextField label="Value" {...propsForField('value')} />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
+        <Button type="button" onClick={onCancel}>
+          Cancel
+        </Button>
       </FlexRow>
     </Form>
   );
@@ -34,4 +42,5 @@ LocationForm.propTypes = {
   }),
   submitButtonText: PropTypes.string,
   onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { usePeople } from '../hooks/people';
 import { useGenders } from '../hooks/genders';
 
-export const NewPerson = ({ onNewPerson }) => {
+export const NewPerson = ({ onNewPerson, onCancel }) => {
   const { createPerson } = usePeople();
   const { genders } = useGenders();
 
@@ -19,11 +19,16 @@ export const NewPerson = ({ onNewPerson }) => {
 
   return (
     <div className="max-w-md">
-      <PersonForm genders={genders} onSubmit={handleSubmit} />
+      <PersonForm
+        genders={genders}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+      />
     </div>
   );
 };
 
 NewPerson.propTypes = {
   onNewPerson: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

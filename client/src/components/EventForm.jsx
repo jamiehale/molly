@@ -14,6 +14,7 @@ export const EventForm = ({
   locations,
   submitButtonText,
   onSubmit,
+  onCancel,
 }) => {
   const { formState, propsForField, propsForForm } = useForm(
     {
@@ -64,6 +65,9 @@ export const EventForm = ({
       />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
+        <Button type="button" onClick={onCancel}>
+          Cancel
+        </Button>
       </FlexRow>
     </Form>
   );
@@ -81,4 +85,5 @@ EventForm.propTypes = {
   locations: PropTypes.array,
   submitButtonText: PropTypes.string,
   onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

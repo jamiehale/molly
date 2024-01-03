@@ -14,6 +14,7 @@ export const NewChildForm = ({
   onSearch,
   parentRoles,
   onSubmit,
+  onCancel,
 }) => {
   const { propsForField, propsForForm } = useForm(
     {
@@ -44,6 +45,9 @@ export const NewChildForm = ({
       />
       <FlexRow className="mt-1">
         <Button type="submit">Add</Button>
+        <Button type="button" onClick={onCancel}>
+          Cancel
+        </Button>
       </FlexRow>
     </Form>
   );
@@ -67,4 +71,5 @@ NewChildForm.propTypes = {
   ),
   onSearch: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

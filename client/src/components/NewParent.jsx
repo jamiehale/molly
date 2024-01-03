@@ -6,7 +6,7 @@ import * as J from '../lib/jlib';
 import { useParents } from '../hooks/parents';
 import { NewParentForm } from './NewParentForm';
 
-export const NewParent = ({ childId, onNewParent }) => {
+export const NewParent = ({ childId, onNewParent, onCancel }) => {
   const { parentRoles } = useParentRoles();
   const { searchForPeople } = usePeopleSearch();
   const [searchResults, setSearchResults] = useState([]);
@@ -40,6 +40,7 @@ export const NewParent = ({ childId, onNewParent }) => {
         parentRoles={parentRoles}
         onSearch={handleSearch}
         onSubmit={handleSubmit}
+        onCancel={onCancel}
       />
     </div>
   );
@@ -48,4 +49,5 @@ export const NewParent = ({ childId, onNewParent }) => {
 NewParent.propTypes = {
   childId: PropTypes.string.isRequired,
   onNewParent: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };

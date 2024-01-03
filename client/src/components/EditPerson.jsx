@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useGenders } from '../hooks/genders';
 import { usePerson } from '../hooks/person';
 
-export const EditPerson = ({ person, onUpdatePerson }) => {
+export const EditPerson = ({ person, onUpdatePerson, onCancel }) => {
   const { updatePerson } = usePerson(person.id);
   const { genders } = useGenders();
 
@@ -24,6 +24,7 @@ export const EditPerson = ({ person, onUpdatePerson }) => {
         genders={genders}
         submitButtonText="Update"
         onSubmit={handleSubmit}
+        onCancel={onCancel}
       />
     </div>
   );
@@ -37,4 +38,5 @@ EditPerson.propTypes = {
     genderId: PropTypes.string.isRequired,
   }).isRequired,
   onUpdatePerson: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
