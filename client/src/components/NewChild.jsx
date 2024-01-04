@@ -13,12 +13,11 @@ export const NewChild = ({ parentId, onNewChild, onCancel }) => {
   const { addChild } = useChildren(parentId);
 
   const handleSubmit = useCallback(
-    ({ childId, parentRoleId }) => {
+    ({ childId, parentRoleId }) =>
       addChild(childId, parentRoleId).then(() => {
         setSearchResults([]);
         onNewChild();
-      });
-    },
+      }),
     [addChild, setSearchResults, onNewChild],
   );
 

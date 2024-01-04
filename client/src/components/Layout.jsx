@@ -33,6 +33,12 @@ export const Layout = ({ children }) => (
           <ListItem>
             <NavLink to="/locations">Locations</NavLink>
           </ListItem>
+          <ListItem>
+            <NavLink to="/artifacts">Artifacts</NavLink>
+          </ListItem>
+          <ListItem>
+            <NavLink to="/artifact-collections">Artifact Collections</NavLink>
+          </ListItem>
         </List>
       </div>
     </aside>

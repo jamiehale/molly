@@ -4,28 +4,28 @@ import { Layout } from './Layout';
 import { Button } from './Button';
 import { CustomToggle } from './CustomToggle';
 import { useEffect } from 'react';
-import { useLocation } from '../hooks/location';
-import { EditLocation } from './EditLocation';
+import { useArtifactCollection } from '../hooks/artifact-collection';
+import { EditArtifactCollection } from './EditArtifactCollection';
 
-export const LocationPage = ({ params }) => {
-  console.log('LocationPage');
-  const { location, reload: reloadLocation } = useLocation(params.id);
+export const ArtifactCollectionPage = ({ params }) => {
+  const { artifactCollection, reload: reloadArtifactCollection } =
+    useArtifactCollection(params.id);
 
-  useEffect(reloadLocation, [reloadLocation]);
+  useEffect(reloadArtifactCollection, [reloadArtifactCollection]);
 
   return (
     <Layout>
-      {location && (
+      {artifactCollection && (
         <>
           <CustomToggle
             buttonText="Edit"
             renderOpen={(onClose) => (
               <div>
                 <Typography>Editing</Typography>
-                <EditLocation
-                  location={location}
-                  onUpdateLocation={() => {
-                    reloadLocation();
+                <EditArtifactCollection
+                  artifactCollection={artifactCollection}
+                  onUpdateArtifactCollection={() => {
+                    reloadArtifactCollection();
                     onClose();
                   }}
                   onCancel={onClose}
@@ -34,7 +34,9 @@ export const LocationPage = ({ params }) => {
             )}
             renderClosed={(onOpen) => (
               <div>
-                <Typography as="title">Location: {location.value}</Typography>
+                <Typography as="title">
+                  Title: {artifactCollection.title}
+                </Typography>
                 <Button type="button" onClick={onOpen}>
                   Edit
                 </Button>
@@ -47,7 +49,7 @@ export const LocationPage = ({ params }) => {
   );
 };
 
-LocationPage.propTypes = {
+ArtifactCollectionPage.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }),

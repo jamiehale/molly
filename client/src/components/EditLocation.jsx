@@ -4,14 +4,14 @@ import { useLocation } from '../hooks/location';
 import { LocationForm } from './LocationForm';
 
 export const EditLocation = ({ location, onUpdateLocation, onCancel }) => {
+  console.log('EditLocation');
   const { updateLocation } = useLocation(location.id);
 
   const handleSubmit = useCallback(
-    ({ value }) => {
+    ({ value }) =>
       updateLocation(value).then(() => {
         onUpdateLocation();
-      });
-    },
+      }),
     [updateLocation, onUpdateLocation],
   );
 

@@ -4,30 +4,33 @@ import { TextField } from './TextField';
 import { Button } from './Button';
 import { Form } from './Form';
 import { FlexRow } from './FlexRow';
-import { required } from '../lib/validation';
 
-export const LocationForm = ({
-  location,
+export const ArtifactCollectionForm = ({
+  artifactCollection,
   submitButtonText,
   onSubmit,
   onCancel,
 }) => {
   const { propsForField, propsForForm } = useForm(
     {
-      value: {
-        initialValue: location ? location.value : '',
-        validates: [required(() => 'Enter a value')],
+      title: {
+        initialValue: artifactCollection ? artifactCollection.title : '',
+      },
+      shortName: {
+        initialValue: artifactCollection ? artifactCollection.shortName : '',
+      },
+      description: {
+        initialValue: artifactCollection ? artifactCollection.description : '',
       },
     },
-    (...args) => {
-      console.log('LocationForm', onSubmit, args);
-      return onSubmit(...args);
-    },
+    onSubmit,
   );
 
   return (
     <Form {...propsForForm()}>
-      <TextField label="Value" {...propsForField('value')} />
+      <TextField label="Title" {...propsForField('title')} />
+      <TextField label="Short Name" {...propsForField('shortName')} />
+      <TextField label="Description" {...propsForField('description')} />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
         <Button type="button" onClick={onCancel}>
@@ -38,10 +41,12 @@ export const LocationForm = ({
   );
 };
 
-LocationForm.propTypes = {
-  location: PropTypes.shape({
+ArtifactCollectionForm.propTypes = {
+  artifactCollection: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    shortName: PropTypes.string.isRequired,
+    description: PropTypes.string,
   }),
   submitButtonText: PropTypes.string,
   onSubmit: PropTypes.func.isRequired,

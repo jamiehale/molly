@@ -7,6 +7,9 @@ import { EventsPage } from './components/EventsPage';
 import { EventPage } from './components/EventPage';
 import { LocationsPage } from './components/LocationsPage';
 import { LocationPage } from './components/LocationPage';
+import { ArtifactsPage } from './components/ArtifactsPage';
+import { ArtifactCollectionsPage } from './components/ArtifactCollectionsPage';
+import { ArtifactCollectionPage } from './components/ArtifactCollectionPage';
 
 const App = () => {
   return (
@@ -31,6 +34,15 @@ const App = () => {
       </Route>
       <Route path="/locations/:id">
         <LocationPage />
+      </Route>
+      <Route path="/artifacts">
+        <ArtifactsPage />
+      </Route>
+      <Route path="/artifact-collections">
+        <ArtifactCollectionsPage />
+      </Route>
+      <Route path="/artifact-collections/:id">
+        <ArtifactCollectionPage />
       </Route>
     </Router>
   );

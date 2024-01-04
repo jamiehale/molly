@@ -9,11 +9,10 @@ export const EditPerson = ({ person, onUpdatePerson, onCancel }) => {
   const { genders } = useGenders();
 
   const handleSubmit = useCallback(
-    ({ givenNames, surname, genderId }) => {
+    ({ givenNames, surname, genderId }) =>
       updatePerson(givenNames, surname, genderId).then(() => {
         onUpdatePerson();
-      });
-    },
+      }),
     [updatePerson, onUpdatePerson],
   );
 

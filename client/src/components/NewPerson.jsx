@@ -9,11 +9,10 @@ export const NewPerson = ({ onNewPerson, onCancel }) => {
   const { genders } = useGenders();
 
   const handleSubmit = useCallback(
-    ({ givenNames, surname, genderId }) => {
+    ({ givenNames, surname, genderId }) =>
       createPerson(givenNames, surname, genderId).then(() => {
         onNewPerson();
-      });
-    },
+      }),
     [createPerson, onNewPerson],
   );
 

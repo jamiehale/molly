@@ -11,11 +11,10 @@ export const EditEvent = ({ event, onUpdateEvent, onCancel }) => {
   const { locations } = useLocations();
 
   const handleSubmit = useCallback(
-    ({ givenNames, surname, genderId }) => {
+    ({ givenNames, surname, genderId }) =>
       updateEvent(givenNames, surname, genderId).then(() => {
         onUpdateEvent();
-      });
-    },
+      }),
     [updateEvent, onUpdateEvent],
   );
 
