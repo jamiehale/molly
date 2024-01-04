@@ -6,6 +6,7 @@ import { Button } from './Button';
 import { Form } from './Form';
 import { FlexRow } from './FlexRow';
 import * as J from '../lib/jlib';
+import { TextAreaField } from './TextAreaField';
 
 export const ArtifactForm = ({
   artifact,
@@ -30,7 +31,7 @@ export const ArtifactForm = ({
   return (
     <Form {...propsForForm()}>
       <TextField label="Title" {...propsForField('title')} />
-      <TextField label="Description" {...propsForField('description')} />
+      <TextAreaField label="Description" {...propsForField('description')} />
       <SelectField
         options={artifactTypes}
         valueFn={J.prop('id')}

@@ -8,6 +8,7 @@ import { EventPage } from './components/EventPage';
 import { LocationsPage } from './components/LocationsPage';
 import { LocationPage } from './components/LocationPage';
 import { ArtifactsPage } from './components/ArtifactsPage';
+import { ArtifactPage } from './components/ArtifactPage';
 import { ArtifactCollectionsPage } from './components/ArtifactCollectionsPage';
 import { ArtifactCollectionPage } from './components/ArtifactCollectionPage';
 
@@ -37,6 +38,9 @@ const App = () => {
       </Route>
       <Route path="/artifacts">
         <ArtifactsPage />
+      </Route>
+      <Route path="/artifacts/:id">
+        <ArtifactPage />
       </Route>
       <Route path="/artifact-collections">
         <ArtifactCollectionsPage />

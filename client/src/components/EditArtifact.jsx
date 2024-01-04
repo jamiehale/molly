@@ -1,33 +1,35 @@
 import PropTypes from 'prop-types';
-import { ArtifactForm } from './ArtifactForm';
 import { useCallback } from 'react';
-import { useArtifacts } from '../hooks/artifacts';
+import { useArtifact } from '../hooks/artifact';
 import { useArtifactTypes } from '../hooks/artifact-types';
 import { useArtifactSources } from '../hooks/artifact-sources';
 import { useArtifactCollections } from '../hooks/artifact-collections';
+import { ArtifactForm } from './ArtifactForm';
 
-export const NewArtifact = ({ onNewArtifact, onCancel }) => {
-  const { createArtifact } = useArtifacts();
+export const EditArtifact = ({ artifact, onUpdateArtifact, onCancel }) => {
+  const { updateArtifact } = useArtifact(artifact.id);
   const { artifactTypes } = useArtifactTypes();
   const { artifactSources } = useArtifactSources();
   const { artifactCollections } = useArtifactCollections();
 
   const handleSubmit = useCallback(
     ({ title, description, typeId, sourceId, collectionId }) =>
-      createArtifact(title, description, typeId, sourceId, collectionId).then(
+      updateArtifact(title, description, typeId, sourceId, collectionId).then(
         () => {
-          onNewArtifact();
+          onUpdateArtifact();
         },
       ),
-    [createArtifact, onNewArtifact],
+    [updateArtifact, onUpdateArtifact],
   );
 
   return (
     <div className="max-w-md">
       <ArtifactForm
+        artifact={artifact}
         artifactTypes={artifactTypes}
         artifactSources={artifactSources}
         artifactCollections={artifactCollections}
+        submitButtonText="Update"
         onSubmit={handleSubmit}
         onCancel={onCancel}
       />
@@ -35,7 +37,15 @@ export const NewArtifact = ({ onNewArtifact, onCancel }) => {
   );
 };
 
-NewArtifact.propTypes = {
-  onNewArtifact: PropTypes.func.isRequired,
+EditArtifact.propTypes = {
+  artifact: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    typeId: PropTypes.string.isRequired,
+    sourceId: PropTypes.string.isRequired,
+    collectionId: PropTypes.string.isRequired,
+  }).isRequired,
+  onUpdateArtifact: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

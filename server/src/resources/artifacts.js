@@ -5,9 +5,35 @@ import {
   patchResource,
   getAllChildResources,
   postChildResource,
+  postResource,
 } from '../resource-helpers';
 import * as J from '../jlib';
 import * as V from '../validation';
+
+const postBody = (
+  validArtifactTypeFn,
+  validArtifactSourceFn,
+  validArtifactCollectionFn,
+) =>
+  V.object({
+    title: V.and(V.required(), V.isNotNull()),
+    description: V.optional(),
+    typeId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactTypeFn),
+    ),
+    sourceId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactSourceFn),
+    ),
+    collectionId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactCollectionFn),
+    ),
+  });
 
 const postAssetBody = (validVaultFn) =>
   V.object({
@@ -57,6 +83,7 @@ export const artifactRoutes = ({
   artifactsRepo,
   artifactTypesRepo,
   artifactSourcesRepo,
+  artifactCollectionsRepo,
   assetsRepo,
   vaultsRepo,
 }) =>
@@ -69,7 +96,29 @@ export const artifactRoutes = ({
     getAllResources('/artifacts', V.any(), () =>
       artifactsRepo.readAllArtifacts().then(J.map(toResult)),
     ),
-    // no post
+    postResource(
+      '/artifacts',
+      postBody(
+        artifactTypesRepo.artifactTypeExists,
+        artifactSourcesRepo.artifactSourceExists,
+        artifactCollectionsRepo.artifactCollectionExists,
+      ),
+      ({ userId, body }) =>
+        artifactsRepo
+          .createArtifact(
+            J.compose(
+              J.assoc('creatorId', userId),
+              J.pick([
+                'title',
+                'description',
+                'typeId',
+                'sourceId',
+                'collectionId',
+              ]),
+            )(body),
+          )
+          .then(toResult),
+    ),
     patchResource(
       '/artifacts/:id',
       artifactsRepo.artifactExists,
