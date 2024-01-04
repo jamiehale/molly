@@ -1,16 +1,16 @@
 import './App.css';
 import { Route, Router } from './components/Router';
-import { PeoplePage } from './components/PeoplePage';
+import { PeoplePage } from './components/pages/people/PeoplePage';
 import { Home } from './components/Home';
-import { PersonPage } from './components/PersonPage';
-import { EventsPage } from './components/EventsPage';
-import { EventPage } from './components/EventPage';
-import { LocationsPage } from './components/LocationsPage';
-import { LocationPage } from './components/LocationPage';
-import { ArtifactsPage } from './components/ArtifactsPage';
-import { ArtifactPage } from './components/ArtifactPage';
-import { ArtifactCollectionsPage } from './components/ArtifactCollectionsPage';
-import { ArtifactCollectionPage } from './components/ArtifactCollectionPage';
+import { PersonPage } from './components/pages/person/PersonPage';
+import { EventsPage } from './components/pages/events/EventsPage';
+import { EventPage } from './components/pages/event/EventPage';
+import { LocationsPage } from './components/pages/locations/LocationsPage';
+import { LocationPage } from './components/pages/location/LocationPage';
+import { ArtifactsPage } from './components/pages/artifacts/ArtifactsPage';
+import { ArtifactPage } from './components/pages/artifact/ArtifactPage';
+import { ArtifactCollectionsPage } from './components/pages/artifact-collections/ArtifactCollectionsPage';
+import { ArtifactCollectionPage } from './components/pages/artifact-collection/ArtifactCollectionPage';
 
 const App = () => {
   return (
