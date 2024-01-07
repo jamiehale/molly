@@ -37,7 +37,7 @@ export const Layout = ({ children }) => (
             <NavLink to="/artifacts">Artifacts</NavLink>
           </ListItem>
           <ListItem>
-            <NavLink to="/artifact-collections">Artifact Collections</NavLink>
+            <NavLink to="/collections">Collections</NavLink>
           </ListItem>
         </List>
       </div>

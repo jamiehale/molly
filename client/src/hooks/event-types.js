@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResources } from './resources';
 
-export const useEventTypes = () => {
-  const { authorizedGet } = useApi();
-
-  const [eventTypes, setEventTypes] = useState([]);
-
-  useEffect(() => {
-    authorizedGet('/event-types').then(setEventTypes);
-  }, [authorizedGet, setEventTypes]);
-
-  return { eventTypes };
-};
+export const useEventTypes = () =>
+  J.transform(
+    {
+      eventTypes: J.prop('resources'),
+      loadEventTypes: J.prop('loadResources'),
+    },
+    useResources('/event-types'),
+  );

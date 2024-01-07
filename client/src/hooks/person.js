@@ -1,23 +1,11 @@
-import { useCallback, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResource } from './resource';
 
-export const usePerson = (id) => {
-  const { authorizedGet, authorizedPatch } = useApi();
-  const [person, setPerson] = useState(null);
-
-  const loadPerson = useCallback(() => {
-    authorizedGet(`/people/${id}`).then(setPerson);
-  }, [id, authorizedGet, setPerson]);
-
-  const updatePerson = useCallback(
-    (givenNames, surname, genderId) =>
-      authorizedPatch(`/people/${id}`, {
-        givenNames,
-        surname,
-        genderId,
-      }).then(setPerson),
-    [id, authorizedPatch, setPerson],
+export const usePerson = (id) =>
+  J.transform(
+    {
+      person: J.prop('resource'),
+      loadPerson: J.prop('loadResource'),
+    },
+    useResource('/people', id),
   );
-
-  return { person, reload: loadPerson, updatePerson };
-};

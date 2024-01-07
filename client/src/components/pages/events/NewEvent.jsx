@@ -1,21 +1,19 @@
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 import { EventForm } from '../../forms/EventForm';
-import { useEvents } from '../../../hooks/events';
 import { useEventTypes } from '../../../hooks/event-types';
 import { useLocations } from '../../../hooks/locations';
+import { useCreateEvent } from '../../../hooks/create-event';
 
-export const NewEvent = ({ onNewEvent, onCancel }) => {
-  const { createEvent } = useEvents();
+export const NewEvent = ({ onCreate, onCancel }) => {
+  const { createEvent } = useCreateEvent();
   const { eventTypes } = useEventTypes();
   const { locations } = useLocations();
 
   const handleSubmit = useCallback(
     ({ title, typeId, dateValue, locationId }) =>
-      createEvent(title, typeId, dateValue, locationId).then(() => {
-        onNewEvent();
-      }),
-    [createEvent, onNewEvent],
+      createEvent(title, typeId, dateValue, locationId).then(onCreate),
+    [createEvent, onCreate],
   );
 
   return (
@@ -31,6 +29,6 @@ export const NewEvent = ({ onNewEvent, onCancel }) => {
 };
 
 NewEvent.propTypes = {
-  onNewEvent: PropTypes.func.isRequired,
+  onCreate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

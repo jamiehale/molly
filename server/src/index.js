@@ -23,8 +23,8 @@ import { createAssetsRepo } from './data/repos/assets';
 import { createUsersRepo } from './data/repos/users';
 import { createArtifactSourcesRepo } from './data/repos/artifact-sources';
 import { createArtifactSourcesStore } from './data/stores/artifact-sources';
-import { createArtifactCollectionsRepo } from './data/repos/artifact-collections';
-import { createArtifactCollectionsStore } from './data/stores/artifact-collections';
+import { createCollectionsRepo } from './data/repos/collections';
+import { createCollectionsStore } from './data/stores/collections';
 import { createVaultsStore } from './data/stores/vaults';
 import { createVaultsRepo } from './data/repos/vaults';
 import { createGendersStore } from './data/stores/genders';
@@ -43,6 +43,11 @@ import { createParentChildrenStore } from './data/stores/parent-children';
 import { createParentChildrenRepo } from './data/repos/parent-children';
 import { createPersonDetailsStore } from './data/stores/person-details';
 import { createEventDetailsStore } from './data/stores/event-details';
+import { createEventPersonDetailsStore } from './data/stores/event-person-details';
+import { createEventPeopleStore } from './data/stores/event-people';
+import { createEventPeopleRepo } from './data/repos/event-people';
+import { createEventPersonRolesStore } from './data/stores/event-person-roles';
+import { createEventPersonRolesRepo } from './data/repos/event-person-roles';
 
 config();
 
@@ -59,14 +64,17 @@ const db = Knex({
 
 const stores = {
   apiKeysStore: createApiKeysStore(db),
-  artifactCollectionsStore: createArtifactCollectionsStore(db),
   artifactPersonRolesStore: createArtifactPersonRolesStore(db),
   artifactSourcesStore: createArtifactSourcesStore(db),
   artifactTypesStore: createArtifactTypesStore(db),
   artifactsStore: createArtifactsStore(db),
   assetsStore: createAssetsStore(db),
   childrenStore: createChildrenStore(db),
+  collectionsStore: createCollectionsStore(db),
   eventDetailsStore: createEventDetailsStore(db),
+  eventPeopleStore: createEventPeopleStore(db),
+  eventPersonDetailsStore: createEventPersonDetailsStore(db),
+  eventPersonRolesStore: createEventPersonRolesStore(db),
   eventTypesStore: createEventTypesStore(db),
   eventsStore: createEventsStore(db),
   gendersStore: createGendersStore(db),
@@ -82,13 +90,15 @@ const stores = {
 
 const repos = {
   apiKeysRepo: createApiKeysRepo(stores),
-  artifactCollectionsRepo: createArtifactCollectionsRepo(stores),
   artifactPersonRolesRepo: createArtifactPersonRolesRepo(stores),
   artifactSourcesRepo: createArtifactSourcesRepo(stores),
   artifactTypesRepo: createArtifactTypesRepo(stores),
   artifactsRepo: createArtifactsRepo(stores),
   assetsRepo: createAssetsRepo(stores),
   childrenRepo: createChildrenRepo(stores),
+  collectionsRepo: createCollectionsRepo(stores),
+  eventPeopleRepo: createEventPeopleRepo(stores),
+  eventPersonRolesRepo: createEventPersonRolesRepo(stores),
   eventTypesRepo: createEventTypesRepo(stores),
   eventsRepo: createEventsRepo(stores),
   gendersRepo: createGendersRepo(stores),

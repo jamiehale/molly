@@ -12,7 +12,7 @@ export const ArtifactForm = ({
   artifact,
   artifactTypes,
   artifactSources,
-  artifactCollections,
+  collections,
   submitButtonText,
   onSubmit,
   onCancel,
@@ -27,10 +27,11 @@ export const ArtifactForm = ({
     },
     onSubmit,
   );
+  // const autofocusRef = useAutofocus();
 
   return (
     <Form {...propsForForm()}>
-      <TextField label="Title" {...propsForField('title')} />
+      <TextField label="Title" {...propsForField('title')} autoFocus />
       <TextAreaField label="Description" {...propsForField('description')} />
       <SelectField
         options={artifactTypes}
@@ -47,7 +48,7 @@ export const ArtifactForm = ({
         {...propsForField('sourceId')}
       />
       <SelectField
-        options={artifactCollections}
+        options={collections}
         valueFn={J.prop('id')}
         displayFn={J.prop('title')}
         label="Collection"
@@ -84,7 +85,7 @@ ArtifactForm.propTypes = {
       title: PropTypes.string.isRequired,
     }),
   ),
-  artifactCollections: PropTypes.arrayOf(
+  collections: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,

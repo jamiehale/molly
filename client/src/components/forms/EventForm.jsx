@@ -41,11 +41,9 @@ export const EventForm = ({
     onSubmit,
   );
 
-  console.log(formState);
-
   return (
     <Form {...propsForForm()}>
-      <TextField label="Title" {...propsForField('title')} />
+      <TextField label="Title" {...propsForField('title')} autoFocus />
       <SelectField
         label="Type"
         options={eventTypes}

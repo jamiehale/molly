@@ -3,15 +3,12 @@ import { Typography } from '../../Typography';
 import { Layout } from '../../Layout';
 import { Button } from '../../Button';
 import { CustomToggle } from '../../CustomToggle';
-import { useEffect } from 'react';
 import { useLocation } from '../../../hooks/location';
 import { EditLocation } from './EditLocation';
 import { Location } from './Location';
 
 export const LocationPage = ({ params }) => {
-  const { location, reload: reloadLocation } = useLocation(params.id);
-
-  useEffect(reloadLocation, [reloadLocation]);
+  const { location, loadLocation } = useLocation(params.id);
 
   return (
     <Layout>
@@ -24,9 +21,10 @@ export const LocationPage = ({ params }) => {
                 <Typography>Editing</Typography>
                 <EditLocation
                   location={location}
-                  onUpdateLocation={() => {
-                    reloadLocation();
-                    onClose();
+                  onUpdate={() => {
+                    loadLocation().then(() => {
+                      onClose();
+                    });
                   }}
                   onCancel={onClose}
                 />

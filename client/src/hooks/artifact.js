@@ -1,25 +1,11 @@
-import { useCallback, useState } from 'react';
-import { useApi } from './api';
+import { useResource } from './resource';
+import * as J from '../lib/jlib';
 
-export const useArtifact = (id) => {
-  const { authorizedGet, authorizedPatch } = useApi();
-  const [artifact, setArtifact] = useState(null);
-
-  const loadArtifact = useCallback(() => {
-    authorizedGet(`/artifacts/${id}`).then(setArtifact);
-  }, [id, authorizedGet, setArtifact]);
-
-  const updateArtifact = useCallback(
-    (title, description, typeId, sourceId, collectionId) =>
-      authorizedPatch(`/artifacts/${id}`, {
-        title,
-        description,
-        typeId,
-        sourceId,
-        collectionId,
-      }).then(setArtifact),
-    [id, authorizedPatch, setArtifact],
+export const useArtifact = (id) =>
+  J.transform(
+    {
+      artifact: J.prop('resource'),
+      loadArtifact: J.prop('loadResource'),
+    },
+    useResource('/artifacts', id),
   );
-
-  return { artifact, reload: loadArtifact, updateArtifact };
-};

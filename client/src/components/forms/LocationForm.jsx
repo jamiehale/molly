@@ -19,15 +19,12 @@ export const LocationForm = ({
         validates: [required(() => 'Enter a value')],
       },
     },
-    (...args) => {
-      console.log('LocationForm', onSubmit, args);
-      return onSubmit(...args);
-    },
+    onSubmit,
   );
 
   return (
     <Form {...propsForForm()}>
-      <TextField label="Value" {...propsForField('value')} />
+      <TextField label="Value" {...propsForField('value')} autoFocus />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
         <Button type="button" onClick={onCancel}>

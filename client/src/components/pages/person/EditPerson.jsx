@@ -4,16 +4,16 @@ import { useCallback } from 'react';
 import { useGenders } from '../../../hooks/genders';
 import { usePerson } from '../../../hooks/person';
 
-export const EditPerson = ({ person, onUpdatePerson, onCancel }) => {
+export const EditPerson = ({ person, onUpdate, onCancel }) => {
   const { updatePerson } = usePerson(person.id);
   const { genders } = useGenders();
 
   const handleSubmit = useCallback(
     ({ givenNames, surname, genderId }) =>
       updatePerson(givenNames, surname, genderId).then(() => {
-        onUpdatePerson();
+        onUpdate();
       }),
-    [updatePerson, onUpdatePerson],
+    [updatePerson, onUpdate],
   );
 
   return (
@@ -36,6 +36,6 @@ EditPerson.propTypes = {
     surname: PropTypes.string,
     genderId: PropTypes.string.isRequired,
   }).isRequired,
-  onUpdatePerson: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

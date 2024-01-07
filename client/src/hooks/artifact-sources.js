@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResources } from './resources';
 
-export const useArtifactSources = () => {
-  const { authorizedGet } = useApi();
-
-  const [artifactSources, setArtifactSources] = useState([]);
-
-  useEffect(() => {
-    authorizedGet('/artifact-sources').then(setArtifactSources);
-  }, [authorizedGet, setArtifactSources]);
-
-  return { artifactSources };
-};
+export const useArtifactSources = () =>
+  J.transform(
+    {
+      artifactSources: J.prop('resources'),
+      loadArtifactSources: J.prop('loadResources'),
+    },
+    useResources('/artifact-sources'),
+  );

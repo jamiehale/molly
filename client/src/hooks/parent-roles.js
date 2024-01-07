@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResources } from './resources';
 
-export const useParentRoles = () => {
-  const { authorizedGet } = useApi();
-
-  const [parentRoles, setParentRoles] = useState([]);
-
-  useEffect(() => {
-    authorizedGet('/parent-roles').then(setParentRoles);
-  }, [authorizedGet, setParentRoles]);
-
-  return { parentRoles };
-};
+export const useParentRoles = () =>
+  J.transform(
+    {
+      parentRoles: J.prop('resources'),
+      loadParentRoles: J.prop('loadResources'),
+    },
+    useResources('/parent-roles'),
+  );

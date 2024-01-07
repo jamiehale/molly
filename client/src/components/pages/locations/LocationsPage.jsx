@@ -6,7 +6,7 @@ import { Locations } from './Locations';
 import { NewLocation } from './NewLocation';
 
 export const LocationsPage = () => {
-  const { locations, reloadLocations } = useLocations();
+  const { locations, loadLocations } = useLocations();
 
   return (
     <Layout>
@@ -16,9 +16,10 @@ export const LocationsPage = () => {
         buttonText="Add Location"
         renderOpen={(onClose) => (
           <NewLocation
-            onNewLocation={() => {
-              reloadLocations();
-              onClose();
+            onNew={() => {
+              loadLocations().then(() => {
+                onClose();
+              });
             }}
             onCancel={onClose}
           />

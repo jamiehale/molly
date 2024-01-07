@@ -4,9 +4,10 @@ import { TextField } from '../TextField';
 import { Button } from '../Button';
 import { Form } from '../Form';
 import { FlexRow } from '../FlexRow';
+import { TextArea } from '../TextArea';
 
-export const ArtifactCollectionForm = ({
-  artifactCollection,
+export const CollectionForm = ({
+  collection,
   submitButtonText,
   onSubmit,
   onCancel,
@@ -14,13 +15,13 @@ export const ArtifactCollectionForm = ({
   const { propsForField, propsForForm } = useForm(
     {
       title: {
-        initialValue: artifactCollection ? artifactCollection.title : '',
+        initialValue: collection ? collection.title : '',
       },
       shortName: {
-        initialValue: artifactCollection ? artifactCollection.shortName : '',
+        initialValue: collection ? collection.shortName : '',
       },
       description: {
-        initialValue: artifactCollection ? artifactCollection.description : '',
+        initialValue: collection ? collection.description : '',
       },
     },
     onSubmit,
@@ -28,9 +29,9 @@ export const ArtifactCollectionForm = ({
 
   return (
     <Form {...propsForForm()}>
-      <TextField label="Title" {...propsForField('title')} />
+      <TextField label="Title" {...propsForField('title')} autoFocus />
       <TextField label="Short Name" {...propsForField('shortName')} />
-      <TextField label="Description" {...propsForField('description')} />
+      <TextArea label="Description" {...propsForField('description')} />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
         <Button type="button" onClick={onCancel}>
@@ -41,8 +42,8 @@ export const ArtifactCollectionForm = ({
   );
 };
 
-ArtifactCollectionForm.propTypes = {
-  artifactCollection: PropTypes.shape({
+CollectionForm.propTypes = {
+  collection: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string,
     shortName: PropTypes.string.isRequired,

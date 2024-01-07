@@ -1,19 +1,19 @@
 import PropTypes from 'prop-types';
 import { PersonForm } from '../../forms/PersonForm';
 import { useCallback } from 'react';
-import { usePeople } from '../../../hooks/people';
+import { useCreatePerson } from '../../../hooks/create-person';
 import { useGenders } from '../../../hooks/genders';
 
-export const NewPerson = ({ onNewPerson, onCancel }) => {
-  const { createPerson } = usePeople();
+export const NewPerson = ({ onNew, onCancel }) => {
+  const { createPerson } = useCreatePerson();
   const { genders } = useGenders();
 
   const handleSubmit = useCallback(
     ({ givenNames, surname, genderId }) =>
       createPerson(givenNames, surname, genderId).then(() => {
-        onNewPerson();
+        onNew();
       }),
-    [createPerson, onNewPerson],
+    [createPerson, onNew],
   );
 
   return (
@@ -28,6 +28,6 @@ export const NewPerson = ({ onNewPerson, onCancel }) => {
 };
 
 NewPerson.propTypes = {
-  onNewPerson: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

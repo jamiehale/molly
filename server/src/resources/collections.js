@@ -62,29 +62,24 @@ const toArtifactResult = J.pick([
   'creatorId',
 ]);
 
-export const artifactCollectionRoutes = ({
-  artifactCollectionsRepo,
-  artifactsRepo,
+export const collectionRoutes = ({
   artifactTypesRepo,
+  artifactsRepo,
   artifactSourcesRepo,
+  collectionsRepo,
 }) =>
   routes([
     getSingleResource(
-      '/artifact-collections/:id',
-      artifactCollectionsRepo.artifactCollectionExists,
-      ({ params }) =>
-        artifactCollectionsRepo
-          .readArtifactCollection(params.id)
-          .then(toResult),
+      '/collections/:id',
+      collectionsRepo.collectionExists,
+      ({ params }) => collectionsRepo.readCollection(params.id).then(toResult),
     ),
-    getAllResources('/artifact-collections', V.any(), () =>
-      artifactCollectionsRepo
-        .readAllArtifactCollections()
-        .then(J.map(toResult)),
+    getAllResources('/collections', V.any(), () =>
+      collectionsRepo.readAllCollections().then(J.map(toResult)),
     ),
-    postResource('/artifact-collections', postBody(), ({ userId, body }) =>
-      artifactCollectionsRepo
-        .createArtifactCollection(
+    postResource('/collections', postBody(), ({ userId, body }) =>
+      collectionsRepo
+        .createCollection(
           J.compose(
             J.assoc('creatorId', userId),
             J.pick(['title', 'shortName', 'description', 'creatorId']),
@@ -93,12 +88,12 @@ export const artifactCollectionRoutes = ({
         .then(toResult),
     ),
     patchResource(
-      '/artifact-collections/:id',
-      artifactCollectionsRepo.artifactCollectionExists,
+      '/collections/:id',
+      collectionsRepo.collectionExists,
       patchBody(),
       ({ params, body }) =>
-        artifactCollectionsRepo
-          .updateArtifactCollection(
+        collectionsRepo
+          .updateCollection(
             params.id,
             J.compose(
               J.filterEmptyProps,
@@ -108,8 +103,8 @@ export const artifactCollectionRoutes = ({
           .then(toResult),
     ),
     getAllChildResources(
-      '/artifact-collections/:id/artifacts',
-      artifactCollectionsRepo.artifactCollectionExists,
+      '/collections/:id/artifacts',
+      collectionsRepo.collectionExists,
       ({ params }) =>
         artifactsRepo
           .readAllArtifacts({ collectionId: params.id })
@@ -117,7 +112,7 @@ export const artifactCollectionRoutes = ({
     ),
     postChildResource(
       '/artifact-collections/:id/artifacts',
-      artifactCollectionsRepo.artifactCollectionExists,
+      collectionsRepo.collectionExists,
       postArtifactBody(
         artifactTypesRepo.artifactTypeExists,
         artifactSourcesRepo.artifactSourceExists,

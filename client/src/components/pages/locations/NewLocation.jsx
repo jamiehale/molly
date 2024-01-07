@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 import { LocationForm } from '../../forms/LocationForm';
-import { useLocations } from '../../../hooks/locations';
+import { useCreateLocation } from '../../../hooks/create-location';
 
-export const NewLocation = ({ onNewLocation, onCancel }) => {
-  const { createLocation } = useLocations();
+export const NewLocation = ({ onNew, onCancel }) => {
+  const { createLocation } = useCreateLocation();
 
   const handleSubmit = useCallback(
     ({ value }) =>
       createLocation(value).then(() => {
-        onNewLocation();
+        onNew();
       }),
-    [createLocation, onNewLocation],
+    [createLocation, onNew],
   );
 
   return (
@@ -22,6 +22,6 @@ export const NewLocation = ({ onNewLocation, onCancel }) => {
 };
 
 NewLocation.propTypes = {
-  onNewLocation: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

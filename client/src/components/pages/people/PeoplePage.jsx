@@ -6,7 +6,7 @@ import { Layout } from '../../Layout';
 import { ButtonToggle } from '../../ButtonToggle';
 
 export const PeoplePage = () => {
-  const { people, reloadPeople } = usePeople();
+  const { people, loadPeople } = usePeople();
 
   return (
     <Layout>
@@ -16,9 +16,10 @@ export const PeoplePage = () => {
         buttonText="Add Person"
         renderOpen={(onClose) => (
           <NewPerson
-            onNewPerson={() => {
-              reloadPeople();
-              onClose();
+            onNew={() => {
+              loadPeople().then(() => {
+                onClose();
+              });
             }}
             onCancel={onClose}
           />

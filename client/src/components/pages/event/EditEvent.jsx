@@ -5,7 +5,7 @@ import { useEventTypes } from '../../../hooks/event-types';
 import { useLocations } from '../../../hooks/locations';
 import { EventForm } from '../../forms/EventForm';
 
-export const EditEvent = ({ event, onUpdateEvent, onCancel }) => {
+export const EditEvent = ({ event, onUpdate, onCancel }) => {
   const { updateEvent } = useEvent(event.id);
   const { eventTypes } = useEventTypes();
   const { locations } = useLocations();
@@ -13,9 +13,9 @@ export const EditEvent = ({ event, onUpdateEvent, onCancel }) => {
   const handleSubmit = useCallback(
     ({ givenNames, surname, genderId }) =>
       updateEvent(givenNames, surname, genderId).then(() => {
-        onUpdateEvent();
+        onUpdate();
       }),
-    [updateEvent, onUpdateEvent],
+    [updateEvent, onUpdate],
   );
 
   return (
@@ -40,6 +40,6 @@ EditEvent.propTypes = {
     dateValue: PropTypes.string.isRequired,
     locationId: PropTypes.string,
   }).isRequired,
-  onUpdateEvent: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResources } from './resources';
 
-export const useGenders = () => {
-  const { authorizedGet } = useApi();
-
-  const [genders, setGenders] = useState([]);
-
-  useEffect(() => {
-    authorizedGet('/genders').then(setGenders);
-  }, [authorizedGet, setGenders]);
-
-  return { genders };
-};
+export const useGenders = () =>
+  J.transform(
+    {
+      genders: J.prop('resources'),
+      loadGenders: J.prop('loadResources'),
+    },
+    useResources('/genders'),
+  );

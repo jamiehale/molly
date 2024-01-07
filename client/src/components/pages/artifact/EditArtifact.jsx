@@ -1,25 +1,25 @@
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
-import { useArtifact } from '../../../hooks/artifact';
+import { useUpdateArtifact } from '../../../hooks/update-artifact';
 import { useArtifactTypes } from '../../../hooks/artifact-types';
 import { useArtifactSources } from '../../../hooks/artifact-sources';
-import { useArtifactCollections } from '../../../hooks/artifact-collections';
+import { useCollections } from '../../../hooks/collections';
 import { ArtifactForm } from '../../forms/ArtifactForm';
 
-export const EditArtifact = ({ artifact, onUpdateArtifact, onCancel }) => {
-  const { updateArtifact } = useArtifact(artifact.id);
+export const EditArtifact = ({ artifact, onUpdate, onCancel }) => {
+  const { updateArtifact } = useUpdateArtifact(artifact.id);
   const { artifactTypes } = useArtifactTypes();
   const { artifactSources } = useArtifactSources();
-  const { artifactCollections } = useArtifactCollections();
+  const { collections } = useCollections();
 
   const handleSubmit = useCallback(
     ({ title, description, typeId, sourceId, collectionId }) =>
       updateArtifact(title, description, typeId, sourceId, collectionId).then(
         () => {
-          onUpdateArtifact();
+          onUpdate();
         },
       ),
-    [updateArtifact, onUpdateArtifact],
+    [updateArtifact, onUpdate],
   );
 
   return (
@@ -28,7 +28,7 @@ export const EditArtifact = ({ artifact, onUpdateArtifact, onCancel }) => {
         artifact={artifact}
         artifactTypes={artifactTypes}
         artifactSources={artifactSources}
-        artifactCollections={artifactCollections}
+        collections={collections}
         submitButtonText="Update"
         onSubmit={handleSubmit}
         onCancel={onCancel}
@@ -46,6 +46,6 @@ EditArtifact.propTypes = {
     sourceId: PropTypes.string.isRequired,
     collectionId: PropTypes.string.isRequired,
   }).isRequired,
-  onUpdateArtifact: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

@@ -1,3 +1,13 @@
+import { useEffect, useRef } from 'react';
+
 export const useAutofocus = () => {
-  const 
-}
+  const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.focus();
+    }
+  }, [ref.current]);
+
+  return ref;
+};

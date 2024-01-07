@@ -1,24 +1,11 @@
-import { useCallback, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResource } from './resource';
 
-export const useEvent = (id) => {
-  const { authorizedGet, authorizedPatch } = useApi();
-  const [event, setEvent] = useState(null);
-
-  const loadEvent = useCallback(() => {
-    authorizedGet(`/events/${id}`).then(setEvent);
-  }, [id, authorizedGet, setEvent]);
-
-  const updateEvent = useCallback(
-    (title, typeId, dateValue, locationId) =>
-      authorizedPatch(`/events/${id}`, {
-        title,
-        typeId,
-        dateValue,
-        locationId,
-      }).then(setEvent),
-    [id, authorizedPatch, setEvent],
+export const useEvent = (id) =>
+  J.transform(
+    {
+      event: J.prop('resource'),
+      loadEvent: J.prop('loadResource'),
+    },
+    useResource('/events', id),
   );
-
-  return { event, reload: loadEvent, updateEvent };
-};

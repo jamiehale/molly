@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-import { Typography } from '../../Typography';
-import { List, ListItem } from '../../List';
-import { Link } from '../../Router';
+import { Typography } from './Typography';
+import { List, ListItem } from './List';
+import { Link } from './Router';
 
 export const PersonList = ({ people, displayFn }) => {
   const theDisplayFn =

@@ -1,22 +1,11 @@
-import { useCallback, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResource } from './resource';
 
-export const useLocation = (id) => {
-  const { authorizedGet, authorizedPatch } = useApi();
-  const [location, setLocation] = useState(null);
-
-  const loadLocation = useCallback(() => {
-    authorizedGet(`/locations/${id}`).then(setLocation);
-  }, [id, authorizedGet, setLocation]);
-
-  const updateLocation = useCallback(
-    (value) => authorizedPatch(`/locations/${id}`, { value }).then(setLocation),
-    [id, authorizedPatch, setLocation],
+export const useLocation = (id) =>
+  J.transform(
+    {
+      location: J.prop('resource'),
+      loadLocation: J.prop('loadResource'),
+    },
+    useResource('/locations', id),
   );
-
-  return {
-    location,
-    reload: loadLocation,
-    updateLocation,
-  };
-};

@@ -1,31 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResources } from './resources';
 
-export const usePeople = () => {
-  const { authorizedGet, authorizedPost } = useApi();
-
-  const [people, setPeople] = useState([]);
-
-  const loadPeople = useCallback(
-    () => authorizedGet('/people').then(setPeople),
-    [authorizedGet, setPeople],
+export const usePeople = () =>
+  J.transform(
+    {
+      people: J.prop('resources'),
+      loadPeople: J.prop('loadResources'),
+    },
+    useResources('/people'),
   );
-
-  useEffect(() => {
-    loadPeople();
-  }, [loadPeople]);
-
-  const createPerson = useCallback(
-    (givenNames, surname, genderId) =>
-      authorizedPost('/people', {
-        givenNames,
-        surname,
-        genderId,
-      }).then((person) => {
-        setPeople([...people, person]);
-      }),
-    [authorizedPost, people, setPeople],
-  );
-
-  return { people, createPerson, reloadPeople: loadPeople };
-};

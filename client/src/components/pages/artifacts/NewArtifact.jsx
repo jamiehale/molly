@@ -1,25 +1,25 @@
 import PropTypes from 'prop-types';
 import { ArtifactForm } from '../../forms/ArtifactForm';
 import { useCallback } from 'react';
-import { useArtifacts } from '../../../hooks/artifacts';
+import { useCreateArtifact } from '../../../hooks/create-artifact';
 import { useArtifactTypes } from '../../../hooks/artifact-types';
 import { useArtifactSources } from '../../../hooks/artifact-sources';
-import { useArtifactCollections } from '../../../hooks/artifact-collections';
+import { useCollections } from '../../../hooks/collections';
 
-export const NewArtifact = ({ onNewArtifact, onCancel }) => {
-  const { createArtifact } = useArtifacts();
+export const NewArtifact = ({ onNew, onCancel }) => {
+  const { createArtifact } = useCreateArtifact();
   const { artifactTypes } = useArtifactTypes();
   const { artifactSources } = useArtifactSources();
-  const { artifactCollections } = useArtifactCollections();
+  const { collections } = useCollections();
 
   const handleSubmit = useCallback(
     ({ title, description, typeId, sourceId, collectionId }) =>
       createArtifact(title, description, typeId, sourceId, collectionId).then(
         () => {
-          onNewArtifact();
+          onNew();
         },
       ),
-    [createArtifact, onNewArtifact],
+    [createArtifact, onNew],
   );
 
   return (
@@ -27,7 +27,7 @@ export const NewArtifact = ({ onNewArtifact, onCancel }) => {
       <ArtifactForm
         artifactTypes={artifactTypes}
         artifactSources={artifactSources}
-        artifactCollections={artifactCollections}
+        collections={collections}
         onSubmit={handleSubmit}
         onCancel={onCancel}
       />
@@ -36,6 +36,6 @@ export const NewArtifact = ({ onNewArtifact, onCancel }) => {
 };
 
 NewArtifact.propTypes = {
-  onNewArtifact: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

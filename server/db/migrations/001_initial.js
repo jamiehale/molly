@@ -5,6 +5,7 @@ const partnerRole = (id, title) => ({ id, title });
 const partnershipType = (id, title) => ({ id, title });
 const parentRole = (id, title) => ({ id, title });
 const eventType = (id, title) => ({ id, title });
+const eventPersonRole = (id, title) => ({ id, title });
 const artifactPersonRole = (id, title) => ({ id, title });
 const artifactType = (id, title) => ({ id, title });
 const artifactSource = (id, title) => ({ id, title });
@@ -52,6 +53,10 @@ export const up = (knex) =>
       table.string('title').notNullable();
     })
     .createTable('event_types', (table) => {
+      table.string('id').primary().notNullable();
+      table.string('title').notNullable();
+    })
+    .createTable('event_person_roles', (table) => {
       table.string('id').primary().notNullable();
       table.string('title').notNullable();
     })
@@ -140,10 +145,19 @@ export const up = (knex) =>
       table.foreign('type_id').references('event_types.id');
       table.foreign('location_id').references('locations.id');
     })
+    .createTable('event_people', (table) => {
+      table.uuid('event_id').notNullable();
+      table.uuid('person_id').notNullable();
+      table.string('role_id').notNullable();
+
+      table.foreign('event_id').references('events.id');
+      table.foreign('person_id').references('people.id');
+      table.foreign('role_id').references('event_person_roles.id');
+    })
 
     // Artifacts
     //
-    .createTable('artifact_collections', (table) => {
+    .createTable('collections', (table) => {
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
       table.string('title').notNullable();
       table.string('short_name').notNullable();
@@ -164,7 +178,7 @@ export const up = (knex) =>
 
       table.foreign('type_id').references('artifact_types.id');
       table.foreign('source_id').references('artifact_sources.id');
-      table.foreign('collection_id').references('artifact_collections.id');
+      table.foreign('collection_id').references('collections.id');
       table.foreign('creator_id').references('users.id');
     })
     .createTable('artifact_people', (table) => {
@@ -245,6 +259,7 @@ export const up = (knex) =>
     .then(() => knex.raw(readSql('001/parents.sql')))
     .then(() => knex.raw(readSql('001/person-details.sql')))
     .then(() => knex.raw(readSql('001/event-details.sql')))
+    .then(() => knex.raw(readSql('001/event-person-details.sql')))
 
     .then(() =>
       knex('artifact_types').insert([
@@ -292,6 +307,17 @@ export const up = (knex) =>
         eventType('death', 'Death'),
         eventType('burial', 'Burial'),
         eventType('marriage', 'Marriage'),
+      ]),
+    )
+    .then(() =>
+      knex('event_person_roles').insert([
+        eventPersonRole('primary', 'Primary'),
+        eventPersonRole('attendee', 'Attendee'),
+        eventPersonRole('resident', 'Resident'),
+        eventPersonRole('bride', 'Bride'),
+        eventPersonRole('groom', 'Groom'),
+        eventPersonRole('mother', 'Mother'),
+        eventPersonRole('father', 'Father'),
       ]),
     )
     .then(() =>
@@ -356,7 +382,8 @@ export const down = (knex) =>
     .dropTableIfExists('artifact_locations')
     .dropTableIfExists('artifact_people')
     .dropTableIfExists('artifacts')
-    .dropTableIfExists('artifact_collections')
+    .dropTableIfExists('collections')
+    .dropTableIfExists('event_people')
     .dropTableIfExists('events')
     .dropTableIfExists('locations')
     .dropTableIfExists('parent_children')
@@ -369,6 +396,7 @@ export const down = (knex) =>
     .dropTableIfExists('artifact_sources')
     .dropTableIfExists('artifact_types')
     .dropTableIfExists('artifact_person_roles')
+    .dropTableIfExists('event_person_roles')
     .dropTableIfExists('event_types')
     .dropTableIfExists('parent_roles')
     .dropTableIfExists('partnership_types')

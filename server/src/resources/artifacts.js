@@ -13,7 +13,7 @@ import * as V from '../validation';
 const postBody = (
   validArtifactTypeFn,
   validArtifactSourceFn,
-  validArtifactCollectionFn,
+  validCollectionFn,
 ) =>
   V.object({
     title: V.and(V.required(), V.isNotNull()),
@@ -31,7 +31,7 @@ const postBody = (
     collectionId: V.and(
       V.required(),
       V.isNotNull(),
-      V.validResource(validArtifactCollectionFn),
+      V.validResource(validCollectionFn),
     ),
   });
 
@@ -42,7 +42,11 @@ const postAssetBody = (validVaultFn) =>
     vaultId: V.and(V.required(), V.isNotNull(), V.validResource(validVaultFn)),
   });
 
-const patchBody = (validArtifactTypeFn, validArtifactSourceFn) =>
+const patchBody = (
+  validArtifactTypeFn,
+  validArtifactSourceFn,
+  validCollectionFn,
+) =>
   V.and(
     V.object({
       title: V.optional(V.isNotNull()),
@@ -52,6 +56,9 @@ const patchBody = (validArtifactTypeFn, validArtifactSourceFn) =>
       ),
       sourceId: V.optional(
         V.and(V.isNotNull(), V.validResource(validArtifactSourceFn)),
+      ),
+      collectionId: V.optional(
+        V.and(V.isNotNull(), V.validResource(validCollectionFn)),
       ),
     }),
     V.isNotEmpty(() => new ParameterError('No fields to update!')),
@@ -83,7 +90,7 @@ export const artifactRoutes = ({
   artifactsRepo,
   artifactTypesRepo,
   artifactSourcesRepo,
-  artifactCollectionsRepo,
+  collectionsRepo,
   assetsRepo,
   vaultsRepo,
 }) =>
@@ -101,7 +108,7 @@ export const artifactRoutes = ({
       postBody(
         artifactTypesRepo.artifactTypeExists,
         artifactSourcesRepo.artifactSourceExists,
-        artifactCollectionsRepo.artifactCollectionExists,
+        collectionsRepo.collectionExists,
       ),
       ({ userId, body }) =>
         artifactsRepo
@@ -125,6 +132,7 @@ export const artifactRoutes = ({
       patchBody(
         artifactTypesRepo.artifactTypeExists,
         artifactSourcesRepo.artifactSourceExists,
+        collectionsRepo.collectionExists,
       ),
       ({ params, body }) =>
         artifactsRepo
@@ -132,7 +140,13 @@ export const artifactRoutes = ({
             params.id,
             J.compose(
               J.filterEmptyProps,
-              J.pick(['title', 'description', 'typeId', 'sourceId']),
+              J.pick([
+                'title',
+                'description',
+                'typeId',
+                'sourceId',
+                'collectionId',
+              ]),
             )(body),
           )
           .then(toResult),

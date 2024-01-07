@@ -9,8 +9,8 @@ import { LocationsPage } from './components/pages/locations/LocationsPage';
 import { LocationPage } from './components/pages/location/LocationPage';
 import { ArtifactsPage } from './components/pages/artifacts/ArtifactsPage';
 import { ArtifactPage } from './components/pages/artifact/ArtifactPage';
-import { ArtifactCollectionsPage } from './components/pages/artifact-collections/ArtifactCollectionsPage';
-import { ArtifactCollectionPage } from './components/pages/artifact-collection/ArtifactCollectionPage';
+import { CollectionsPage } from './components/pages/collections/CollectionsPage';
+import { CollectionPage } from './components/pages/collection/CollectionPage';
 
 const App = () => {
   return (
@@ -42,11 +42,11 @@ const App = () => {
       <Route path="/artifacts/:id">
         <ArtifactPage />
       </Route>
-      <Route path="/artifact-collections">
-        <ArtifactCollectionsPage />
+      <Route path="/collections">
+        <CollectionsPage />
       </Route>
-      <Route path="/artifact-collections/:id">
-        <ArtifactCollectionPage />
+      <Route path="/collections/:id">
+        <CollectionPage />
       </Route>
     </Router>
   );

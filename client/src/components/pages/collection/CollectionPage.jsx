@@ -3,31 +3,28 @@ import { Typography } from '../../Typography';
 import { Layout } from '../../Layout';
 import { Button } from '../../Button';
 import { CustomToggle } from '../../CustomToggle';
-import { useEffect } from 'react';
-import { useArtifactCollection } from '../../../hooks/artifact-collection';
-import { EditArtifactCollection } from './EditArtifactCollection';
-import { ArtifactCollection } from './ArtifactCollection';
+import { useCollection } from '../../../hooks/collection';
+import { EditCollection } from './EditCollection';
+import { Collection } from './Collection';
 
-export const ArtifactCollectionPage = ({ params }) => {
-  const { artifactCollection, reload: reloadArtifactCollection } =
-    useArtifactCollection(params.id);
-
-  useEffect(reloadArtifactCollection, [reloadArtifactCollection]);
+export const CollectionPage = ({ params }) => {
+  const { collection, loadCollection } = useCollection(params.id);
 
   return (
     <Layout>
-      {artifactCollection && (
+      {collection && (
         <>
           <CustomToggle
             buttonText="Edit"
             renderOpen={(onClose) => (
               <div>
                 <Typography>Editing</Typography>
-                <EditArtifactCollection
-                  artifactCollection={artifactCollection}
-                  onUpdateArtifactCollection={() => {
-                    reloadArtifactCollection();
-                    onClose();
+                <EditCollection
+                  collection={collection}
+                  onUpdate={() => {
+                    loadCollection().then(() => {
+                      onClose();
+                    });
                   }}
                   onCancel={onClose}
                 />
@@ -35,7 +32,7 @@ export const ArtifactCollectionPage = ({ params }) => {
             )}
             renderClosed={(onOpen) => (
               <div>
-                <ArtifactCollection artifactCollection={artifactCollection} />
+                <Collection collection={collection} />
                 <Button type="button" onClick={onOpen}>
                   Edit
                 </Button>
@@ -48,7 +45,7 @@ export const ArtifactCollectionPage = ({ params }) => {
   );
 };
 
-ArtifactCollectionPage.propTypes = {
+CollectionPage.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }),

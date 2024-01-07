@@ -35,6 +35,7 @@ export const NewChildForm = ({
         displayFn={displayFn}
         onSearch={onSearch}
         {...propsForField('child')}
+        autoFocus
       />
       <SelectField
         label="Parent Role"

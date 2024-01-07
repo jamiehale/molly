@@ -25,7 +25,11 @@ export const PersonForm = ({
 
   return (
     <Form {...propsForForm()}>
-      <TextField label="Given Names" {...propsForField('givenNames')} />
+      <TextField
+        label="Given Names"
+        {...propsForField('givenNames')}
+        autoFocus
+      />
       <TextField label="Surname" {...propsForField('surname')} />
       <SelectField
         options={genders}

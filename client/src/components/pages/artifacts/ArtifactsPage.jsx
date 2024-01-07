@@ -6,7 +6,7 @@ import { Layout } from '../../Layout';
 import { ButtonToggle } from '../../ButtonToggle';
 
 export const ArtifactsPage = () => {
-  const { artifacts, reloadArtifacts } = useArtifacts();
+  const { artifacts, loadArtifacts } = useArtifacts();
 
   return (
     <Layout>
@@ -16,9 +16,10 @@ export const ArtifactsPage = () => {
         buttonText="Add Artifact"
         renderOpen={(onClose) => (
           <NewArtifact
-            onNewArtifact={() => {
-              reloadArtifacts();
-              onClose();
+            onNew={() => {
+              loadArtifacts().then(() => {
+                onClose();
+              });
             }}
             onCancel={onClose}
           />

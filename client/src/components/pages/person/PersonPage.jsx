@@ -7,21 +7,18 @@ import { useParents } from '../../../hooks/parents';
 import { NewChild } from './NewChild';
 import { Button } from '../../Button';
 import { NewParent } from './NewParent';
-import { PersonList } from './PersonList';
+import { PersonList } from '../../PersonList';
 import { ButtonToggle } from '../../ButtonToggle';
 import { CustomToggle } from '../../CustomToggle';
 import { EditPerson } from './EditPerson';
-import { useEffect } from 'react';
 import { FlexColumn } from '../../FlexColumn';
 import { Person } from './Person';
 import { FlexRow } from '../../FlexRow';
 
 export const PersonPage = ({ params }) => {
-  const { person, reload: reloadPerson } = usePerson(params.id);
+  const { person, loadPerson } = usePerson(params.id);
   const { children, reloadChildren } = useChildren(params.id);
   const { parents, reloadParents } = useParents(params.id);
-
-  useEffect(reloadPerson, [reloadPerson]);
 
   return (
     <Layout>
@@ -34,9 +31,10 @@ export const PersonPage = ({ params }) => {
                 <Typography>Editing</Typography>
                 <EditPerson
                   person={person}
-                  onUpdatePerson={() => {
-                    reloadPerson();
-                    onClose();
+                  onUpdate={() => {
+                    loadPerson().then(() => {
+                      onClose();
+                    });
                   }}
                   onCancel={onClose}
                 />

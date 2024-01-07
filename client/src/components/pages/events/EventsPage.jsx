@@ -6,7 +6,7 @@ import { NewEvent } from './NewEvent';
 import { useEvents } from '../../../hooks/events';
 
 export const EventsPage = () => {
-  const { events, reloadEvents } = useEvents();
+  const { events, loadEvents } = useEvents();
 
   return (
     <Layout>
@@ -16,9 +16,10 @@ export const EventsPage = () => {
         buttonText="Add Event"
         renderOpen={(onClose) => (
           <NewEvent
-            onNewEvent={() => {
-              reloadEvents();
-              onClose();
+            onCreate={() => {
+              loadEvents().then(() => {
+                onClose();
+              });
             }}
             onCancel={onClose}
           />

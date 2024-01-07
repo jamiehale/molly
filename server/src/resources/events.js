@@ -4,6 +4,8 @@ import {
   getAllResources,
   postResource,
   patchResource,
+  getAllChildResources,
+  postChildResource,
 } from '../resource-helpers';
 import * as V from '../validation';
 import * as J from '../jlib';
@@ -48,7 +50,40 @@ const toDetailsResult = J.pick([
   'locationValue',
 ]);
 
-export const eventRoutes = ({ eventsRepo, eventTypesRepo, locationsRepo }) =>
+const toEventPersonResult = J.pick([
+  'eventId',
+  'roleId',
+  'roleTitle',
+  'id',
+  'givenNames',
+  'surname',
+  'genderId',
+  'genderTitle',
+  'creatorId',
+]);
+
+const postEventPersonBody = (validPersonFn, validEventPersonRoleFn) =>
+  V.object({
+    personId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validPersonFn),
+    ),
+    roleId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validEventPersonRoleFn),
+    ),
+  });
+
+export const eventRoutes = ({
+  eventsRepo,
+  eventPersonRolesRepo,
+  eventPeopleRepo,
+  eventTypesRepo,
+  peopleRepo,
+  locationsRepo,
+}) =>
   routes([
     getSingleResource('/events/:id', eventsRepo.eventExists, ({ params }) =>
       eventsRepo.readEvent(params.id).then(toDetailsResult),
@@ -83,5 +118,31 @@ export const eventRoutes = ({ eventsRepo, eventTypesRepo, locationsRepo }) =>
             )(body),
           )
           .then(toResult),
+    ),
+    getAllChildResources(
+      '/events/:id/people',
+      eventsRepo.eventExists,
+      ({ params }) =>
+        eventPeopleRepo
+          .readAllEventPeople(params.id)
+          .then(J.map(toEventPersonResult)),
+    ),
+    postChildResource(
+      '/events/:id/people',
+      eventsRepo.eventExists,
+      postEventPersonBody(
+        peopleRepo.personExists,
+        eventPersonRolesRepo.eventPersonRoleExists,
+      ),
+      ({ params, body }) =>
+        eventPeopleRepo
+          .createEventPerson(
+            J.compose(
+              J.filterEmptyProps,
+              J.assoc('eventId', params.id),
+              J.pick(['personId', 'roleId']),
+            )(body),
+          )
+          .then(toEventPersonResult),
     ),
   ]);
