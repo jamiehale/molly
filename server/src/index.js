@@ -48,6 +48,8 @@ import { createEventPeopleStore } from './data/stores/event-people';
 import { createEventPeopleRepo } from './data/repos/event-people';
 import { createEventPersonRolesStore } from './data/stores/event-person-roles';
 import { createEventPersonRolesRepo } from './data/repos/event-person-roles';
+import { createEventArtifactsRepo } from './data/repos/event-artifacts';
+import { createEventArtifactsStore } from './data/stores/event-artifacts';
 
 config();
 
@@ -71,6 +73,7 @@ const stores = {
   assetsStore: createAssetsStore(db),
   childrenStore: createChildrenStore(db),
   collectionsStore: createCollectionsStore(db),
+  eventArtifactsStore: createEventArtifactsStore(db),
   eventDetailsStore: createEventDetailsStore(db),
   eventPeopleStore: createEventPeopleStore(db),
   eventPersonDetailsStore: createEventPersonDetailsStore(db),
@@ -97,6 +100,7 @@ const repos = {
   assetsRepo: createAssetsRepo(stores),
   childrenRepo: createChildrenRepo(stores),
   collectionsRepo: createCollectionsRepo(stores),
+  eventArtifactsRepo: createEventArtifactsRepo(stores),
   eventPeopleRepo: createEventPeopleRepo(stores),
   eventPersonRolesRepo: createEventPersonRolesRepo(stores),
   eventTypesRepo: createEventTypesRepo(stores),

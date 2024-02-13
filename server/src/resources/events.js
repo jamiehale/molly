@@ -62,6 +62,22 @@ const toEventPersonResult = J.pick([
   'creatorId',
 ]);
 
+const toEventArtifactResult = J.pick([
+  'eventId',
+  'roleId',
+  'roleTitle',
+  'id',
+  'title',
+  'description',
+  'typeId',
+  'typeTitle',
+  'sourceId',
+  'sourceTitle',
+  'collectionId',
+  'collectionTitle',
+  'creatorId',
+]);
+
 const postEventPersonBody = (validPersonFn, validEventPersonRoleFn) =>
   V.object({
     personId: V.and(
@@ -77,7 +93,9 @@ const postEventPersonBody = (validPersonFn, validEventPersonRoleFn) =>
   });
 
 export const eventRoutes = ({
+  artifactsRepo,
   eventsRepo,
+  eventArtifactsRepo,
   eventPersonRolesRepo,
   eventPeopleRepo,
   eventTypesRepo,
@@ -144,5 +162,13 @@ export const eventRoutes = ({
             )(body),
           )
           .then(toEventPersonResult),
+    ),
+    getAllChildResources(
+      '/events/:id/artifacts',
+      artifactsRepo.eventExists,
+      ({ params }) =>
+        eventArtifactsRepo
+          .readAllEventArtifacts(params.id)
+          .then(J.map(toEventArtifactResult)),
     ),
   ]);

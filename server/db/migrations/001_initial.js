@@ -260,6 +260,7 @@ export const up = (knex) =>
     .then(() => knex.raw(readSql('001/person-details.sql')))
     .then(() => knex.raw(readSql('001/event-details.sql')))
     .then(() => knex.raw(readSql('001/event-person-details.sql')))
+    .then(() => knex.raw(readSql('001/event-artifact-details.sql')))
 
     .then(() =>
       knex('artifact_types').insert([
@@ -370,6 +371,8 @@ export const up = (knex) =>
 
 export const down = (knex) =>
   knex.schema
+    .dropViewIfExists('event_artifact_details')
+    .dropViewIfExists('event_person_details')
     .dropViewIfExists('event_details')
     .dropViewIfExists('person_details')
     .dropViewIfExists('parents')
