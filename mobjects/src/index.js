@@ -10,6 +10,7 @@ import { createMobjectsRepo } from './data/repos/mobjects.js';
 import { httpErrorFromMollyError } from './resource-helpers.js';
 import { createTagsStore } from './data/stores/tags.js';
 import { createAttributesStore } from './data/stores/attributes.js';
+import { createFilesStore } from './data/stores/files.js';
 
 config();
 
@@ -26,6 +27,7 @@ const db = Knex({
 
 const stores = {
   mobjectsStore: createMobjectsStore(db),
+  filesStore: createFilesStore(db),
   tagsStore: createTagsStore(db),
   attributesStore: createAttributesStore(db),
 };

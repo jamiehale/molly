@@ -26,12 +26,27 @@ export const up = (knex) =>
     })
 
     .createTable('mobjects', (table) => {
-      table.string('id').primary().notNullable();
-      table.string('path').notNullable();
+      table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
+      table.string('key').notNullable();
       table.timestamps(true, true);
+
+      table.unique(['key']);
+    })
+    .createTable('files', (table) => {
+      table.string('hash').primary();
+      table.timestamps(true, true);
+
+      table.unique(['mobject_id', 'hash']);
+    })
+    .createTable('mobject_files', (table) => {
+      table.uuid('mobject_id').notNullable();
+      table.string('file_hash').notNullable();
+
+      table.foreign('mobject_id').references('mobjects.id');
+      table.foreign('file_hash').references('files.hash');
     })
     .createTable('tags', (table) => {
-      table.string('mobject_id').notNullable();
+      table.uuid('mobject_id').notNullable();
       table.string('tag').notNullable();
       table.timestamps(true, true);
 
@@ -39,7 +54,7 @@ export const up = (knex) =>
       table.unique(['mobject_id', 'tag']);
     })
     .createTable('attributes', (table) => {
-      table.string('mobject_id').notNullable();
+      table.uuid('mobject_id').notNullable();
       table.string('attribute_name').notNullable();
       table.string('attribute_value').notNullable();
       table.timestamps(true, true);
