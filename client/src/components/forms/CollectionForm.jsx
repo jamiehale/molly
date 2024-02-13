@@ -4,7 +4,7 @@ import { TextField } from '../TextField';
 import { Button } from '../Button';
 import { Form } from '../Form';
 import { FlexRow } from '../FlexRow';
-import { TextArea } from '../TextArea';
+import { TextAreaField } from '../TextAreaField';
 
 export const CollectionForm = ({
   collection,
@@ -31,7 +31,7 @@ export const CollectionForm = ({
     <Form {...propsForForm()}>
       <TextField label="Title" {...propsForField('title')} autoFocus />
       <TextField label="Short Name" {...propsForField('shortName')} />
-      <TextArea label="Description" {...propsForField('description')} />
+      <TextAreaField label="Description" {...propsForField('description')} />
       <FlexRow className="mt-1">
         <Button type="submit">{submitButtonText || 'Add'}</Button>
         <Button type="button" onClick={onCancel}>

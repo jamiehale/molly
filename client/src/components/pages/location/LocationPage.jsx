@@ -6,12 +6,14 @@ import { CustomToggle } from '../../CustomToggle';
 import { useLocation } from '../../../hooks/location';
 import { EditLocation } from './EditLocation';
 import { Location } from './Location';
+import { Link } from '../../Router';
 
 export const LocationPage = ({ params }) => {
   const { location, loadLocation } = useLocation(params.id);
 
   return (
     <Layout>
+      <Link to="/locations">&lt;&lt;</Link>
       {location && (
         <>
           <CustomToggle

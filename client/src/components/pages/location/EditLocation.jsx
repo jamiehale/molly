@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
-import { useLocation } from '../../../hooks/location';
+import { useUpdateLocation } from '../../../hooks/update-location';
 import { LocationForm } from '../../forms/LocationForm';
 
 export const EditLocation = ({ location, onUpdate, onCancel }) => {
-  const { updateLocation } = useLocation(location.id);
+  const { updateLocation } = useUpdateLocation(location.id);
 
   const handleSubmit = useCallback(
     ({ value }) =>

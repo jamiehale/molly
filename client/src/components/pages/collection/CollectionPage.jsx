@@ -6,12 +6,14 @@ import { CustomToggle } from '../../CustomToggle';
 import { useCollection } from '../../../hooks/collection';
 import { EditCollection } from './EditCollection';
 import { Collection } from './Collection';
+import { Link } from '../../Router';
 
 export const CollectionPage = ({ params }) => {
   const { collection, loadCollection } = useCollection(params.id);
 
   return (
     <Layout>
+      <Link to="/collections">&lt;&lt;</Link>
       {collection && (
         <>
           <CustomToggle

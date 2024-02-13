@@ -4,21 +4,21 @@ import { useParentRoles } from '../../../hooks/parent-roles';
 import { usePeopleSearch } from '../../../hooks/people-search';
 import { NewChildForm } from '../../forms/NewChildForm';
 import * as J from '../../../lib/jlib';
-import { useChildren } from '../../../hooks/children';
+import { useCreateChild } from '../../../hooks/create-child';
 
 export const NewChild = ({ parentId, onNewChild, onCancel }) => {
   const { parentRoles } = useParentRoles();
   const { searchForPeople } = usePeopleSearch();
   const [searchResults, setSearchResults] = useState([]);
-  const { addChild } = useChildren(parentId);
+  const { createChild } = useCreateChild(parentId);
 
   const handleSubmit = useCallback(
     ({ childId, parentRoleId }) =>
-      addChild(childId, parentRoleId).then(() => {
+      createChild(childId, parentRoleId).then(() => {
         setSearchResults([]);
         onNewChild();
       }),
-    [addChild, setSearchResults, onNewChild],
+    [createChild, setSearchResults, onNewChild],
   );
 
   const handleSearch = useCallback(

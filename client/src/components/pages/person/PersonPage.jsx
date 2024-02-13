@@ -14,14 +14,90 @@ import { EditPerson } from './EditPerson';
 import { FlexColumn } from '../../FlexColumn';
 import { Person } from './Person';
 import { FlexRow } from '../../FlexRow';
+import { Link } from '../../Router';
+
+const Children = ({ parentId }) => {
+  const { children, loadChildren } = useChildren(parentId);
+
+  return (
+    <>
+      <Typography as="subtitle">Children</Typography>
+      <PersonList
+        people={children}
+        displayFn={(person) =>
+          `${person.surname}, ${person.givenNames} (${person.parentRoleTitle})`
+        }
+      />
+      <div>
+        <ButtonToggle
+          buttonText="Add Child"
+          renderOpen={(onClose) => (
+            <div>
+              <NewChild
+                parentId={parentId}
+                onNewChild={() => {
+                  loadChildren().then(() => {
+                    onClose();
+                  });
+                }}
+                onCancel={onClose}
+              />
+            </div>
+          )}
+        />
+      </div>
+    </>
+  );
+};
+
+Children.propTypes = {
+  parentId: PropTypes.string.isRequired,
+};
+
+const Parents = ({ childId }) => {
+  const { parents, loadParents } = useParents(childId);
+
+  return (
+    <>
+      <Typography as="subtitle">Parents</Typography>
+      <PersonList
+        people={parents}
+        displayFn={(person) =>
+          `${person.surname}, ${person.givenNames} (${person.parentRoleTitle})`
+        }
+      ></PersonList>
+      <div>
+        <ButtonToggle
+          buttonText="Add Parent"
+          renderOpen={(onClose) => (
+            <div>
+              <NewParent
+                childId={childId}
+                onNewParent={() => {
+                  loadParents().then(() => {
+                    onClose();
+                  });
+                }}
+                onCancel={onClose}
+              />
+            </div>
+          )}
+        />
+      </div>
+    </>
+  );
+};
+
+Parents.propTypes = {
+  childId: PropTypes.string.isRequired,
+};
 
 export const PersonPage = ({ params }) => {
   const { person, loadPerson } = usePerson(params.id);
-  const { children, reloadChildren } = useChildren(params.id);
-  const { parents, reloadParents } = useParents(params.id);
 
   return (
     <Layout>
+      <Link to="/people">&lt;&lt;</Link>
       {person && (
         <>
           <CustomToggle
@@ -52,54 +128,8 @@ export const PersonPage = ({ params }) => {
             )}
           />
           <FlexColumn>
-            <Typography>Children</Typography>
-            <PersonList
-              people={children}
-              displayFn={(person) =>
-                `${person.surname}, ${person.givenNames} (${person.parentRoleTitle})`
-              }
-            />
-            <div>
-              <ButtonToggle
-                buttonText="Add Child"
-                renderOpen={(onClose) => (
-                  <div>
-                    <NewChild
-                      parentId={person.id}
-                      onNewChild={() => {
-                        reloadChildren();
-                        onClose();
-                      }}
-                      onCancel={onClose}
-                    />
-                  </div>
-                )}
-              />
-            </div>
-            <Typography>Parents</Typography>
-            <PersonList
-              people={parents}
-              displayFn={(person) =>
-                `${person.surname}, ${person.givenNames} (${person.parentRoleTitle})`
-              }
-            ></PersonList>
-            <div>
-              <ButtonToggle
-                buttonText="Add Parent"
-                renderOpen={(onClose) => (
-                  <div>
-                    <NewParent
-                      childId={person.id}
-                      onNewParent={() => {
-                        reloadParents();
-                        onClose();
-                      }}
-                      onCancel={onClose}
-                    />
-                  </div>
-                )}
-              />
-            </div>
+            <Children parentId={person.id} />
+            <Parents childId={person.id} />
           </FlexColumn>
         </>
       )}

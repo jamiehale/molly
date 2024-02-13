@@ -1,25 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useApi } from './api';
+import * as J from '../lib/jlib';
+import { useResources } from './resources';
 
-export const useParents = (childId) => {
-  const { authorizedGet, authorizedPost } = useApi();
-
-  const [parents, setParents] = useState([]);
-
-  useEffect(() => {
-    authorizedGet(`/people/${childId}/parents`).then(setParents);
-  }, [childId, authorizedGet, setParents]);
-
-  const addParent = useCallback(
-    (parentId, parentRoleId) =>
-      authorizedPost(`/people/${childId}/parents`, { parentId, parentRoleId }),
-    [childId, authorizedPost],
+export const useParents = (childId) =>
+  J.transform(
+    {
+      parents: J.prop('resources'),
+      loadParents: J.prop('loadResources'),
+    },
+    useResources(`/people/${childId}/parents`),
   );
-
-  const reloadParents = useCallback(
-    () => authorizedGet(`/people/${childId}/parents`).then(setParents),
-    [childId, authorizedGet, setParents],
-  );
-
-  return { parents, reloadParents, addParent };
-};

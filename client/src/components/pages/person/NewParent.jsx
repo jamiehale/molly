@@ -3,22 +3,22 @@ import { useCallback, useState } from 'react';
 import { useParentRoles } from '../../../hooks/parent-roles';
 import { usePeopleSearch } from '../../../hooks/people-search';
 import * as J from '../../../lib/jlib';
-import { useParents } from '../../../hooks/parents';
+import { useCreateParent } from '../../../hooks/create-parent';
 import { NewParentForm } from '../../forms/NewParentForm';
 
 export const NewParent = ({ childId, onNewParent, onCancel }) => {
   const { parentRoles } = useParentRoles();
   const { searchForPeople } = usePeopleSearch();
   const [searchResults, setSearchResults] = useState([]);
-  const { addParent } = useParents(childId);
+  const { createParent } = useCreateParent(childId);
 
   const handleSubmit = useCallback(
     ({ parentId, parentRoleId }) =>
-      addParent(parentId, parentRoleId).then(() => {
+      createParent(parentId, parentRoleId).then(() => {
         setSearchResults([]);
         onNewParent();
       }),
-    [addParent, setSearchResults, onNewParent],
+    [createParent, setSearchResults, onNewParent],
   );
 
   const handleSearch = useCallback(

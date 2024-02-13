@@ -6,6 +6,11 @@ const types = {
       {children}
     </h1>
   ),
+  subtitle: ({ className, children, ...props }) => (
+    <h1 className={classnames('text-2xl mb-2', className)} {...props}>
+      {children}
+    </h1>
+  ),
   p: ({ className, children, ...props }) => (
     <p className={classnames(className, '')} {...props}>
       {children}
