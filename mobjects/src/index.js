@@ -11,6 +11,7 @@ import { httpErrorFromMollyError } from './resource-helpers.js';
 import { createTagsStore } from './data/stores/tags.js';
 import { createAttributesStore } from './data/stores/attributes.js';
 import { createFilesStore } from './data/stores/files.js';
+import { createMobjectFilesStore } from './data/stores/mobject_files.js';
 
 config();
 
@@ -28,6 +29,7 @@ const db = Knex({
 const stores = {
   mobjectsStore: createMobjectsStore(db),
   filesStore: createFilesStore(db),
+  mobjectFilesStore: createMobjectFilesStore(db),
   tagsStore: createTagsStore(db),
   attributesStore: createAttributesStore(db),
 };
@@ -42,7 +44,7 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use('/', api({ basePath: process.env.BASE_PATH }, repos));
+app.use('/', api({ basePath: process.env.BASE_PATH, tmpPath: '/tmp' }, repos));
 
 app.use((req, res, next) => {
   next(new HttpError('Not Found', 404));

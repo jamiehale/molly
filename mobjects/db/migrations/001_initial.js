@@ -35,8 +35,6 @@ export const up = (knex) =>
     .createTable('files', (table) => {
       table.string('hash').primary();
       table.timestamps(true, true);
-
-      table.unique(['mobject_id', 'hash']);
     })
     .createTable('mobject_files', (table) => {
       table.uuid('mobject_id').notNullable();
@@ -67,6 +65,8 @@ export const down = (knex) =>
   knex.schema
     .dropTableIfExists('attributes')
     .dropTableIfExists('tags')
+    .dropTableIfExists('mobject_files')
+    .dropTableIfExists('files')
     .dropTableIfExists('mobjects')
     .dropTableIfExists('api_keys')
     .dropTableIfExists('users');

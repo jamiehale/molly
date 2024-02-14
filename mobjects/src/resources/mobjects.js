@@ -74,7 +74,7 @@ const toParentResult = J.pick([
 
 const postTagBody = V.object({ tag: V.required() });
 
-const receiveFile = (tmpFilename) =>
+const receiveFile = (req, tmpFilename) =>
   new Promise((resolve, reject) => {
     const output = fs.createWriteStream(tmpFilename);
     output.on('open', () => {
@@ -84,12 +84,13 @@ const receiveFile = (tmpFilename) =>
     output.on('close', resolve);
   });
 
-const hashFile = (tmpFilename) => {
-  const hashStream = crypto.createHash('sha1');
-  const inputStream = fs.createReadStream(tmpFilename);
-  inputStream.pipe(hashStream);
-  return hashStream.digest('hex');
-};
+const hashFile = (tmpFilename) =>
+  new Promise((resolve) => {
+    const hashStream = crypto.createHash('sha1');
+    const inputStream = fs.createReadStream(tmpFilename);
+    inputStream.pipe(hashStream);
+    inputStream.on('end', () => resolve(hashStream.digest('hex')));
+  });
 
 const objectPathFromHash = (hash) =>
   hash
@@ -103,7 +104,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.post('/o/(*)/-/tags', (req, res, next) => {
         const key = req.params[0];
         mobjectsRepo
-          .mobjectExists(key)
+          .mobjectExistsByKey(key)
           .then(J.throwIfFalse(() => new NotFoundError('Not found')))
           .then(() =>
             postTagBody({
@@ -123,7 +124,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.get('/o/(*)/-/tags', (req, res, next) => {
         const key = req.params[0];
         mobjectsRepo
-          .mobjectExists(key)
+          .mobjectExistsByKey(key)
           .then(J.throwIfFalse(() => new NotFoundError('Not found')))
           .then(() =>
             mobjectsRepo.readAllMobjectTags(key).then((tags) => {
@@ -137,7 +138,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.put('/o/(*)/-/tags', (req, res, next) => {
         const key = req.params[0];
         mobjectsRepo
-          .mobjectExists(key)
+          .mobjectExistsByKey(key)
           .then(J.throwIfFalse(() => new NotFoundError('Not found')))
           .then(() => patchTagsBody()({ scope: '', value: req.body }))
           .then((tags) =>
@@ -153,7 +154,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
         const key = req.params[0];
         const { tag } = req.params;
         mobjectsRepo
-          .mobjectExists(key)
+          .mobjectExistsByKey(key)
           .then(J.throwIfFalse(() => new NotFoundError('Not found')))
           .then(() =>
             mobjectsRepo.deleteMobjectTag(key, tag).then(() => {
@@ -168,7 +169,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.get('/o/(*)/-/attributes', (req, res, next) => {
         const key = req.params[0];
         mobjectsRepo
-          .mobjectExists(key)
+          .mobjectExistsByKey(key)
           .then(J.throwIfFalse(() => new NotFoundError('Not found')))
           .then(() =>
             mobjectsRepo.readAllMobjectAttributes(key).then((attributes) => {
@@ -182,9 +183,10 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.get('/o/(*)', (req, res, next) => {
         const key = req.params[0];
         mobjectsRepo
-          .readMobject(key)
-          .then((o) => {
-            res.sendFile(path.join(config.basePath, o.path));
+          .readMobjectByKey(key)
+          .then((mobject) => mobjectsRepo.readFile(mobject.id))
+          .then((file) => {
+            res.sendFile(path.join(config.basePath, objectPathFromHash(file.hash), `${file.hash}${path.extname(key)}`));
           })
           .catch(next);
       });
@@ -197,29 +199,29 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
         const tmpFilename = path.join(config.tmpPath, `${crypto.randomBytes(16).toString('hex')}_${basename}`);
         fsPromises
           .mkdir(config.tmpPath, { recursive: true })
-          .then(receiveFile(tmpFilename))
-          .then(hashFile(tmpFilename))
+          .then(() => receiveFile(req, tmpFilename))
+          .then(() => hashFile(tmpFilename))
           .then((hash) => mobjectsRepo.findOrCreateFile(hash))
           .then((file) => {
             const objectPath = path.join(config.basePath, objectPathFromHash(file.hash));
-            const objectFilename = path.join(objectPath, `${file.hash}.${extension}`);
-            fsPromises.exists(objectFilename).then((exists) => {
-              if (!exists) {
-                return fsPromises
-                  .mkdir(objectPath, { recursive: true })
-                  .then(() => fsPromises.rename(tmpFilename, objectFilename));
-              }
-            });
+            const objectFilename = path.join(objectPath, `${file.hash}${extension}`);
+            if (!fs.existsSync(objectFilename)) {
+              return fsPromises
+                .mkdir(objectPath, { recursive: true })
+                .then(() => fsPromises.rename(tmpFilename, objectFilename));
+            } else {
+              fs.rmSync(tmpFilename);
+            }
           })
-          .then(() => mobjectsRepo.mobjectExists(key))
+          .then(() => mobjectsRepo.mobjectExistsByKey(key))
           .then((exists) => {
             if (exists) {
-              mobjectsRepo.updateMobject(key, {}).then(() => {
+              mobjectsRepo.updateMobjectByKey(key).then(() => {
                 res.status(204);
                 res.send();
               });
             } else {
-              mobjectsRepo.createMobject(key, key).then(() => {
+              mobjectsRepo.createMobject(key, file.hash).then(() => {
                 res.status(201);
                 res.send();
               });
@@ -232,7 +234,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.delete('/o/(*)', (req, res, next) => {
         const key = req.params[0];
         mobjectsRepo
-          .mobjectExists(key)
+          .mobjectExistsByKey(key)
           .then(J.throwIfFalse(() => new NotFoundError('Not found')))
           .then(() => mobjectsRepo.deleteMobject(key).then(() => fsPromises.rm(path.join(config.basePath, key))))
           .then(() => {
@@ -246,7 +248,7 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
       router.post('/o', (req, res, next) => {
         postBody()({ scope: '', value: req.body })
           .then(({ key, path }) => {
-            mobjectsRepo.mobjectExists(key).then((exists) => {
+            mobjectsRepo.mobjectExistsByKey(key).then((exists) => {
               if (exists) {
                 throw new ParameterError(`Mobject with key ${key} exists`);
               }

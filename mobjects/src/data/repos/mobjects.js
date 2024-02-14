@@ -2,7 +2,7 @@ import * as J from '../../jlib.js';
 
 const fromMobject = J.transform({
   id: J.prop('id'),
-  path: J.prop('path'),
+  key: J.prop('key'),
 });
 
 const toMobject = J.transform({
@@ -12,15 +12,21 @@ const toMobject = J.transform({
   updatedAt: J.prop('updated_at'),
 });
 
-const createMobject = J.curry((mobjectStore, id, path) =>
-  mobjectStore.create(fromMobject({ id, path })).then(toMobject),
+const createMobject = J.curry((mobjectStore, mobjectFileStore, key, hash) =>
+  mobjectStore
+    .create(fromMobject({ key }))
+    .then((mobject) => mobjectFileStore.create({ mobject_id: mobject.id, hash }).then(toMobject)),
 );
 
 const readMobject = J.curry((mobjectStore, id) => mobjectStore.readSingle({ id }).then(toMobject));
 
-const mobjectExists = J.curry((mobjectStore, id) => mobjectStore.exists({ id }));
+const readMobjectByKey = J.curry((mobjectStore, key) => mobjectStore.readSingle({ key }).then(toMobject));
 
-const updateMobject = J.curry((mobjectStore, id, fields) => mobjectStore.updateSingle({ id }, fields).then(toMobject));
+const mobjectExistsByKey = J.curry((mobjectStore, key) => mobjectStore.exists({ key }));
+
+const updateMobjectByKey = J.curry((mobjectStore, key, fields = {}) =>
+  mobjectStore.updateSingle({ key }, fields).then(toMobject),
+);
 
 const deleteMobject = J.curry((mobjectStore, id) => mobjectStore.deleteSingle({ id }));
 
@@ -30,10 +36,12 @@ const toFile = J.transform({
   updatedAt: J.prop('updated_at'),
 });
 
+const readFile = J.curry((filesStore, id) => filesStore.readSingle({ mobject_id: id }).then(toFile));
+
 const findOrCreateFile = J.curry((filesStore, hash) =>
-  filesStore.fileExists(hash).then((exists) => {
+  filesStore.exists({ hash }).then((exists) => {
     if (exists) {
-      return filesStore.readSingle(hash).then(toFile);
+      return filesStore.readSingle({ hash }).then(toFile);
     }
     return filesStore.create({ hash }).then(toFile);
   }),
@@ -65,13 +73,17 @@ const readAllMobjectAttributes = J.curry((attributesStore, mobjectId) =>
   attributesStore.readAll({ mobject_id: mobjectId }).then(J.map(toAttribute)),
 );
 
-export const createMobjectsRepo = ({ mobjectsStore, filesStore, tagsStore, attributesStore }) => ({
-  createMobject: createMobject(mobjectsStore),
+export const createMobjectsRepo = ({ mobjectsStore, filesStore, mobjectFileStore, tagsStore, attributesStore }) => ({
+  createMobject: createMobject(mobjectsStore, mobjectFileStore),
   readMobject: readMobject(mobjectsStore),
-  mobjectExists: mobjectExists(mobjectsStore),
-  updateMobject: updateMobject(mobjectsStore),
+  readMobjectByKey: readMobjectByKey(mobjectsStore),
+  mobjectExistsByKey: mobjectExistsByKey(mobjectsStore),
+  updateMobjectByKey: updateMobjectByKey(mobjectsStore),
   deleteMobject: deleteMobject(mobjectsStore),
+
+  readFile: readFile(filesStore),
   findOrCreateFile: findOrCreateFile(filesStore),
+
   createMobjectTag: createMobjectTag(tagsStore),
   readAllMobjectTags: readAllMobjectTags(tagsStore),
   deleteMobjectTag: deleteMobjectTag(tagsStore),

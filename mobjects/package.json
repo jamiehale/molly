@@ -12,6 +12,7 @@
     "db:migrate:rollback": "knex migrate:rollback",
     "db:migrate:make": "knex --esm migrate:make",
     "db:data:prune:yes:really": "rm -rf db/data/*",
+    "data:prune:yes:really": "rm -rf data/*",
     "test": "jest"
   },
   "dependencies": {
