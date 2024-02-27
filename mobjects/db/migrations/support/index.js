@@ -1,4 +1,7 @@
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-export const readSql = (filename) =>
-  fs.readFileSync(`${__dirname}/${filename}`, { encoding: 'utf-8' });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export const readSql = (filename) => fs.readFileSync(`${__dirname}/${filename}`, { encoding: 'utf-8' });

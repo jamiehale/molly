@@ -8,8 +8,20 @@ const fromMobject = J.transform({
 const toMobject = J.transform({
   id: J.prop('id'),
   key: J.prop('key'),
+  mimeType: J.prop('mimetype'),
   createdAt: J.prop('created_at'),
   updatedAt: J.prop('updated_at'),
+});
+
+const toMobjectDetails = J.transform({
+  id: J.prop('id'),
+  key: J.prop('key'),
+  mimeType: J.prop('mimetype'),
+  createdAt: J.prop('created_at'),
+  updatedAt: J.prop('updated_at'),
+  fileHash: J.prop('file_hash'),
+  fileCreatedAt: J.prop('file_created_at'),
+  fileUpdatedAt: J.prop('file_updated_at'),
 });
 
 const createMobject = J.curry((mobjectStore, mobjectFileStore, key, hash) =>
@@ -20,7 +32,20 @@ const createMobject = J.curry((mobjectStore, mobjectFileStore, key, hash) =>
 
 const readMobject = J.curry((mobjectStore, id) => mobjectStore.readSingle({ id }).then(toMobject));
 
-const readMobjectByKey = J.curry((mobjectStore, key) => mobjectStore.readSingle({ key }).then(toMobject));
+const readMobjectByKey = J.curry((mobjectDetailsStore, key) =>
+  mobjectDetailsStore.readSingle({ key }).then(toMobjectDetails),
+);
+
+const findOrCreateMobject = J.curry((mobjectStore, key, mimeType) =>
+  mobjectStore.exists({ key }).then((exists) => {
+    if (exists) {
+      return mobjectStore
+        .updateSingle({ key }, { mime_type: mimeType })
+        .then(() => mobjectStore.readSingle({ key }).then(toMobject));
+    }
+    return mobjectStore.create({ key, mimetype: mimeType }).then(toMobject);
+  }),
+);
 
 const mobjectExistsByKey = J.curry((mobjectStore, key) => mobjectStore.exists({ key }));
 
@@ -28,7 +53,7 @@ const updateMobjectByKey = J.curry((mobjectStore, key, fields = {}) =>
   mobjectStore.updateSingle({ key }, fields).then(toMobject),
 );
 
-const deleteMobject = J.curry((mobjectStore, id) => mobjectStore.deleteSingle({ id }));
+const deleteMobject = J.curry((mobjectStore, key) => mobjectStore.deleteSingle({ key }));
 
 const toFile = J.transform({
   hash: J.prop('hash'),
@@ -44,6 +69,21 @@ const findOrCreateFile = J.curry((filesStore, hash) =>
       return filesStore.readSingle({ hash }).then(toFile);
     }
     return filesStore.create({ hash }).then(toFile);
+  }),
+);
+
+const updateOrCreateMobjectFile = J.curry((knexStore, mobjectFileStore, mobjectId, hash) =>
+  mobjectFileStore.exists({ mobject_id: mobjectId, file_hash: hash, replaced_at: null }).then((exists) => {
+    if (!exists) {
+      return knexStore('mobject_files')
+        .where({ mobject_id: mobjectId })
+        .whereNot({ file_hash: hash })
+        .whereNull('replaced_at')
+        .update({
+          replaced_at: knexStore.fn.now(),
+        })
+        .then(() => mobjectFileStore.create({ mobject_id: mobjectId, file_hash: hash }));
+    }
   }),
 );
 
@@ -73,16 +113,27 @@ const readAllMobjectAttributes = J.curry((attributesStore, mobjectId) =>
   attributesStore.readAll({ mobject_id: mobjectId }).then(J.map(toAttribute)),
 );
 
-export const createMobjectsRepo = ({ mobjectsStore, filesStore, mobjectFileStore, tagsStore, attributesStore }) => ({
-  createMobject: createMobject(mobjectsStore, mobjectFileStore),
+export const createMobjectsRepo = ({
+  knexStore,
+  mobjectsStore,
+  filesStore,
+  mobjectDetailsStore,
+  mobjectFilesStore,
+  tagsStore,
+  attributesStore,
+}) => ({
+  createMobject: createMobject(mobjectsStore, mobjectFilesStore),
   readMobject: readMobject(mobjectsStore),
-  readMobjectByKey: readMobjectByKey(mobjectsStore),
+  readMobjectByKey: readMobjectByKey(mobjectDetailsStore),
+  findOrCreateMobject: findOrCreateMobject(mobjectsStore),
   mobjectExistsByKey: mobjectExistsByKey(mobjectsStore),
   updateMobjectByKey: updateMobjectByKey(mobjectsStore),
   deleteMobject: deleteMobject(mobjectsStore),
 
   readFile: readFile(filesStore),
   findOrCreateFile: findOrCreateFile(filesStore),
+
+  updateOrCreateMobjectFile: updateOrCreateMobjectFile(knexStore, mobjectFilesStore),
 
   createMobjectTag: createMobjectTag(tagsStore),
   readAllMobjectTags: readAllMobjectTags(tagsStore),

@@ -1,4 +1,4 @@
-// import { readSql } from './support';
+import { readSql } from './support/index.js';
 
 const mobject = (id, path) => ({ id, path });
 const tag = (mobject_id, tag) => ({ mobject_id, tag });
@@ -28,6 +28,7 @@ export const up = (knex) =>
     .createTable('mobjects', (table) => {
       table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
       table.string('key').notNullable();
+      table.string('mimetype').notNullable();
       table.timestamps(true, true);
 
       table.unique(['key']);
@@ -39,9 +40,11 @@ export const up = (knex) =>
     .createTable('mobject_files', (table) => {
       table.uuid('mobject_id').notNullable();
       table.string('file_hash').notNullable();
+      table.timestamp('replaced_at');
 
-      table.foreign('mobject_id').references('mobjects.id');
+      table.foreign('mobject_id').references('mobjects.id').onDelete('CASCADE');
       table.foreign('file_hash').references('files.hash');
+      table.unique(['mobject_id', 'file_hash'], { predicate: knex.whereNull('replaced_at') });
     })
     .createTable('tags', (table) => {
       table.uuid('mobject_id').notNullable();
@@ -59,10 +62,12 @@ export const up = (knex) =>
 
       table.foreign('mobject_id').references('mobjects.id');
       table.unique(['mobject_id', 'attribute_name']);
-    });
+    })
+    .then(() => knex.raw(readSql('001/mobject-details.sql')));
 
 export const down = (knex) =>
   knex.schema
+    .dropViewIfExists('mobject_details')
     .dropTableIfExists('attributes')
     .dropTableIfExists('tags')
     .dropTableIfExists('mobject_files')
