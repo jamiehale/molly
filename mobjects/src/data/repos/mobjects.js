@@ -30,7 +30,13 @@ const createMobject = J.curry((mobjectStore, mobjectFileStore, key, hash) =>
     .then((mobject) => mobjectFileStore.create({ mobject_id: mobject.id, hash }).then(toMobject)),
 );
 
+const readAllMobjects = (mobjectDetailsStore) => () => mobjectDetailsStore.readAll({}).then(J.map(toMobjectDetails));
+
 const readMobject = J.curry((mobjectStore, id) => mobjectStore.readSingle({ id }).then(toMobject));
+
+const readMobjectDetails = J.curry((mobjectDetailsStore, id) =>
+  mobjectDetailsStore.readSingle({ id }).then(toMobjectDetails),
+);
 
 const readMobjectByKey = J.curry((mobjectDetailsStore, key) =>
   mobjectDetailsStore.readSingle({ key }).then(toMobjectDetails),
@@ -90,8 +96,6 @@ const updateOrCreateMobjectFile = J.curry((knexStore, mobjectFileStore, mobjectI
 const fromTag = J.transform({
   mobject_id: J.prop('mobjectId'),
   tag: J.prop('tag'),
-  createdAt: J.prop('created_at'),
-  updatedAt: J.prop('updated_at'),
 });
 
 const createMobjectTag = J.curry((tagsStore, mobjectId, tag) => tagsStore.create(fromTag({ mobjectId, tag })));
@@ -123,8 +127,10 @@ export const createMobjectsRepo = ({
   attributesStore,
 }) => ({
   createMobject: createMobject(mobjectsStore, mobjectFilesStore),
+  readAllMobjects: readAllMobjects(mobjectDetailsStore),
   readMobject: readMobject(mobjectsStore),
   readMobjectByKey: readMobjectByKey(mobjectDetailsStore),
+  readMobjectDetails: readMobjectDetails(mobjectDetailsStore),
   findOrCreateMobject: findOrCreateMobject(mobjectsStore),
   mobjectExistsByKey: mobjectExistsByKey(mobjectsStore),
   updateMobjectByKey: updateMobjectByKey(mobjectsStore),
