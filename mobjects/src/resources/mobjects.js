@@ -11,6 +11,8 @@ const patchTagsBody = () => V.isArray();
 
 const postTagBody = V.object({ tag: V.required() });
 
+const postAttributeBody = V.object({ name: V.required(), value: V.required() });
+
 const receiveFile = (req, tmpFilename) =>
   new Promise((resolve, reject) => {
     const output = fs.createWriteStream(tmpFilename);
@@ -195,6 +197,24 @@ const getMobjectAttributes = (mobjectsRepo) => (req, res, next) => {
     .catch(next);
 };
 
+const postMobjectAttribute = (mobjectsRepo) => (req, res, next) => {
+  const key = req.params[0];
+  mobjectsRepo
+    .readMobjectByKey(key)
+    .then((mobject) =>
+      postAttributeBody({
+        scope: '',
+        value: req.body,
+      }).then(({ name, value }) =>
+        mobjectsRepo.createMobjectAttribute(mobject.id, name, value).then(() => {
+          res.status(201);
+          res.send();
+        }),
+      ),
+    )
+    .catch(next);
+};
+
 export const mobjectRoutes = (config, { mobjectsRepo }) =>
   routes([
     (router) => {
@@ -217,6 +237,9 @@ export const mobjectRoutes = (config, { mobjectsRepo }) =>
     },
     (router) => {
       router.get('/o/(*)/-/attributes', getMobjectAttributes(mobjectsRepo));
+    },
+    (router) => {
+      router.post('/o/(*)/-/attributes', postMobjectAttribute(mobjectsRepo));
     },
     (router) => {
       router.get('/o/(*)', getMobject(config, mobjectsRepo));

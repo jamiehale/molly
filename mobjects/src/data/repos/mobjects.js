@@ -113,8 +113,18 @@ const toAttribute = J.transform({
   updatedAt: J.prop('updated_at'),
 });
 
+const fromAttribute = J.transform({
+  mobject_id: J.prop('mobjectId'),
+  attribute_name: J.prop('name'),
+  attribute_value: J.prop('value'),
+});
+
 const readAllMobjectAttributes = J.curry((attributesStore, mobjectId) =>
   attributesStore.readAll({ mobject_id: mobjectId }).then(J.map(toAttribute)),
+);
+
+const createMobjectAttribute = J.curry((attributesStore, mobjectId, name, value) =>
+  attributesStore.create(fromAttribute({ mobjectId, name, value })),
 );
 
 export const createMobjectsRepo = ({
@@ -145,6 +155,7 @@ export const createMobjectsRepo = ({
   readAllMobjectTags: readAllMobjectTags(tagsStore),
   deleteMobjectTag: deleteMobjectTag(tagsStore),
   readAllMobjectAttributes: readAllMobjectAttributes(attributesStore),
+  createMobjectAttribute: createMobjectAttribute(attributesStore),
   // readAllLocations: readAllResources(
   //   locationsStore,
   //   J.compose(J.filterEmptyProps, fromModel),
