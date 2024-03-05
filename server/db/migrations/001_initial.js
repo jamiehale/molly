@@ -181,32 +181,32 @@ export const up = (knex) =>
       table.foreign('collection_id').references('collections.id');
       table.foreign('creator_id').references('users.id');
     })
-    .createTable('artifact_people', (table) => {
-      table.uuid('artifact_id').notNullable();
+    .createTable('people_artifacts', (table) => {
       table.uuid('person_id').notNullable();
+      table.uuid('artifact_id').notNullable();
       table.string('role_id').notNullable();
       table.uuid('creator_id').notNullable();
 
-      table.foreign('artifact_id').references('artifacts.id');
       table.foreign('person_id').references('people.id');
+      table.foreign('artifact_id').references('artifacts.id');
       table.foreign('role_id').references('artifact_person_roles.id');
     })
-    .createTable('artifact_locations', (table) => {
-      table.uuid('artifact_id').notNullable();
+    .createTable('location_artifacts', (table) => {
       table.uuid('location_id').notNullable();
+      table.uuid('artifact_id').notNullable();
       table.string('type_id').notNullable();
       table.uuid('creator_id').notNullable();
 
-      table.foreign('artifact_id').references('artifacts.id');
       table.foreign('location_id').references('locations.id');
+      table.foreign('artifact_id').references('artifacts.id');
       table.foreign('type_id').references('artifact_location_types.id');
     })
-    .createTable('artifact_events', (table) => {
-      table.uuid('artifact_id').notNullable();
+    .createTable('event_artifacts', (table) => {
       table.uuid('event_id').notNullable();
+      table.uuid('artifact_id').notNullable();
 
-      table.foreign('artifact_id').references('artifacts.id');
       table.foreign('event_id').references('events.id');
+      table.foreign('artifact_id').references('artifacts.id');
     })
 
     // Assets
@@ -381,9 +381,9 @@ export const down = (knex) =>
     .dropTableIfExists('person_dates')
     .dropTableIfExists('assets')
     .dropTableIfExists('vaults')
-    .dropTableIfExists('artifact_events')
-    .dropTableIfExists('artifact_locations')
-    .dropTableIfExists('artifact_people')
+    .dropTableIfExists('event_artifacts')
+    .dropTableIfExists('location_artifacts')
+    .dropTableIfExists('people_artifacts')
     .dropTableIfExists('artifacts')
     .dropTableIfExists('collections')
     .dropTableIfExists('event_people')

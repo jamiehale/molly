@@ -4,114 +4,13 @@ import { Layout } from '../../Layout';
 import { Button } from '../../Button';
 import { CustomToggle } from '../../CustomToggle';
 import { useEvent } from '../../../hooks/event';
-import { useEventPeople } from '../../../hooks/event-people';
-import { useEventArtifacts } from '../../../hooks/event-artifacts';
 import { EditEvent } from './EditEvent';
 import { Event } from './Event';
 import { FlexColumn } from '../../FlexColumn';
 import { FlexRow } from '../../FlexRow';
-import { List, ListItem } from '../../List';
-import { ButtonToggle } from '../../ButtonToggle';
-import { NewEventPerson } from './NewEventPerson';
-import { PersonList } from '../../PersonList';
 import { Link } from '../../Router';
-
-const People = ({ eventId }) => {
-  const { eventPeople, loadEventPeople } = useEventPeople(eventId);
-
-  return (
-    <>
-      <Typography as="subtitle">People</Typography>
-      <PersonList
-        people={eventPeople}
-        displayFn={({ surname, givenNames, roleTitle }) =>
-          `${surname}, ${givenNames} (${roleTitle})`
-        }
-      />
-      <div>
-        <ButtonToggle
-          buttonText="Add Person"
-          renderOpen={(onClose) => (
-            <div>
-              <NewEventPerson
-                eventId={event.id}
-                onNew={() => {
-                  loadEventPeople().then(() => {
-                    onClose();
-                  });
-                }}
-                onCancel={onClose}
-              />
-            </div>
-          )}
-        />
-      </div>
-    </>
-  );
-};
-
-People.propTypes = {
-  eventId: PropTypes.string.isRequired,
-};
-
-const Artifacts = ({ eventId }) => {
-  const { eventArtifacts, loadEventArtifacts } = useEventArtifacts(eventId);
-
-  return (
-    <>
-      <Typography as="subtitle">Artifacts</Typography>
-      <PersonList
-        people={eventArtifacts}
-        displayFn={({ surname, givenNames, roleTitle }) =>
-          `${surname}, ${givenNames} (${roleTitle})`
-        }
-      />
-      <div>
-        <ButtonToggle
-          buttonText="Add Person"
-          renderOpen={(onClose) => (
-            <div>
-              <NewEventPerson
-                eventId={event.id}
-                onNew={() => {
-                  loadEventArtifacts().then(() => {
-                    onClose();
-                  });
-                }}
-                onCancel={onClose}
-              />
-            </div>
-          )}
-        />
-      </div>
-    </>
-  );
-};
-
-Artifacts.propTypes = {
-  eventId: PropTypes.string.isRequired,
-};
-
-export const EventPeople = ({ eventPeople }) => (
-  <List>
-    {eventPeople.map((eventPerson) => (
-      <ListItem key={eventPerson.id}>
-        <Typography>
-          {eventPerson.surname}, {eventPerson.givenNames}
-        </Typography>
-      </ListItem>
-    ))}
-  </List>
-);
-
-EventPeople.propTypes = {
-  eventPeople: PropTypes.arrayOf(
-    PropTypes.shape({
-      surname: PropTypes.string,
-      givenNames: PropTypes.string,
-    }),
-  ).isRequired,
-};
+import { People } from './People';
+import { Artifacts } from './Artifacts';
 
 export const EventPage = ({ params }) => {
   const { event, loadEvent } = useEvent(params.id);

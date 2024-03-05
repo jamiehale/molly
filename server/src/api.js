@@ -13,6 +13,7 @@ import { genderRoutes } from './resources/genders';
 import { personRoutes } from './resources/people';
 import { parentRoleRoutes } from './resources/parent-roles';
 import { eventPersonRoleRoutes } from './resources/event-person-roles';
+import { eventArtifactRoleRoutes } from './resources/event-artifact-roles';
 
 export const api = (repos) => {
   const router = express.Router();
@@ -23,6 +24,7 @@ export const api = (repos) => {
   router.use(authenticated(repos), artifactTypeRoutes(repos));
   router.use(authenticated(repos), assetRoutes(repos));
   router.use(authenticated(repos), collectionRoutes(repos));
+  router.use(authenticated(repos), eventArtifactRoleRoutes(repos));
   router.use(authenticated(repos), eventPersonRoleRoutes(repos));
   router.use(authenticated(repos), eventRoutes(repos));
   router.use(authenticated(repos), eventTypeRoutes(repos));

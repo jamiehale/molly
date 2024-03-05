@@ -92,6 +92,15 @@ const postEventPersonBody = (validPersonFn, validEventPersonRoleFn) =>
     ),
   });
 
+const postEventArtifactBody = (validArtifactFn) =>
+  V.object({
+    artifactId: V.and(
+      V.required(),
+      V.isNotNull(),
+      V.validResource(validArtifactFn),
+    ),
+  });
+
 export const eventRoutes = ({
   artifactsRepo,
   eventsRepo,
@@ -103,6 +112,14 @@ export const eventRoutes = ({
   locationsRepo,
 }) =>
   routes([
+    getAllChildResources(
+      '/events/:id/artifacts',
+      eventsRepo.eventExists,
+      ({ params }) =>
+        eventArtifactsRepo
+          .readAllEventArtifacts(params.id)
+          .then(J.map(toEventArtifactResult)),
+    ),
     getSingleResource('/events/:id', eventsRepo.eventExists, ({ params }) =>
       eventsRepo.readEvent(params.id).then(toDetailsResult),
     ),
@@ -163,12 +180,19 @@ export const eventRoutes = ({
           )
           .then(toEventPersonResult),
     ),
-    getAllChildResources(
+    postChildResource(
       '/events/:id/artifacts',
-      artifactsRepo.eventExists,
-      ({ params }) =>
+      eventsRepo.eventExists,
+      postEventArtifactBody(artifactsRepo.artifactExists),
+      ({ params, body }) =>
         eventArtifactsRepo
-          .readAllEventArtifacts(params.id)
-          .then(J.map(toEventArtifactResult)),
+          .createEventArtifact(
+            J.compose(
+              J.filterEmptyProps,
+              J.assoc('eventId', params.id),
+              J.pick(['artifactId']),
+            )(body),
+          )
+          .then(toEventArtifactResult),
     ),
   ]);

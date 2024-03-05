@@ -12,19 +12,15 @@ import { toInternalError } from '../../error';
 const fromModel = J.transform({
   event_id: J.prop('eventId'),
   artifact_id: J.prop('artifactId'),
-  role_id: J.prop('roleId'),
 });
 
 const toModel = J.transform({
   eventId: J.prop('event_id'),
   artifactId: J.prop('artifact_id'),
-  roleId: J.prop('role_id'),
 });
 
 const toDetailsModel = J.transform({
   eventId: J.prop('event_id'),
-  roleId: J.prop('role_id'),
-  roleTitle: J.prop('role_title'),
   id: J.prop('id'),
   title: J.prop('title'),
   description: J.prop('description'),
